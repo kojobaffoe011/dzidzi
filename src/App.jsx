@@ -9,6 +9,10 @@ import PageNotFound from "./pages/404Page/PageNotFound";
 import LoginOutlet from "./pages/auth/LoginOutlet";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterInfo from "./pages/auth/signup/RegisterInfo";
+import DetailsMain from "./components/reusableComponents/DetailsScreen";
+import RestaurantMenu from "./pages/main/orderpages/RestaurantMenu";
+import OrderPagesLayout from "./pages/main/OrderPagesLayout";
+import ReviewOrder from "./pages/main/orderpages/ReviewOrder";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +30,16 @@ const App = () => {
                 {/* <Route path="otp/:phone" element={<ForgotOTP />} /> */}
                 {/* <Route path="newpassword/:phone" element={<NewPassword />} /> */}
               </Route>
+              <Route path="/details" exact element={<OrderPagesLayout />}>
+                <Route path="" exact element={<DetailsMain />}></Route>
+                <Route
+                  path="revieworder"
+                  exact
+                  element={<ReviewOrder />}
+                ></Route>
+                <Route path="menu" exact element={<RestaurantMenu />}></Route>
+              </Route>
+
               {/* <Route path="/login" element={<LoginOutlet />}>
                 <Route path="" element={<Login />} />
                 <Route path="forgot" element={<Forgotpassword />} />

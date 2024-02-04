@@ -13,10 +13,12 @@ import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
 
-const Form = () => {
+const Form = ({ userType }) => {
   const [showPass, setShowPass] = useState(false);
   const { setAuth } = useAuth();
   const { mutationFn } = useLogin();
+
+  console.log(userType);
 
   const handleTogglePass = () => {
     setShowPass(!showPass);
@@ -30,6 +32,11 @@ const Form = () => {
       .email("Please enter a valid email")
       .required("Email is required"),
   });
+  const AltSchema = yup.object().shape({
+    password: yup.string().required("Password is required"),
+
+    username: yup.string().required("Username is required"),
+  });
 
   const {
     register,
@@ -37,7 +44,7 @@ const Form = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(LoginSchema),
+    resolver: yupResolver(userType === "Customer" ? AltSchema : LoginSchema),
   });
 
   const navigate = useNavigate();
@@ -91,34 +98,56 @@ const Form = () => {
 
   const formSubmitHandler = (data) => {
     if (Object.keys(errors).length === 0) {
-      mutate({
-        email: data.email,
-        password: data.password,
-      });
+      // mutate({
+      //   email: data.email,
+      //   password: data.password,
+      // });
+      navigateTo("/details");
     }
   };
 
   return (
-    <div className="mt-[50px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">
+    <div className="mt-[10px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">
       <div className="flex flex-col">
         <form onSubmit={handleSubmit(formSubmitHandler)}>
-          <div className="relative">
-            <label>
-              <p className="mb-2 text-gray-600 text-sm">EMAIL ADDRESS</p>
-            </label>
-            <input
-              {...register("email")}
-              name="email"
-              className="rounded-lg border border-gray-600  w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-500"
-            />
-            {errors.email ? (
-              <span className="text-red-600 text-sm mt-3">
-                {errors.email.message}
-              </span>
-            ) : (
-              ""
-            )}
-          </div>
+          {userType === "Customer" ? (
+            <div className="relative">
+              <label>
+                <p className="mb-2 text-gray-600 text-sm">USERNAME</p>
+              </label>
+              <input
+                {...register("username")}
+                name="username"
+                className="rounded-lg border border-gray-600  w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-500"
+              />
+              {errors.username ? (
+                <span className="text-red-600 text-sm mt-3">
+                  {errors.username.message}
+                </span>
+              ) : (
+                ""
+              )}
+            </div>
+          ) : (
+            <div className="relative">
+              <label>
+                <p className="mb-2 text-gray-600 text-sm">EMAIL ADDRESS</p>
+              </label>
+              <input
+                {...register("email")}
+                name="email"
+                className="rounded-lg border border-gray-600  w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-500"
+              />
+              {errors.email ? (
+                <span className="text-red-600 text-sm mt-3">
+                  {errors.email.message}
+                </span>
+              ) : (
+                ""
+              )}
+            </div>
+          )}
+
           <div className="relative mt-5">
             <label>
               <p className="mb-2 text-gray-600 text-sm">PASSWORD</p>
@@ -172,16 +201,39 @@ const Form = () => {
   );
 };
 
+const usersTypes = ["Customer", "Rider", "Restaurant"];
+
 const LoginPage = () => {
+  const [userType, setUserType] = useState("Customer");
+
   return (
     <div className="w-full">
-      <div className="flex-col mb-16">
+      <div className="flex-col mb-2">
         <p className="font-bold text-2xl text-center">Welcome Back!</p>
         <p className="font-light text-sm text-center">
-          We are happy to see you again!
+          Select user type and login!
         </p>
+        <div className="mt-4 flex items-center justify-center p-3 gap-4 ">
+          {usersTypes.map((item, idx) => {
+            return (
+              <div
+                className={`${
+                  userType === item
+                    ? "border-red-500 border-2 text-red-500"
+                    : "border-gray-400 hover:text-red-400 hover:border-red-500 text-gray-400"
+                } font-bold rounded px-4 py-1 cursor-pointer border hover:border-red-500 `}
+                key={idx}
+                onClick={() => {
+                  setUserType(item);
+                }}
+              >
+                <p>{item}</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <Form />
+      <Form userType={userType} />
     </div>
   );
 };

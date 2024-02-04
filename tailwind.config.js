@@ -20,6 +20,8 @@ module.exports = {
       backgroundImage: {
         "hero-bg": "url('/src/assets/landingpage/bg.jpg')",
         "login-bg": "url('/src/assets/landingpage/bg-1.jpg')",
+        "rest-bg": "url('/src/assets/landingpage/defaultrest.jpeg')",
+        "promo-bg": "url('/src/assets/landingpage/promo.jpeg')",
         // "footer-texture": "url('/img/footer-texture.png')",
       },
       fontFamily: {
