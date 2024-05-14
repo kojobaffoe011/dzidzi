@@ -1,6 +1,6 @@
 // LOCAL
-export const BASE_URL = "http://localhost:1267/api";
-export const NO_AUTH_URL = "http://localhost:1267";
+export const BASE_URL = "https://dzidzi-repo.onrender.com";
+export const NO_AUTH_URL = "https://dzidzi-repo.onrender.com";
 
 //tailwind classes for responsiveness of form inputs
 export const resp =

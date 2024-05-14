@@ -78,13 +78,15 @@ axios.interceptors.request.use(
 );
 
 // Function to make a POST request
-export const post = (route, payload) =>
+export const post = (route, payload) => {
   new Promise((resolve, reject) => {
     axios
       .post(route, payload)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
   });
+  console.log("exceuting post");
+};
 
 // Function to make a PUT request
 export const put = (route, payload) =>

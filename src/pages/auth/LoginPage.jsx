@@ -7,18 +7,17 @@ import { useNavigate } from "react-router";
 import Spinner from "../../components/loaders/Spinner";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { useLogin } from "../../components/brokers/students";
+import { useGetUsers, useLogin } from "../../components/brokers/apicalls";
 import { useMutation } from "react-query";
 import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
+import axios from "axios";
 
-const Form = ({ userType }) => {
+const Form = ({ userType, error, setError }) => {
   const [showPass, setShowPass] = useState(false);
   const { setAuth } = useAuth();
-  const { mutationFn } = useLogin();
-
-  console.log(userType);
+  // const { mutationFn } = useLogin();
 
   const handleTogglePass = () => {
     setShowPass(!showPass);
@@ -52,42 +51,33 @@ const Form = ({ userType }) => {
     navigate(url);
   };
 
+  const mutationFn = (data) => {
+    return axios.post(
+      `https://dzidzi-repo.onrender.com/system/auth/login`,
+      data,
+      {
+        headers: {
+          Authorization: null,
+        },
+      }
+    );
+  };
+
   const { mutate, isLoading: cardLoading } = useMutation(mutationFn, {
     onSuccess: (data) => {
       const response = data?.data;
-      setAuth({
-        token: response.token,
-        id: response.id,
-        email: response.email,
-        student_id: response.student_id,
-        user_type: response.user_type,
-        name: response.name,
-        phone: response.phone,
-        gender: response.gender,
-        campus: response.campus,
-        nationality: response.nationality,
-      });
-      localStorage.setItem(
-        "ghlstud",
-        JSON.stringify({
-          id: response.id,
-          email: response.email,
-          student_id: response.student_id,
-          name: response.name,
-          phone: response.phone,
-          gender: response.gender,
-          campus: response.campus,
-          nationality: response.nationality,
-        })
-      );
+      setAuth(data);
+      localStorage.setItem("dzidzi", JSON.stringify({}));
       setLoginTimestamp();
-      cookie.setCipher(response?.token);
+      cookie.setCipher(response?.access_token);
 
       showSuccessToast("Logged in Successfully");
-      navigateTo("/dashboard");
+      console.log({ success: data });
+      navigateTo("/details");
     },
     onError: (data) => {
-      showErrorToast(data?.response?.data?.error);
+      setError(true);
+      showErrorToast(data.response.data?.message || "An error occured");
     },
   });
 
@@ -98,11 +88,10 @@ const Form = ({ userType }) => {
 
   const formSubmitHandler = (data) => {
     if (Object.keys(errors).length === 0) {
-      // mutate({
-      //   email: data.email,
-      //   password: data.password,
-      // });
-      navigateTo("/details");
+      mutate({
+        username: userType === "Customer" ? data.username : data.email,
+        password: data.password,
+      });
     }
   };
 
@@ -205,6 +194,9 @@ const usersTypes = ["Customer", "Rider", "Restaurant"];
 
 const LoginPage = () => {
   const [userType, setUserType] = useState("Customer");
+  const [error, setError] = useState(false);
+
+  console.log(error);
 
   return (
     <div className="w-full">
@@ -233,7 +225,7 @@ const LoginPage = () => {
           })}
         </div>
       </div>
-      <Form userType={userType} />
+      <Form userType={userType} error={error} setError={setError} />
     </div>
   );
 };

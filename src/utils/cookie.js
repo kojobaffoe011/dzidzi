@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
 // Define the cookie name used for the project cipher
-const projectCipher = "ghl-student-app-chipher";
+const projectCipher = "dzidzi-chipher";
 
 class Auth {
   /**

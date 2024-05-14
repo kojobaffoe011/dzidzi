@@ -50,26 +50,6 @@ const queryOptions = {
 };
 
 //GET REQUESTS
-export const usePersonalBio = () => {
-  const queryKey = ["pers"];
-
-  const queryFn = () => {
-    return get(`/getstudentdetails`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
 
 export const useMyShortStayRequests = (status) => {
   const queryKey = ["stayrequests", status];
@@ -685,20 +665,183 @@ export const useUploadLetter = () => {
   return { letterMutationFn };
 };
 
+//Authentications Get token to authorize all requests
+
 export const useLogin = () => {
   const mutationFn = (data) => {
-    return axios.post(`${NO_AUTH_URL}/auth/login`, data);
+    return axios.post(`${NO_AUTH_URL}/system/auth/login`, data, {
+      headers: {
+        Authorization: null,
+      },
+    });
   };
 
   return { mutationFn };
 };
 
-export const useInitiatePayment = () => {
-  const addInitiateMutation = (data) => {
-    return post(`/initiatepayment`, data);
+export const useLogout = () => {
+  const mutationFn = (data) => {
+    return axios.post(`${NO_AUTH_URL}/system/auth/logout`, data, {
+      headers: null,
+    });
   };
 
-  return { addInitiateMutation };
+  return { mutationFn };
+};
+
+export const useAltLogin = () => {
+  const mutationFn = (data) => {
+    return axios.post(`${NO_AUTH_URL}/auth/login`, data, {
+      headers: {
+        Authorization: null,
+      },
+    });
+  };
+
+  return { mutationFn };
+};
+
+export const useSecured = () => {
+  const queryKey = ["usesecured"];
+
+  const queryFn = () => {
+    return get(`/secured`);
+  };
+
+  const select = (response) => {
+    console.log(response);
+    response?.data?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//users requests
+
+export const useGetUsers = () => {
+  const queryKey = ["getusers"];
+
+  const queryFn = () => {
+    return get(`/users`);
+  };
+
+  const select = (response) => {
+    console.log(response);
+    response?.data?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetUsersByFilters = (
+  firstname,
+  lastname,
+  activated,
+  email,
+  username
+) => {
+  const queryKey = [
+    "findusers",
+    firstname,
+    lastname,
+    activated,
+    email,
+    username,
+  ];
+
+  const queryFn = () => {
+    return get(
+      `/users/filter?firstname=${firstname}&lastname=${lastname}&activated=${lastname}&email=${email}&username=${username}`
+    );
+  };
+
+  const select = (response) => {
+    console.log(response);
+    response?.data?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+// export const useGetUsersByID = (id) => {
+//   const queryKey = ["findusers", id];
+
+//   const queryFn = () => {
+//     return get(`/users/${id}`);
+//   };
+
+//   const select = (response) => {
+//     console.log(response);
+//     response?.data?.data;
+//   };
+
+//   const enabled = Boolean(id);
+
+//   return useQuery({
+//     queryKey,
+//     queryFn,
+//     select,
+//     enabled,
+//     refetch0nWindowFocus: false,
+//     refetchOnmount: false,
+//     refetch0nReconnect: false,
+//     retry: false,
+//     staleTime: 0,
+//   });
+// };
+
+export const useGetUsersByID = (id) => {
+  const queryKey = ["findusers", id];
+
+  const queryFn = () => {
+    return get(`/users/${id}`);
+  };
+
+  const select = (response) => {
+    console.log(response);
+    response?.data?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
 };
 
 export const usePaylater = () => {

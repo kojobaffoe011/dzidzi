@@ -9,6 +9,11 @@ import { HiOutlineMail } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router";
 import { GiHamburger } from "react-icons/gi";
+import { useLogout } from "../brokers/apicalls";
+import cookie from "../../utils/cookie";
+import { showErrorToast, showSuccessToast } from "../../toast/Toast";
+import { useMutation } from "react-query";
+import Spinner from "../loaders/Spinner";
 
 const links = [
   {
@@ -52,50 +57,30 @@ const media = [
 
 const Header = () => {
   const { pathname } = useLocation();
+  const { mutationFn } = useLogout();
+
+  const { mutate, isLoading: cardLoading } = useMutation(mutationFn, {
+    onSuccess: (data) => {
+      setAuth({});
+
+      showSuccessToast("Logged in Successfully");
+      console.log({ success: data });
+      navigateTo("/");
+    },
+    onError: (data) => {
+      showErrorToast(data.response.data?.message || "An error occured");
+      console.log({ error: data });
+    },
+  });
+
+  const handleLogout = () => {
+    cookie.clearCipher();
+    localStorage.removeItem("dzidzi");
+    localStorage.removeItem("loginTime");
+    return mutate();
+  };
+
   return (
-    // <div className="p-24 flex flex-col">
-    //   <div className="flex justify-around gap-12 items-center p-4 px-16">
-    //     {links.map((item, idx) => {
-    //       return (
-    //         <div key={idx}>
-    //           <p className="font-bold text-sm cursor-pointer">{item.title}</p>
-    //         </div>
-    //       );
-    //     })}
-    //   </div>
-
-    //   <div className="border border-gray-300 my-8" />
-
-    //   <div className="flex  flex-col gap-3">
-    //     <div className="flex justify-between items-center">
-    //       <p className="text-gray-900 font-logo font-extrabold text-3xl">
-    //         dzidzi
-    //       </p>
-    //       <div className="flex justify-end gap-3 items-center">
-    //         {media.map((item, idx) => {
-    //           return (
-    //             <div key={idx}>
-    //               <p className="font-bold text-sm">{item}</p>
-    //             </div>
-    //           );
-    //         })}
-    //       </div>
-    //     </div>
-    //     <div className="flex justify-between items-center">
-    //       <div>
-    //         <p className="font-bold text-gray-500 text-xs">
-    //           © COPYRIGHT 2023 | ALL RIGHTS RESERVED
-    //         </p>
-    //       </div>
-    //       <div className="flex gap-2 items-center">
-    //         <HiOutlineMail size="20px" />
-    //         <p className="font-bold text-gray-500 text-xs">
-    //           DZIDZIFOODDELIVERY@DZIDZI.COM
-    //         </p>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
     <div className=" px-24">
       <div className="flex justify-between items-center">
         <Link to={pathname == "/details" ? "" : -1}>
@@ -108,8 +93,17 @@ const Header = () => {
         <div className="flex items-center gap-2">
           {" "}
           <Link to="/">
-            <button className="rounded-full bg-white px-6 py-2 border border-gray-900">
-              <p className="font-bold font-gray-500 ">Logout</p>
+            <button
+              className="rounded-full bg-white px-6 py-2 border border-gray-900"
+              onClick={handleLogout}
+            >
+              <div className="flex items-center justify-center">
+                {cardLoading ? (
+                  <Spinner />
+                ) : (
+                  <p className="font-bold font-gray-500 ">Logout</p>
+                )}
+              </div>
             </button>
           </Link>
         </div>

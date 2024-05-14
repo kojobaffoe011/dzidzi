@@ -8,7 +8,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import {
   useRegister,
   useRegisterOrganization,
-} from "../../../components/brokers/students";
+} from "../../../components/brokers/apicalls";
 import { useMutation } from "react-query";
 import * as yup from "yup";
 import Spinner from "../../../components/loaders/Spinner";
