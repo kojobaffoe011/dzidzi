@@ -1,75 +1,66 @@
 import React from "react";
-import {
-  filters,
-  products,
-} from "../../../components/reusableComponents/DetailsScreen";
 
 import { FaMedal } from "react-icons/fa6";
 import { AiFillStar, AiOutlineHeart } from "react-icons/ai";
-import { BsThreeDots } from "react-icons/bs";
-import RestaurantCard from "../../../components/reusableComponents/restaurantCard";
-import MenuDetails from "../../../components/reusableComponents/menuDetails";
+import { BsArrowLeft, BsArrowRight, BsThreeDots } from "react-icons/bs";
+import RestaurantDescription from "../../../components/reusableComponents/RestaurantDescription";
+import ViewRestaurantsPage from "../../admin/ViewRestaurantsPage";
 
-function RestaurantImage() {
+const MostLikedItems = () => {
+  const numberOfImages = 10;
+  const width = numberOfImages * 250;
+  const maxWidth = `${"w-" + "[" + width + "px" + "]"}`;
   return (
-    <div className="bg-hero-bg bg-cover h-[20vh] relative">
-      <div className="absolute flex gap-2 right-8 top-8">
-        {" "}
-        <button className="p-3 bg-white rounded-full">
-          {" "}
-          <AiOutlineHeart size={"40px"} />{" "}
-        </button>
-        <button className="p-3 bg-white rounded-full">
-          {" "}
-          <BsThreeDots size={"40px"} />{" "}
-        </button>
+    <div className="flex flex-col">
+      <div className="flex justify-between">
+        <p className="font-bold text-lg">Featured Items</p>
+        <div className="flex justify-between items-center gap-4">
+          <BsArrowLeft className="text-xl cursor-pointer" />
+          <BsArrowRight className="text-xl cursor-pointer" />
+        </div>
+      </div>
+      <div className="overflow-hidden overflow-x-scroll">
+        <div
+          className={`flex gap-2 overflow-x-scroll ${maxWidth} overflow-scroll cursor-pointer`}
+        >
+          {Array(numberOfImages)
+            .fill("")
+            .map((item, idx) => {
+              return (
+                <div
+                  className="h-[250px] w-[250px] bg-green-300"
+                  key={idx}
+                ></div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );
-}
+};
 
-function RestaurantIntro() {
+const filters = ["Promotion", "Bucket", "Favorites", "Rice"];
+
+const MenuList = () => {
   return (
-    <div className="flex flex-col  gap-2 p-4">
-      {" "}
-      <div>
-        {" "}
-        <p className="text-4xl font-extrabold"> Koo Eatery</p>
-      </div>
-      <div className=" flex items-center  ">
-        <div>
-          {" "}
-          <FaMedal className="mr-2" size={"30px"} />{" "}
-        </div>
-        <div className="flex flex-col  ">
-          {" "}
-          <div className="flex items-center">
-            {" "}
-            <AiFillStar className="mr-1" />
-            <p>4.9 (Ratings(y)) • Category • $ • more info</p>
-          </div>
-          <div>
-            {" "}
-            <p className="text-xs text-slate-500">Open till 9:00 PM</p>{" "}
-          </div>
-        </div>
-      </div>
-      <div></div>
+    <div className="border border-red-400 mt-6 grid grid-cols-2 gap-4">
+      {Array(5)
+        .fill({
+          name: "Chili Cheese Zinger Burger",
+          price: "€8.49",
+          text: "Spicy & cheesy - eine himmlische Kombination aus Chili Cheese uns unserem Zinger. Knusprig-scharfes Chicken mit Chili Cheese Sauce, knackigem Salat, Jalapenos und einer Scheibe Cheese, serviert in einem Brioche Bun.",
+        })
+        .map((item, idx) => {
+          return <div className="border border-blue-200">a</div>;
+        })}
     </div>
   );
-}
+};
 
 function RestaurantMenu() {
   return (
     <div>
-      <RestaurantImage />
-      <RestaurantIntro />
-      <MenuDetails filters={filters}>
-        {" "}
-        <RestaurantCard title="Popular Near Me" data={products} />
-        <RestaurantCard title="New Entries" data={products} />
-        <RestaurantCard title="First of many" data={products} />
-      </MenuDetails>
+      <ViewRestaurantsPage />
     </div>
   );
 }

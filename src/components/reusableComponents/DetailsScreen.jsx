@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { BiChevronDown } from "react-icons/bi";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { GiPizzaSlice } from "react-icons/gi";
 import RestaurantCard from "./restaurantCard";
 import MenuDetails from "./menuDetails";
+import { useRestaurantList } from "../brokers/apicalls";
 
 export const filters = [
   "Sort",
@@ -68,66 +69,66 @@ const promodata = [
 
 const categories = [
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
   {
-    icon: <GiPizzaSlice size={"50px"} />,
+    icon: <GiPizzaSlice size={"40px"} />,
     text: "pizza ",
   },
 ];
 
 function Categories() {
   return (
-    <div className="flex justify-center gap-8 p-8">
+    <div className="flex justify-center gap-8 overflow-x-scroll px-12">
       {categories.map((item, idx) => {
         return (
           <div className="flex flex-col items-center">
@@ -145,12 +146,12 @@ function Categories() {
 
 function Promo() {
   return (
-    <div className="grid grid-cols-3 p-16 gap-6">
+    <div className="grid grid-cols-3 py-4 gap-6">
       {promodata?.map((item, idx) => {
         return (
-          <div className="">
+          <div className="cursor-pointer">
             <div className="flex flex-col w-full gap-2">
-              <div className="h-[230px] rounded-xl bg-promo-bg bg-cover bg-no-repeat relative">
+              <div className="h-[160px] rounded-xl bg-promo-bg bg-cover bg-no-repeat relative">
                 {" "}
                 <div className="bg-black opacity-[0.75] flex justify-between h-full flex-col p-4 rounded-xl ">
                   {/* <div className=" flex justify-between h-full flex-col  "> */}
@@ -180,28 +181,61 @@ function Promo() {
 }
 
 function DetailsMain() {
+  const [name, setName] = useState(null);
+  const [rating, setRating] = useState(null);
+  const {
+    data: restaurantsList = [],
+    isLoading: restaurantsLoading,
+    hasNextPage: restaurantsHasNextPage,
+    fetchNextPage: restaurantsFetchNextPage,
+    isFetchingNextPage: restaurantsFetchingNextPage,
+    isError: isUsersError,
+  } = useRestaurantList(name, rating);
+
+  let pages = restaurantsList?.pages?.flatMap((page) => page?.results);
+
+  if (restaurantsLoading) {
+    return (
+      <div className="p-16 flex items-center justify-center h-screen flex-col">
+        <>
+          <p className="font-logo font-extrabold text-6xl animate-bounce">
+            dzidzi
+          </p>
+          <p className="animate-bounce text-sm text-gray-400">
+            Where food lives
+          </p>
+        </>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <Categories />
       <Promo />
-      {/* <DetailsScreen /> */}
       <MenuDetails isRestaurantPage={true} filters={filters}>
         {" "}
         <RestaurantCard
           showDelivery={true}
           title="Popular Near Me"
-          data={products}
+          data={pages}
         />
-        <RestaurantCard
-          showDelivery={true}
-          title="New Entries"
-          data={products}
-        />
-        <RestaurantCard
-          showDelivery={true}
-          title="First of many"
-          data={products}
-        />
+        {restaurantsHasNextPage && (
+          <div className="flex justify-center my-4">
+            <button
+              className="border border-gray-500 px-8 py-2 bg-gray-100 font-bold rounded hover:bg-gray-200"
+              onClick={() => {
+                restaurantsFetchNextPage();
+              }}
+            >
+              {restaurantsFetchingNextPage ? (
+                <Spinner color="blue" size="20px" />
+              ) : (
+                <p className="text-xs">Load more</p>
+              )}
+            </button>
+          </div>
+        )}
       </MenuDetails>
     </div>
   );

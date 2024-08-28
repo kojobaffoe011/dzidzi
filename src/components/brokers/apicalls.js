@@ -39,7 +39,7 @@
 import axios from "axios";
 import { useInfiniteQuery, useQuery } from "react-query";
 import { NO_AUTH_URL } from "../../utils/config";
-import { get, post, put } from "../../utils/transport";
+import { delete_request, get, post, put } from "../../utils/transport";
 
 const queryOptions = {
   refetch0nWindowFocus: false,
@@ -50,619 +50,549 @@ const queryOptions = {
 };
 
 //GET REQUESTS
+//get active user
+export const useGetActiveUser = () => {
+  const queryKey = ["activeUser"];
 
-export const useMyShortStayRequests = (status) => {
-  const queryKey = ["stayrequests", status];
+  let url = `/active-user`;
 
-  let url = `/stayrequests`;
+  const queryFn = () => {
+    return get(url);
+  };
 
-  if (status) {
-    url = `/stayrequests?status=${status}`;
+  const select = (response) => {
+    return response?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//get all users
+
+const fetchUsers = async ({ pageParam = null, queryKey }) => {
+  const [firstName, lastName] = queryKey;
+  const limit = 20; // Adjust the limit if necessary
+  let url = `/paged-users?limit=${limit}`;
+
+  if (pageParam) {
+    url += `&cursor=${encodeURIComponent(pageParam)}`;
+  }
+  if (firstName) {
+    url += `&firstName=${encodeURIComponent(firstName)}`;
+  }
+  if (lastName) {
+    url += `&lastName=${encodeURIComponent(lastName)}`;
+  }
+
+  const response = await axios.get(url);
+  return response.data;
+};
+
+export const useUserList = (firstName, lastName) => {
+  const queryKey = [firstName, lastName, "userList"];
+
+  // Determine the next page param
+  const getNextPageParam = (lastPage) =>
+    lastPage.hasNextPage ? lastPage.lastCursor : undefined;
+
+  // Configure options for the useInfiniteQuery hook
+  const options = {
+    getNextPageParam,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  };
+
+  // Use the useInfiniteQuery hook to manage the paginated query
+  return useInfiniteQuery(queryKey, fetchUsers, options);
+};
+
+/// Function to fetch paged restaurants
+const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
+  const [, name, rating] = queryKey;
+  const limit = 20; // Adjust the limit if necessary
+  let url = `/paged-restaurants?limit=${limit}`;
+
+  if (pageParam) {
+    url += `&cursor=${encodeURIComponent(pageParam)}`;
+  }
+  if (name) {
+    url += `&name=${encodeURIComponent(name)}`;
+  }
+  if (rating) {
+    url += `&rating=${encodeURIComponent(rating)}`;
+  }
+
+  const response = await axios.get(url);
+  return response.data;
+};
+
+export const useRestaurantList = (name, rating) => {
+  const queryKey = ["restaurantList", name, rating];
+
+  // Determine the next page param
+  const getNextPageParam = (lastPage) =>
+    lastPage.hasNextPage ? lastPage.lastCursor : undefined;
+
+  // Configure options for the useInfiniteQuery hook
+  const options = {
+    getNextPageParam,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  };
+
+  // Use the useInfiniteQuery hook to manage the paginated query
+  return useInfiniteQuery(queryKey, fetchRestaurants, options);
+};
+
+export const useGetSingleRestaurant = (id) => {
+  const queryKey = ["restaurant", id];
+
+  const url = `/restaurant/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+export const useGetSingleMenu = (id) => {
+  const queryKey = ["singlemenu", id];
+
+  const url = `/restaurant/menu/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetSingleUser = (id) => {
+  const queryKey = ["singleuser", id];
+
+  const url = `/user/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetSingleService = (id) => {
+  const queryKey = ["singleservice", id];
+
+  const url = `/service/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetSingleCourier = (id) => {
+  const queryKey = ["singlecourier", id];
+
+  const url = `/courier/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+const fetchMenus = async ({ queryKey, pageParam = {} }) => {
+  const [_key, restaurantID, category, rating, minPrice, maxPrice, name] =
+    queryKey;
+
+  const cursor = pageParam.cursor || null;
+  const direction = pageParam.direction || "FORWARD";
+  const limit = 5; // Adjust the limit if necessary
+  let url = `/paged-menus?limit=${limit}`;
+
+  if (name) {
+    url += `&name=${encodeURIComponent(name)}`;
+  }
+  if (rating) {
+    url += `&rating=${encodeURIComponent(rating)}`;
+  }
+  if (category) {
+    url += `&category=${encodeURIComponent(category)}`;
+  }
+  if (minPrice) {
+    url += `&minimumPrice=${encodeURIComponent(minPrice)}`;
+  }
+  if (maxPrice) {
+    url += `&maximumPrice=${encodeURIComponent(maxPrice)}`;
+  }
+  if (cursor) {
+    url += `&cursor=${encodeURIComponent(cursor)}`;
+  }
+  if (direction) {
+    url += `&direction=${encodeURIComponent(direction)}`;
+  }
+  if (restaurantID) {
+    url += `&restaurantId=${encodeURIComponent(restaurantID)}`;
+  }
+
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Fetching menus failed:", error);
+    throw error;
+  }
+};
+
+export const useMenuListAlt = (
+  name,
+  category,
+  rating,
+  minPrice,
+  maxPrice,
+  restaurantID,
+  cursor,
+  direction
+) => {
+  const queryKey = [
+    "menualt",
+    name,
+    category,
+    rating,
+    minPrice,
+    maxPrice,
+    restaurantID,
+    cursor,
+    direction,
+  ];
+
+  const limit = 5; // Adjust the limit if necessary
+  let url = `/paged-menus?limit=${limit}`;
+
+  if (name) {
+    url += `&name=${encodeURIComponent(name)}`;
+  }
+  if (rating) {
+    url += `&rating=${encodeURIComponent(rating)}`;
+  }
+  if (category) {
+    url += `&category=${encodeURIComponent(category)}`;
+  }
+  if (minPrice) {
+    url += `&minimumPrice=${encodeURIComponent(minPrice)}`;
+  }
+  if (maxPrice) {
+    url += `&maximumPrice=${encodeURIComponent(maxPrice)}`;
+  }
+  if (cursor) {
+    url += `&cursor=${encodeURIComponent(cursor)}`;
+  }
+  if (direction) {
+    url += `&direction=${encodeURIComponent(direction)}`;
+  }
+  if (restaurantID) {
+    url += `&restaurantId=${encodeURIComponent(restaurantID)}`;
   }
 
   const queryFn = () => {
     return get(url);
   };
 
-  const select = (response) => response?.data?.data;
-
-  // const enabled = Boolean(status);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    // enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const useGetStayCounts = () => {
-  const queryKey = ["staycounts"];
-
-  let url = `/staycounts`;
-
-  const queryFn = () => {
-    return get(url);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  // const enabled = Boolean(status);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    // enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const useSingleStayRequest = (id) => {
-  const queryKey = ["stayrequests", id];
-
-  const url = `/singlestayrequest?id=${id}`;
-
-  const queryFn = () => {
-    return get(url);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  const enabled = Boolean(id);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const useSingleStayRequestForPayment = (id) => {
-  const queryKey = ["stayrequestsforpayment", id];
-
-  const url = `/singlestayrequestforpayment?id=${id}`;
-
-  const queryFn = () => {
-    return get(url);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  const enabled = Boolean(id);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const useGetCampus = () => {
-  const queryKey = ["campuses"];
-
-  const queryFn = () => {
-    return axios.get(`${NO_AUTH_URL}/auth/campuses`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetSingleCampus = (campus) => {
-  const queryKey = ["campus", campus];
-
-  const queryFn = () => {
-    return axios.get(
-      `${NO_AUTH_URL}/auth/campus/${encodeURIComponent(campus)}`
-    );
-  };
-
-  const enabled = Boolean(campus);
-
   const select = (response) => {
-    return response?.data?.data;
+    return response?.data;
   };
+
+  const enabled = Boolean(cursor, direction);
 
   return useQuery({
     queryKey,
     queryFn,
     select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useGetMyRefunds = () => {
-  const queryKey = ["refunds"];
-
-  const queryFn = () => {
-    return get(`/getmyrefunds`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetCancellationBalance = () => {
-  const queryKey = ["balance-cancellation"];
-
-  const queryFn = () => {
-    return get(`/cancellationbalance`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetMySwaps = () => {
-  const queryKey = ["swaps"];
-
-  const queryFn = () => {
-    return get(`/getmyswaps`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetMyCancellation = () => {
-  const queryKey = ["cancellations"];
-
-  const queryFn = () => {
-    return get(`/getmycancellations`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetHostelBlocks = () => {
-  const queryKey = ["hostelblocks"];
-
-  const queryFn = () => {
-    return get(`/gethostelblocks`);
-  };
-
-  const select = (response) => response?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useGetBlocks = (gender) => {
-  const queryKey = ["hostelblocks", gender];
-
-  const queryFn = () => {
-    return get(`/blocks/${gender}`);
-  };
-
-  const enabled = Boolean(gender);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useGetRoomsByBlocks = (gender, block) => {
-  const queryKey = ["roomblock", gender, block];
-
-  const queryFn = () => {
-    return get(`/rooms/${gender}/${block}`);
-  };
-
-  const enabled = Boolean(gender, block);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useGetRoomsByBlockAndRoomType = (gender, block, type, roomID) => {
-  const queryKey = ["roomblocktype", gender, block, type, roomID];
-
-  const queryFn = () => {
-    return get(`/getroombyblocktype/${block}/${type}/${gender}/${roomID}`);
-  };
-
-  const enabled = Boolean(gender, block, type, roomID);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useGetStudentByRoom = (room, gender) => {
-  const queryKey = ["studentbyroom", room, gender];
-
-  const queryFn = () => {
-    return get(`/getstudentbyroom/${room}/${gender}`);
-  };
-
-  const enabled = Boolean(room, gender);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useRoomTypes = () => {
-  const queryKey = ["roomtype"];
-
-  const queryFn = () => {
-    return get(`/getroomtypes`);
-  };
-
-  const select = (response) => response?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    ...queryOptions,
-  });
-};
-
-export const useAvailableBeds = (id) => {
-  const queryKey = ["beds", id];
-
-  const queryFn = () => {
-    return get(`/availablebeds/${id}`);
-  };
-
-  const enabled = Boolean(id);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
+    // enabled,
     refetch0nWindowFocus: false,
     refetchOnmount: false,
     refetch0nReconnect: false,
     retry: false,
-    staleTime: 3000,
+    staleTime: 0,
+    keepPreviousData: true,
   });
 };
 
-export const useRoom = (id, nationality) => {
-  const queryKey = ["roomData", nationality, id];
-
-  const queryFn = () => {
-    return get(`/room/${id}/${nationality}`);
-  };
-
-  const enabled = Boolean(id, nationality);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useGetExpiration = (phone) => {
-  const queryKey = ["expiration", phone];
-
-  const queryFn = () => {
-    return axios.get(`${NO_AUTH_URL}/auth/getexpiration/${phone}`);
-  };
-
-  const enabled = Boolean(phone);
-
-  const select = (response) => response?.data?.data;
-
-  return useQuery({
-    refetchInterval: 5000,
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    ...queryOptions,
-  });
-};
-
-export const useMyBookings = (nationality) => {
-  const queryKey = ["bookings", nationality];
-
-  const queryFn = () => {
-    return get(`/mybookings/${nationality}`);
-  };
-
-  const select = (response) => response?.data?.data;
-
-  const enabled = Boolean(nationality);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 3000,
-  });
-};
-
-export const useGetRoomsInfinite = (
-  gender,
-  roomType,
-  rentAmount,
-  block,
-  nationality
+export const useMenuList = (
+  name,
+  category,
+  rating,
+  minPrice,
+  maxPrice,
+  restaurantID,
+  cursor
 ) => {
-  //queryKey based on the provided parameters.
   const queryKey = [
-    "roomalt",
-    gender,
-    roomType,
-    rentAmount,
-    block,
-    nationality,
+    "menuList",
+    restaurantID,
+    category,
+    rating,
+    minPrice,
+    maxPrice,
+    name,
+    cursor,
   ];
 
-  // function fetchRooms that retrieves room data based on the provided parameters.
-  /**
-   * Fetches room data in a paginated manner.
-   *
-   * @param {Object} pageParam - The page parameter for fetching the next page of data.
-   * @returns {Promise} A promise that resolves to the fetched data or rejects with an error.
-   */
-
-  const fetchRooms = ({ pageParam = 1 }) =>
-    get(
-      `/getroomsalt/${gender}/${encodeURIComponent(
-        roomType
-      )}/${encodeURIComponent(rentAmount)}/${encodeURIComponent(
-        block
-      )}/${encodeURIComponent(nationality)}?page=${encodeURIComponent(
-        parseInt(pageParam)
-      )}&pageSize=${encodeURIComponent(parseInt(24))}`
-    );
-
-  // flag to keep previous data when paginating.
-  const keepPreviousData = true;
-
-  // function getNextPageParam to determine the next page to fetch.
-  const getNextPageParam = (_lastPage, pages) => {
-    // Calculate the total number of rooms and the room limit per page.
-    const totalRooms = pages?.[0]?.data?.totalCount;
-
-    const roomLimit = pages?.[0]?.data?.data?.length;
-
-    // Calculate the number of pages required to fetch all data.
-    const numberOfPages = Math.ceil(totalRooms / roomLimit);
-
-    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
-    if (pages.length < numberOfPages) return pages.length + 1;
-
-    return undefined;
+  const getNextPageParam = (lastPage, allPages) => {
+    return lastPage?.lastCursor
+      ? { cursor: lastPage.lastCursor, direction: "FORWARD" }
+      : undefined;
   };
 
-  // flag to prevent refetching on window focus.
-  const refetchOnWindowFocus = false;
+  const getPreviousPageParam = (firstPage, allPages) => {
+    return allPages?.[allPages.length - 1]?.lastCursor
+      ? {
+          cursor: allPages?.[allPages.length - 1]?.lastCursor,
+          direction: "BACKWARDS",
+        }
+      : undefined;
+  };
 
-  // Configure options for the useInfiniteQuery hook.
-  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+  const options = {
+    getNextPageParam,
+    getPreviousPageParam,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  };
 
-  // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery(queryKey, fetchRooms, options);
+  return useInfiniteQuery(queryKey, fetchMenus, options);
 };
 
-export const useGetInvoice = (id, nationality) => {
-  const queryKey = ["invoice", nationality, id];
-
-  const queryFn = () => {
-    return get(`/invoice/${id}/${nationality}`);
+//edit Restaurant
+export const useEditRestaurant = () => {
+  const mutationFn = (data) => {
+    return put(`/restaurant`, data);
   };
 
-  const enabled = Boolean(id, nationality);
+  return { mutationFn };
+};
 
-  const select = (response) => response?.data?.data;
+//delte restaurant
+export const useDeleteRestaurant = (restaurantId) => {
+  const mutationFn = (data) => {
+    return delete_request(
+      `/credential/restaurant/remove/${restaurantId}`,
+      data
+    );
+  };
+
+  return { mutationFn };
+};
+
+//get couriers
+export const useGetCouriers = () => {
+  const queryKey = ["couriers"];
+
+  let url = `/couriers`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
 
   return useQuery({
     queryKey,
     queryFn,
     select,
-    enabled,
-    ...queryOptions,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
   });
 };
 
-//POST REQUESTS
-export const useVerifyCard = () => {
+//useGet Services
+export const useGetServices = () => {
+  const queryKey = ["services"];
+
+  let url = `/services`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//useGet Coupons
+export const useGetCoupons = () => {
+  const queryKey = ["coupons"];
+
+  let url = `/coupons`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+export const useGetExtras = () => {
+  const queryKey = ["coupons"];
+
+  let url = `/coupons`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//post
+
+export const useAddCredentials = () => {
   const mutationFn = (data) => {
-    return post(`/verifyghcard`, data);
+    return post(`/credential`, data);
   };
 
   return { mutationFn };
 };
 
-export const useSendShortStayRequest = () => {
+export const useAddCoupon = () => {
   const mutationFn = (data) => {
-    return post(`/shortstayrequest`, data);
+    return post(`/coupon`, data);
   };
 
   return { mutationFn };
-};
-
-export const useOutBasicInfo = () => {
-  const mutationFn = (data) => {
-    return post(`/outstationbasicinfo`, data);
-  };
-
-  return { mutationFn };
-};
-
-export const useVerifyL100Card = () => {
-  const mutationFn = (data) => {
-    return post(`/verifyghcardL100`, data);
-  };
-
-  return { mutationFn };
-};
-
-export const useForgotPassword = () => {
-  const mutationFn = (data) => {
-    return axios.post(`${NO_AUTH_URL}/auth/forgotpassword`, data);
-  };
-
-  return { mutationFn };
-};
-
-export const useCheckStudent = () => {
-  const mutationFn = (data) => {
-    return post(`/checkstudent`, data);
-  };
-
-  return { mutationFn };
-};
-
-export const useUploadID = () => {
-  const IDmutationFn = (formData) => {
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
-    return axios.post(`${NO_AUTH_URL}/upload/id_card`, formData, config);
-  };
-
-  return { IDmutationFn };
-};
-
-export const useUploadOtherID = () => {
-  const OtherMutationFn = (formData) => {
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
-    return axios.post(`${NO_AUTH_URL}/upload/other_id`, formData, config);
-  };
-
-  return { OtherMutationFn };
-};
-
-export const useUploadPhoto = () => {
-  const photoMutationFn = (formData) => {
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
-    return axios.post(`${NO_AUTH_URL}/upload/profile_pic`, formData, config);
-  };
-
-  return { photoMutationFn };
-};
-
-export const useUploadLetter = () => {
-  const letterMutationFn = (formData) => {
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
-    return axios.post(
-      `${NO_AUTH_URL}/upload/admission_letter`,
-      formData,
-      config
-    );
-  };
-
-  return { letterMutationFn };
 };
 
 //Authentications Get token to authorize all requests
@@ -709,7 +639,6 @@ export const useSecured = () => {
   };
 
   const select = (response) => {
-    console.log(response);
     response?.data?.data;
   };
 
@@ -726,187 +655,6 @@ export const useSecured = () => {
 };
 
 //users requests
-
-export const useGetUsers = () => {
-  const queryKey = ["getusers"];
-
-  const queryFn = () => {
-    return get(`/users`);
-  };
-
-  const select = (response) => {
-    console.log(response);
-    response?.data?.data;
-  };
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const useGetUsersByFilters = (
-  firstname,
-  lastname,
-  activated,
-  email,
-  username
-) => {
-  const queryKey = [
-    "findusers",
-    firstname,
-    lastname,
-    activated,
-    email,
-    username,
-  ];
-
-  const queryFn = () => {
-    return get(
-      `/users/filter?firstname=${firstname}&lastname=${lastname}&activated=${lastname}&email=${email}&username=${username}`
-    );
-  };
-
-  const select = (response) => {
-    console.log(response);
-    response?.data?.data;
-  };
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-// export const useGetUsersByID = (id) => {
-//   const queryKey = ["findusers", id];
-
-//   const queryFn = () => {
-//     return get(`/users/${id}`);
-//   };
-
-//   const select = (response) => {
-//     console.log(response);
-//     response?.data?.data;
-//   };
-
-//   const enabled = Boolean(id);
-
-//   return useQuery({
-//     queryKey,
-//     queryFn,
-//     select,
-//     enabled,
-//     refetch0nWindowFocus: false,
-//     refetchOnmount: false,
-//     refetch0nReconnect: false,
-//     retry: false,
-//     staleTime: 0,
-//   });
-// };
-
-export const useGetUsersByID = (id) => {
-  const queryKey = ["findusers", id];
-
-  const queryFn = () => {
-    return get(`/users/${id}`);
-  };
-
-  const select = (response) => {
-    console.log(response);
-    response?.data?.data;
-  };
-
-  const enabled = Boolean(id);
-
-  return useQuery({
-    queryKey,
-    queryFn,
-    select,
-    enabled,
-    refetch0nWindowFocus: false,
-    refetchOnmount: false,
-    refetch0nReconnect: false,
-    retry: false,
-    staleTime: 0,
-  });
-};
-
-export const usePaylater = () => {
-  const addPayLaterMutation = (data) => {
-    return post(`/paylater`, data);
-  };
-
-  return { addPayLaterMutation };
-};
-
-export const useCheckStatus = () => {
-  const checkStatusMutation = (data) => {
-    return post(`/checkstatus`, data);
-  };
-
-  return { checkStatusMutation };
-};
-
-export const useRegister = () => {
-  const registerMutation = (data) => {
-    return post(`${NO_AUTH_URL}/auth/register`, data);
-  };
-
-  return { registerMutation };
-};
-
-export const useRegisterOrganization = () => {
-  const registerMutation = (data) => {
-    return post(`${NO_AUTH_URL}/auth/registerorg`, data);
-  };
-
-  return { registerMutation };
-};
-
-export const useCancelBooking = () => {
-  const cancelMutationFn = (data) => {
-    return post(`/cancelbooking`, data);
-  };
-
-  return { cancelMutationFn };
-};
-
-export const useRequestRefund = () => {
-  const refundMutation = (data) => {
-    return post(`/requestrefund`, data);
-  };
-
-  return { refundMutation };
-};
-
-export const useRequestSwap = () => {
-  const swapMutation = (data) => {
-    return post(`/swaprooms`, data);
-  };
-
-  return { swapMutation };
-};
-
-export const usePayToMaintain = () => {
-  const payMutation = (data) => {
-    return post(`/paytomaintain`, data);
-  };
-
-  return { payMutation };
-};
 
 //PUT REQUESTS
 export const useUploadExtraDocuments = () => {
@@ -925,12 +673,18 @@ export const useChangeStudentDetails = () => {
   return { mutationFn };
 };
 
-export const useChangePass = () => {
-  const changePassMut = (data) => {
-    return put(`/changepass`, data);
+export const useChangeDetails = () => {
+  const changeRestMut = (data) => {
+    return put(`/restaurant`, data);
+  };
+  const changeUserMut = (data) => {
+    return put(`/user`, data);
+  };
+  const changeServiceMut = (data) => {
+    return put(`/service`, data);
   };
 
-  return { changePassMut };
+  return { changeRestMut, changeUserMut, changeServiceMut };
 };
 
 export const useResetPassword = () => {

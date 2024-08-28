@@ -86,9 +86,11 @@ const Hero = () => {
                     />
                   </div>
                   <div className="col-span-3">
-                    <button className="bg-gray-900 px-4 py-2 w-full border border-white h-full">
-                      <p className="font-bold text-white">Find Food</p>
-                    </button>
+                    <Link to={"/details"}>
+                      <button className="bg-gray-900 px-4 py-2 w-full border border-white h-full">
+                        <p className="font-bold text-white">Find Food</p>
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -110,54 +112,6 @@ const Hero = () => {
     </div>
   );
 };
-
-// const Footer = () => {
-//   return (
-//     <div className="p-24 flex flex-col">
-//       <div className="flex justify-around gap-12 items-center p-4 px-16">
-//         {links.map((item, idx) => {
-//           return (
-//             <div key={idx}>
-//               <p className="font-bold text-sm cursor-pointer">{item.title}</p>
-//             </div>
-//           );
-//         })}
-//       </div>
-
-//       <div className="border border-gray-300 my-8" />
-
-//       <div className="flex  flex-col gap-3">
-//         <div className="flex justify-between items-center">
-//           <p className="text-gray-900 font-logo font-extrabold text-3xl">
-//             dzidzi
-//           </p>
-//           <div className="flex justify-end gap-3 items-center">
-//             {media.map((item, idx) => {
-//               return (
-//                 <div key={idx}>
-//                   <p className="font-bold text-sm">{item}</p>
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         </div>
-//         <div className="flex justify-between items-center">
-//           <div>
-//             <p className="font-bold text-gray-500 text-xs">
-//               © COPYRIGHT 2023 | ALL RIGHTS RESERVED
-//             </p>
-//           </div>
-//           <div className="flex gap-2 items-center">
-//             <HiOutlineMail size="20px" />
-//             <p className="font-bold text-gray-500 text-xs">
-//               DZIDZIFOODDELIVERY@DZIDZI.COM
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const HowWeServeYou = () => {
   return (

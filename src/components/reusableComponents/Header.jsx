@@ -14,6 +14,7 @@ import cookie from "../../utils/cookie";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import { useMutation } from "react-query";
 import Spinner from "../loaders/Spinner";
+import Cart from "./Cart";
 
 const links = [
   {
@@ -58,18 +59,17 @@ const media = [
 const Header = () => {
   const { pathname } = useLocation();
   const { mutationFn } = useLogout();
+  const loggedIn = cookie.getCipher();
 
   const { mutate, isLoading: cardLoading } = useMutation(mutationFn, {
     onSuccess: (data) => {
       setAuth({});
 
       showSuccessToast("Logged in Successfully");
-      console.log({ success: data });
       navigateTo("/");
     },
     onError: (data) => {
       showErrorToast(data.response.data?.message || "An error occured");
-      console.log({ error: data });
     },
   });
 
@@ -81,7 +81,7 @@ const Header = () => {
   };
 
   return (
-    <div className=" px-24">
+    <div className=" px-24 mt-4">
       <div className="flex justify-between items-center">
         <Link to={pathname == "/details" ? "" : -1}>
           <div className="flex items-center gap-4">
@@ -92,23 +92,26 @@ const Header = () => {
 
         <div className="flex items-center gap-2">
           {" "}
-          <Link to="/">
-            <button
-              className="rounded-full bg-white px-6 py-2 border border-gray-900"
-              onClick={handleLogout}
-            >
-              <div className="flex items-center justify-center">
-                {cardLoading ? (
-                  <Spinner />
-                ) : (
-                  <p className="font-bold font-gray-500 ">Logout</p>
-                )}
-              </div>
-            </button>
-          </Link>
+          <Cart />
+          {loggedIn && (
+            <Link to="/">
+              <button
+                className="rounded-full bg-white px-6 py-2 border border-gray-900"
+                onClick={handleLogout}
+              >
+                <div className="flex items-center justify-center">
+                  {cardLoading ? (
+                    <Spinner />
+                  ) : (
+                    <p className="font-bold font-gray-500 text-xs ">Logout</p>
+                  )}
+                </div>
+              </button>
+            </Link>
+          )}
         </div>
       </div>
-      <div className="border border-gray-300 my-8" />
+      <div className="border border-gray-300 my-2" />
     </div>
   );
 };
