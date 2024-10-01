@@ -40,8 +40,6 @@ const Couriers = (props) => {
   } = useGetCouriers();
 
   const fetchedData = props?.fetchedData || couriers;
-  console.log(ID);
-
   return (
     <>
       <AddCredentialModal

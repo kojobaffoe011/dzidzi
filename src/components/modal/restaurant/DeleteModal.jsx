@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
 import { useAddCredentials } from "../../brokers/apicalls";
@@ -34,7 +34,8 @@ const DeleteModal = (props) => {
 
   const { mutationFn } = useAddCredentials();
 
-  const { mutate, isLoading } = useMutation(mutationFn, {
+  const { mutate, isLoading } = useMutation({
+    mutationFn,
     onSuccess: (data) => {
       // if (data.response.status == 200) {
       showSuccessToast("User Checked In Successfully");
@@ -56,8 +57,7 @@ const DeleteModal = (props) => {
     try {
       if (types.includes(userRole)) {
         mutate({
-          email: data.email,
-          userRole: userRole,
+          variabes: { email: data.email, userRole: userRole },
         });
       } else showErrorToast("Fill all fields");
     } catch (error) {

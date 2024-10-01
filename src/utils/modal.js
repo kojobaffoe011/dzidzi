@@ -5,7 +5,7 @@
 export const defaultModalStyles = {
   overlay: {
     background: "rgba(0,0,0,0.9)", // Semi-transparent black overlay
-    zIndex: 5, // Z-index to control overlay stacking
+    zIndex: 20, // Z-index to control overlay stacking
     overflowY: "scroll",
   },
   content: {

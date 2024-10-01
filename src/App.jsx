@@ -1,4 +1,5 @@
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Route, Routes } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/authProvider";
@@ -27,15 +28,17 @@ import Coupons from "./pages/admin/Coupons";
 import ViewUsers from "./pages/admin/ViewUsers";
 import ViewCouriers from "./pages/admin/ViewCouriers";
 import VIewServices from "./pages/admin/VIewServices";
+import { OrderProvider } from "./context/orderProvider";
+import Checkout from "./pages/main/orderpages/Checkout";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient} contextSharing={true}>
       <BrowserRouter>
-        <Layout>
-          <AuthProvider>
+        <AuthProvider>
+          <Layout>
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginOutlet />}>
@@ -52,17 +55,15 @@ const App = () => {
                 element={<DetailsMain />}
               ></Route>
 
-              {/* new layout */}
-
-              <Route path="/details" exact element={<OrderPagesLayout />}>
+              <Route path="/details" exact element={<OrderProvider />}>
                 <Route path="" exact element={<DetailsMain />} />
                 <Route path="menu/:id" exact element={<RestaurantMenu />} />
                 <Route
-                  path="menu/revieworder/:id"
+                  path="menu/revieworder/:resID/:id"
                   exact
                   element={<ReviewOrder />}
                 ></Route>
-                {/* <Route path="menu" exact element={<RestaurantMenu />}></Route> */}
+                <Route path="checkout/:id" exact element={<Checkout />}></Route>
               </Route>
 
               <Route element={<PersistLogin />}>
@@ -88,10 +89,11 @@ const App = () => {
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>
-          </AuthProvider>
-        </Layout>
+          </Layout>
+        </AuthProvider>
         <Toaster position="top-center" reverseOrder={true} />
       </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen={false} client={queryClient} />
     </QueryClientProvider>
   );
 };

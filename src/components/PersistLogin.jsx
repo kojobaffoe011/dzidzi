@@ -16,26 +16,26 @@ const PersistLogin = () => {
   // State to track if the component is in a loading state
   const [isLoading, setIsLoading] = useState(true);
   // Access the setAuth function from the useAuth hook
-  const { setAuth } = useAuth();
+  // const { setAuth } = useAuth();
 
   // Retrieve the authentication token from cookies
   const token = cookie.getCipher();
 
-  // Effect to handle persistent login
-  useEffect(() => {
-    let isMounted = true;
+  // // Effect to handle persistent login
+  // useEffect(() => {
+  //   let isMounted = true;
 
-    // Retrieve the logged-in user data from local storage
-    const loggedInUser = localStorage.getItem("dzidzi");
+  //   // Retrieve the logged-in user data from local storage
+  //   const loggedInUser = localStorage.getItem("dzidzi");
 
-    if (isMounted) {
-      // If user data exists in local storage, set it as the authenticated user
-      loggedInUser !== null && setAuth(JSON.parse(loggedInUser));
-      // Mark loading as complete
-      setIsLoading(false);
-    }
-    return () => (isMounted = false);
-  }, [setAuth]);
+  //   if (isMounted) {
+  //     // If user data exists in local storage, set it as the authenticated user
+  //     loggedInUser !== null && setAuth(JSON.parse(loggedInUser));
+  //     // Mark loading as complete
+  //     setIsLoading(false);
+  //   }
+  //   return () => (isMounted = false);
+  // }, [setAuth]);
 
   return (
     /* Conditional rendering based on token and loading state */

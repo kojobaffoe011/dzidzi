@@ -8,30 +8,21 @@ import Spinner from "../../components/loaders/Spinner";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { useGetActiveUser, useLogin } from "../../components/brokers/apicalls";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
-import axios from "axios";
-import Loader from "../../components/loaders/Loader";
 
 const Form = ({ userType, error, setError }) => {
   const [showPass, setShowPass] = useState(false);
-  const { setAuth } = useAuth();
+  const { setAuth, auth } = useAuth();
+  const { pathname } = useLocation();
   const { mutationFn } = useLogin();
 
   const handleTogglePass = () => {
     setShowPass(!showPass);
   };
 
-  const LoginSchema = yup.object().shape({
-    password: yup.string().required("Password is required"),
-
-    email: yup
-      .string()
-      .email("Please enter a valid email")
-      .required("Email is required"),
-  });
   const AltSchema = yup.object().shape({
     password: yup.string().required("Password is required"),
     username: yup.string().required("Username is required"),
@@ -51,14 +42,18 @@ const Form = ({ userType, error, setError }) => {
     navigate(url);
   };
 
-  const { mutate, isLoading: cardLoading } = useMutation(mutationFn, {
+  const { mutate, isPending: cardLoading } = useMutation({
+    mutationFn,
     onSuccess: (data) => {
-      const response = data?.data;
-      setAuth(data);
-      localStorage.setItem("dzidzi", JSON.stringify({}));
       setLoginTimestamp();
-      cookie.setCipher(response?.access_token);
-      navigateTo("/welcome");
+      cookie.setCipher(data?.data?.access_token);
+      navigateTo(
+        `${
+          pathname.includes("login")
+            ? "/welcome"
+            : `/details/checkout/${auth?.restaurant.id}`
+        }`
+      );
     },
     onError: (data) => {
       setError(true);
@@ -79,6 +74,8 @@ const Form = ({ userType, error, setError }) => {
       });
     }
   };
+
+  console.log({ authFromLogin: auth });
 
   return (
     <div className="mt-[10px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">

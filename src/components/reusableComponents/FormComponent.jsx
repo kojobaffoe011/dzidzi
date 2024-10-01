@@ -2,7 +2,7 @@ import React from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useAddCredentials } from "../brokers/apicalls";
 import { RiErrorWarningFill } from "react-icons/ri";
 

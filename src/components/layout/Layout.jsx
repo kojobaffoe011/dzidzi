@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect } from "react";
+import useAuth from "../../hooks/useAuth";
 
 /**
  * The `Layout` component serves as a basic layout structure for a web page.
@@ -9,8 +11,27 @@ import React from "react";
  * @returns {JSX.Element} The rendered layout with child components.
  */
 const Layout = (props) => {
+  const { auth, setAuth } = useAuth();
+
+  useEffect(() => {
+    if (
+      auth?.open == true &&
+      auth?.orders?.length > 0 &&
+      typeof window != "undefined" &&
+      window.document
+    ) {
+      document.body.style.overflow = "hidden";
+    } else document.body.style.overflow = "scroll";
+  }, [auth?.open]);
+
   return (
-    <div className="flex flex-col min-h-screen mx-auto">
+    <div className="flex flex-col min-h-screen mx-auto relative">
+      {auth?.open && auth?.orders?.length > 0 && (
+        <div
+          className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
+          onClick={() => setAuth({ ...auth, open: false })}
+        ></div>
+      )}
       <div className="flex flex-col">{props.children}</div>
     </div>
   );

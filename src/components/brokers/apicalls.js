@@ -37,7 +37,7 @@
  */
 
 import axios from "axios";
-import { useInfiniteQuery, useQuery } from "react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { NO_AUTH_URL } from "../../utils/config";
 import { delete_request, get, post, put } from "../../utils/transport";
 
@@ -68,6 +68,34 @@ export const useGetActiveUser = () => {
     queryKey,
     queryFn,
     select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetActiveUserDetails = (id) => {
+  const queryKey = ["activeuserdetails", id];
+
+  let url = `/user/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
     refetch0nWindowFocus: false,
     refetchOnmount: false,
     refetch0nReconnect: false,
@@ -112,7 +140,7 @@ export const useUserList = (firstName, lastName) => {
   };
 
   // Use the useInfiniteQuery hook to manage the paginated query
-  return useInfiniteQuery(queryKey, fetchUsers, options);
+  return useInfiniteQuery({ queryKey, fetchUsers, options });
 };
 
 /// Function to fetch paged restaurants
@@ -135,6 +163,24 @@ const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
   return response.data;
 };
 
+// export const useRestaurantList = (name, rating) => {
+//   const queryKey = ["restaurantList", name, rating];
+
+//   // Determine the next page param
+//   const getNextPageParam = (lastPage) =>
+//     lastPage.hasNextPage ? lastPage.lastCursor : undefined;
+
+//   // Configure options for the useInfiniteQuery hook
+//   const options = {
+//     getNextPageParam,
+//     keepPreviousData: true,
+//     refetchOnWindowFocus: false,
+//   };
+
+//   // Use the useInfiniteQuery hook to manage the paginated query
+//   return useInfiniteQuery(queryKey, fetchRestaurants, options);
+// };
+
 export const useRestaurantList = (name, rating) => {
   const queryKey = ["restaurantList", name, rating];
 
@@ -142,17 +188,15 @@ export const useRestaurantList = (name, rating) => {
   const getNextPageParam = (lastPage) =>
     lastPage.hasNextPage ? lastPage.lastCursor : undefined;
 
-  // Configure options for the useInfiniteQuery hook
-  const options = {
-    getNextPageParam,
-    keepPreviousData: true,
+  // Pass everything as an object to useInfiniteQuery
+  return useInfiniteQuery({
+    queryKey, // Pass queryKey as part of the object
+    queryFn: fetchRestaurants, // Use queryFn instead of fetch function as the second argument
+    getNextPageParam, // getNextPageParam now part of the options object
+    keepPreviousData: true, // Other options also as part of the object
     refetchOnWindowFocus: false,
-  };
-
-  // Use the useInfiniteQuery hook to manage the paginated query
-  return useInfiniteQuery(queryKey, fetchRestaurants, options);
+  });
 };
-
 export const useGetSingleRestaurant = (id) => {
   const queryKey = ["restaurant", id];
 
@@ -451,7 +495,95 @@ export const useMenuList = (
     refetchOnWindowFocus: false,
   };
 
-  return useInfiniteQuery(queryKey, fetchMenus, options);
+  return useInfiniteQuery({ queryKey, queryFn: fetchMenus, ...options });
+};
+
+const fetchExtras = async ({ queryKey, pageParam = {} }) => {
+  const [_key, restaurantID, extraID, rating, minPrice, maxPrice, name] =
+    queryKey;
+
+  const cursor = pageParam.cursor || null;
+  const direction = pageParam.direction || "FORWARD";
+  const limit = 9; // Adjust the limit if necessary
+  let url = `/paged-extras?limit=${limit}`;
+
+  if (name) {
+    url += `&name=${encodeURIComponent(name)}`;
+  }
+  if (rating) {
+    url += `&rating=${encodeURIComponent(rating)}`;
+  }
+  if (minPrice) {
+    url += `&minimumPrice=${encodeURIComponent(minPrice)}`;
+  }
+  if (maxPrice) {
+    url += `&maximumPrice=${encodeURIComponent(maxPrice)}`;
+  }
+  if (cursor) {
+    url += `&cursor=${encodeURIComponent(cursor)}`;
+  }
+  if (direction) {
+    url += `&direction=${encodeURIComponent(direction)}`;
+  }
+  if (restaurantID) {
+    url += `&restaurantId=${encodeURIComponent(restaurantID)}`;
+  }
+  if (extraID) {
+    url += `&extraId=${encodeURIComponent(extraID)}`;
+  }
+
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Fetching menus failed:", error);
+    throw error;
+  }
+};
+
+export const useExtrasList = (
+  minPrice,
+  maxPrice,
+  name,
+  rating,
+  restaurantID,
+  extraID,
+  cursor
+) => {
+  const queryKey = [
+    "extraList",
+    restaurantID,
+    extraID,
+    rating,
+    minPrice,
+    maxPrice,
+    name,
+    cursor,
+  ];
+
+  const getNextPageParam = (lastPage, allPages) => {
+    return lastPage?.lastCursor
+      ? { cursor: lastPage.lastCursor, direction: "FORWARD" }
+      : undefined;
+  };
+
+  const getPreviousPageParam = (firstPage, allPages) => {
+    return allPages?.[allPages.length - 1]?.lastCursor
+      ? {
+          cursor: allPages?.[allPages.length - 1]?.lastCursor,
+          direction: "BACKWARDS",
+        }
+      : undefined;
+  };
+
+  const options = {
+    getNextPageParam,
+    getPreviousPageParam,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  };
+
+  return useInfiniteQuery({ queryKey, queryFn: fetchExtras, ...options });
 };
 
 //edit Restaurant
@@ -608,6 +740,17 @@ export const useLogin = () => {
 
   return { mutationFn };
 };
+export const useRegisterUser = () => {
+  const mutationFn = (data) => {
+    return axios.post(`${NO_AUTH_URL}/user/sign-up`, data, {
+      headers: {
+        Authorization: null,
+      },
+    });
+  };
+
+  return { mutationFn };
+};
 
 export const useLogout = () => {
   const mutationFn = (data) => {
@@ -702,3 +845,76 @@ export const useSignup = () => {
 
   return { addDocMutation };
 };
+
+///ORDERS
+
+//Add order items
+export const useAddOrderItem = () => {
+  const mutationFn = (data) => {
+    const response = post(`/item`, data);
+    console.log(response, "from order item");
+    return response?.data;
+  };
+
+  return { mutationFn };
+};
+
+//get order item
+export const useGetOrderItemByID = (id) => {
+  const queryKey = ["orderitem", id];
+
+  let url = `/item/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+///get image
+export const useGetImage = (id) => {
+  const queryKey = ["getimage", id];
+
+  const url = `/load/image/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//update order item

@@ -10,22 +10,17 @@ import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
-import {
-  useAddCredentials,
-  useGetSingleRestaurant,
-} from "../../brokers/apicalls";
-import RestaurantDescription from "../../reusableComponents/RestaurantDescription";
-import Loader from "../../loaders/Loader";
+import { useAddCoupon, useAddCredentials } from "../../brokers/apicalls";
 
-const ViewRestaurant = (props) => {
+const PromoCode = (props) => {
   const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
-  const { userRole, restaurantID, restaurantData, restaurantLoading } = props;
-
+  const { userRole } = props;
   const credentialSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email("Please enter a valid email")
-      .required("Email is required"),
+    name: yup.string().required("Name is required"),
+    percentage: yup.number().required("Percentage is required"),
+    description: yup.string().required("Description is required"),
+    startDate: yup.date().required("Start Date is required"),
+    endDate: yup.date().required("End Date is required"),
   });
 
   const {
@@ -37,76 +32,69 @@ const ViewRestaurant = (props) => {
     resolver: yupResolver(credentialSchema),
   });
 
-  const { mutationFn } = useAddCredentials();
+  // const { mutationFn } = useAddCoupon();
 
   const { mutate, isLoading } = useMutation({
-    mutationFn,
+    mutationKey: ["addCoupon"],
+    mutationFn: async (data) => {
+      const response = await axios.post(`order/make-order`, data);
+      return response?.data;
+    },
     onSuccess: (data) => {
-      // if (data.response.status == 200) {
-      showSuccessToast("User Checked In Successfully");
-      // } else {
-      // showErrorToast(data?.response?.data.message);
-      // }
-
+      showSuccessToast("Coupon Added Successfully");
       reset();
       props?.handleCancel();
     },
-    onError: (data) => {
-      showErrorToast(data?.response?.error);
+    onError: (error) => {
+      showErrorToast(error?.response?.data?.message || "An error occurred");
       reset();
       props?.handleCancel();
     },
   });
 
-  const handleAddCredential = (data) => {
+  const handleAddCoupon = (data) => {
     try {
       if (types.includes(userRole)) {
         mutate({
-          email: data.email,
-          userRole: userRole,
+          couponName: data.name,
+          percentage: data.percentage,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
         });
-      } else showErrorToast("Fill all fields");
+      }
     } catch (error) {
       showErrorToast(error.message);
     }
   };
 
-  if (restaurantLoading) {
-    return (
-      <div>
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
     <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
-          <RestaurantDescription
-            name={restaurantData?.name}
-            rating={restaurantData?.averageRating}
-            type="modal"
-          />
-
-          {/* <form onSubmit={handleSubmit(handleAddCredential)}>
-            <div className="flex flex-col mb-3">
+          <div className="p-2 flex flex-col pb-4">
+            <div className="flex justify-center">
+              <p className="font-bold">ADD PROMO CODE</p>
+            </div>
+          </div>
+          <form onSubmit={handleSubmit(handleAddCoupon)}>
+            <div className="flex flex-col mb-3 gap-1">
               <input
-                className="border outline-none p-2 text-sm h-[100px]"
-                placeholder="dzidzi@dzidzi.com"
-                name="email"
-                {...register("email")}
+                className="border outline-none p-2 text-sm border border-black rounded-md"
+                placeholder="promocode"
+                name="promocode"
+                {...register("promocode")}
+                required
               />
             </div>
+
             <div className="flex justify-center">
               <div className="flex items-center mr-2">
-                <Button className="px-8 py-2 w-full bg-green-600 rounded">
+                <Button className="px-8 py-2 w-full bg-black rounded-md">
                   {isLoading ? (
                     <Spinner color="white" size="15px" />
                   ) : (
-                    <p className="font-bold text-base text-white">
-                      Add Credential
-                    </p>
+                    <p className="font-bold text-sm text-white">Apply Promo</p>
                   )}
                 </Button>
               </div>
@@ -116,15 +104,15 @@ const ViewRestaurant = (props) => {
                   type="button"
                   onClick={props.handleCancel}
                 >
-                  <p className="font-bold text-base text-gray-500">Exit</p>
+                  <p className="font-bold text-sm text-gray-500">Exit</p>
                 </button>
               </div>
             </div>
-          </form> */}
+          </form>
         </div>
       </Modal>
     </div>
   );
 };
 
-export default ViewRestaurant;
+export default PromoCode;

@@ -2,7 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import React, { Suspense, useCallback } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
@@ -89,7 +89,8 @@ const ViewRestaurantsPage = () => {
 
   const { mutationFn } = useDeleteRestaurant(id);
 
-  const { mutate, isLoading } = useMutation(mutationFn, {
+  const { mutate, isLoading } = useMutation({
+    mutationFn,
     onSuccess: (data) => {
       // if (data.response.status == 200) {
       showSuccessToast("Restaurant Deleted Successfully");
@@ -143,7 +144,7 @@ const ViewRestaurantsPage = () => {
                 {pages?.map((item, idx) => {
                   return (
                     <Link
-                      to={`/details/menu/revieworder/${item?.value.id}`}
+                      to={`/details/menu/revieworder/${item?.value.restaurant.id}/${item?.value.id}`}
                       key={idx}
                     >
                       <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">

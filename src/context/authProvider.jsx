@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createContext, useState } from "react";
 
 // Create an empty context to manage authentication-related data
@@ -12,8 +13,16 @@ const AuthContext = createContext({});
  * @returns {JSX.Element} A context provider that wraps its child components.
  */
 export const AuthProvider = ({ children }) => {
-  // Initialize the authentication state with an empty object
-  const [auth, setAuth] = useState({});
+  // Retrieve the auth data from localStorage if it exists, otherwise initialize with an empty object
+  const storedAuth = localStorage.getItem("dzidzi");
+  const initialAuth = storedAuth ? JSON.parse(storedAuth) : {};
+
+  const [auth, setAuth] = useState(initialAuth);
+
+  // Use useEffect to update localStorage whenever the auth state changes
+  useEffect(() => {
+    localStorage.setItem("dzidzi", JSON.stringify(auth));
+  }, [auth]);
 
   return (
     // Provide the authentication context with auth, setAuth values

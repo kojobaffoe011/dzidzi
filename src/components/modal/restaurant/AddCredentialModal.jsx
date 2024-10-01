@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
 import { useAddCredentials } from "../../brokers/apicalls";
@@ -34,23 +34,37 @@ const AddCredentialModal = (props) => {
 
   const { mutationFn } = useAddCredentials();
 
-  const { mutate, isLoading } = useMutation(mutationFn, {
+  const { mutate, isLoading } = useMutation({
+    mutationFn, // mutation function goes here
     onSuccess: (data) => {
-      // if (data.response.status == 200) {
       showSuccessToast("User Checked In Successfully");
-      // } else {
-      // showErrorToast(data?.response?.data.message);
-      // }
-
       reset();
       props?.handleCancel();
     },
-    onError: (data) => {
-      showErrorToast(data?.response?.error);
+    onError: (error) => {
+      showErrorToast(error?.response?.data?.message || "An error occurred");
       reset();
       props?.handleCancel();
     },
   });
+
+  // const { mutate, isLoading } = useMutation(mutationFn, {
+  //   onSuccess: (data) => {
+  //     // if (data.response.status == 200) {
+  //     showSuccessToast("User Checked In Successfully");
+  //     // } else {
+  //     // showErrorToast(data?.response?.data.message);
+  //     // }
+
+  //     reset();
+  //     props?.handleCancel();
+  //   },
+  //   onError: (data) => {
+  //     showErrorToast(data?.response?.error);
+  //     reset();
+  //     props?.handleCancel();
+  //   },
+  // });
 
   const handleAddCredential = (data) => {
     try {

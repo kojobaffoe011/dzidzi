@@ -78,19 +78,18 @@ axios.interceptors.request.use(
 );
 
 // Function to make a POST request
-export const post = (route, payload) => {
-  new Promise((resolve, reject) => {
+export const post = async (route, payload) => {
+  await new Promise((resolve, reject) => {
     axios
       .post(route, payload)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
   });
-  console.log("exceuting post");
 };
 
 // Function to make a PUT request
-export const put = (route, payload) =>
-  new Promise((resolve, reject) => {
+export const put = async (route, payload) =>
+  await new Promise((resolve, reject) => {
     axios
       .put(route, payload)
       .then((res) => resolve(res))
@@ -98,8 +97,8 @@ export const put = (route, payload) =>
   });
 
 // Function to make a GET request
-export const get = (route) =>
-  new Promise((resolve, reject) => {
+export const get = async (route) =>
+  await new Promise((resolve, reject) => {
     axios
       .get(route, config)
       .then((res) => resolve(res))
@@ -107,8 +106,8 @@ export const get = (route) =>
   });
 
 // Function to make a DELETE request
-export const delete_request = (route) =>
-  new Promise((resolve, reject) => {
+export const delete_request = async (route) =>
+  await new Promise((resolve, reject) => {
     axios
       .delete(route)
       .then((res) => resolve(res))
@@ -116,8 +115,8 @@ export const delete_request = (route) =>
   });
 
 // Function to make multiple Axios requests simultaneously
-export const all = (routes) =>
-  new Promise((resolve, reject) => {
+export const all = async (routes) =>
+  await new Promise((resolve, reject) => {
     axios
       .all(routes)
       .then((res) => resolve(res))

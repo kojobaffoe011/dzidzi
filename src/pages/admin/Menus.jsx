@@ -227,7 +227,6 @@ const Menus = () => {
                         className="px-2 py-1 text-xs rounded-md"
                         onClick={() => {
                           handleOpenViewModal();
-                          console.log(item);
                           setMenuID(item?.value?.id);
                         }}
                       >

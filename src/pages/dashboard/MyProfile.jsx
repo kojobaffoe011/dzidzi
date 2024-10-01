@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
 import { AiOutlineEye } from "react-icons/ai";
 import { Link } from "react-router-dom";
@@ -67,7 +67,8 @@ const StudentDetails = () => {
     resolver: yupResolver(ChangePassSchema),
   });
 
-  const { mutate, isLoading: saveLoading } = useMutation(changeRestMut, {
+  const { mutate, isLoading: saveLoading } = useMutation({
+    mutationFn: changeRestMut,
     onSuccess: (data) => {
       showSuccessToast("Save changes successfully");
       reset();
