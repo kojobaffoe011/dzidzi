@@ -1,9 +1,7 @@
-import React, { Suspense, useState } from "react";
+import  { Suspense, useEffect, useState } from "react";
 import Button from "../../../components/Button";
-import food from "../../../assets/landingpage/defaultrest.jpeg";
 import { useParams } from "react-router";
 import {
-  useAddOrderItem,
   useExtrasList,
   useGetImage,
   useGetSingleMenu,
@@ -16,6 +14,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import axios from "axios";
+import Imageloader from "../../../components/loaders/Imageloader";
 
 const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
   const [extraCount, setExtraCount] = useState(1);
@@ -100,6 +99,7 @@ const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
 const ReviewOrder = () => {
   const [selectedNumber, setSelectedNumber] = useState(1);
   const { auth, setAuth } = useAuth();
+  const [imageSrc, setImageSrc] = useState('')
 
   const [filters, setFilters] = useState({
     name: null,
@@ -114,16 +114,9 @@ const ReviewOrder = () => {
   const {
     isLoading: menuLoading,
     data: menuData,
-    isError,
-    error,
+    // isError,
+    // error,
   } = useGetSingleMenu(id);
-
-  const {
-    isLoading: imageLoading,
-    data: imageData,
-    isError: isImageError,
-    error: imageError,
-  } = useGetImage(menuData?.image?.id);
 
   const {
     data: extraList = [],
@@ -131,7 +124,7 @@ const ReviewOrder = () => {
     hasNextPage: extraHasNextPage,
     fetchNextPage: extraFetchNextPage,
     isFetchingNextPage: extraFetchingNextPage,
-    isError: isextraError,
+    // isError: isextraError,
   } = useExtrasList(
     filters.minPrice,
     filters.maxPrice,
@@ -194,11 +187,7 @@ const ReviewOrder = () => {
         </div>
         <div className="grid grid-cols-2 p-2 gap-2">
           <div className="flex items-center justify-center">
-            {imageLoading ? (
-              <Spinner size="50px" />
-            ) : (
-              <img src={imageData} alt="" width={"300px"} />
-            )}
+          <Imageloader imageID={menuData?.image?.id}/>
           </div>
           <div className="flex-col flex">
             <div className="flex flex-col gap-1">
@@ -253,7 +242,7 @@ const ReviewOrder = () => {
           <div className="grid grid-cols-3 gap-2">
             {pages?.map((item, idx) => {
               return (
-                <div className="flex flex-col">
+                <div className="flex flex-col" key={idx}>
                   <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
                     <div className="overflow-hidden basis-1/3">
                       <Suspense

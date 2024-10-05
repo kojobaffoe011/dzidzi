@@ -19,11 +19,11 @@ import RestaurantDescription from "../../components/reusableComponents/Restauran
 import burger from "../../assets/images/burger.jpeg";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
+import Imageloader from "../../components/loaders/Imageloader";
 
 const ViewRestaurantsPage = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
-  const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
   const [credentialOpen, setCredentialsOpen] = useState(false);
 
   const handleOpenInvoiceModal = useCallback(() => {
@@ -149,21 +149,7 @@ const ViewRestaurantsPage = () => {
                     >
                       <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
                         <div className="overflow-hidden basis-1/3">
-                          <Suspense
-                            fallback={
-                              <div>
-                                <Spinner color="blue" size="20px" />
-                              </div>
-                            }
-                          >
-                            <LazyImage
-                              src={
-                                item?.value.image ? item?.value.image : burger
-                              }
-                              alt="imgs"
-                              className="w-[100px] rounded h-[70px]"
-                            />
-                          </Suspense>
+                      <div className="h-full"><Imageloader imageID={item.value.image?.id}/></div>  
                         </div>
                         <div className="p-1 flex justify-between items-center basis-2/3 w-full h-full">
                           <div className="flex flex-col w-full gap-1">

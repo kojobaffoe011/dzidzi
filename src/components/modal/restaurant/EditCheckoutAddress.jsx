@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
 import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
-import { useAddCoupon, useGetActiveUserDetails } from "../../brokers/apicalls";
+import { useAddCoupon } from "../../brokers/apicalls";
 import { FaCheckCircle } from "react-icons/fa";
 import { GoLocation } from "react-icons/go";
 
@@ -47,7 +46,7 @@ const EditCheckoutAddress = (props) => {
 
   const { mutate, isLoading } = useMutation({
     mutationFn,
-    onSuccess: (data) => {
+    onSuccess: () => {
       showSuccessToast("Coupon Added Successfully");
       reset();
       props?.handleCancel();
@@ -118,6 +117,7 @@ const EditCheckoutAddress = (props) => {
             {addressOptions.map((item, idx) => {
               return (
                 <div
+                key={idx}
                   className={`border cursor-pointer ${
                     useMyAddress == item.useMyAddress
                       ? "border-green-500 border-2 font-bold"

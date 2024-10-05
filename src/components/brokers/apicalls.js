@@ -894,8 +894,14 @@ export const useGetImage = (id) => {
 
   const url = `/load/image/${id}`;
 
-  const queryFn = () => {
-    return get(url);
+  const get = (url) => axios.get(url, { responseType: 'blob' });  // This forces Axios to handle the data as a binary Blob
+
+
+  const queryFn = async () => {
+    const response = await get(url, { responseType: 'blob' });  // Specify 'blob' to handle binary data
+      console.log({response});  // Check if the response is indeed a Blob
+
+    return response;
   };
 
   const select = (response) => {

@@ -1,30 +1,18 @@
-import React, { useEffect, useState } from "react";
+import  {  useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
 import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
-import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
-import { useAddCoupon, useGetOrderItemByID } from "../../brokers/apicalls";
+import {useGetOrderItemByID } from "../../brokers/apicalls";
 import axios from "axios";
 
 const UpdateOrderModal = (props) => {
-  const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
   const [selectedNumber, setSelectedNumber] = useState(1);
-  const { userRole, order, restaurant } = props;
-  const { auth, setAuth } = useAuth();
-  const credentialSchema = yup.object().shape({
-    name: yup.string().required("Name is required"),
-    percentage: yup.number().required("Percentage is required"),
-    description: yup.string().required("Description is required"),
-    startDate: yup.date().required("Start Date is required"),
-    endDate: yup.date().required("End Date is required"),
-  });
+  const { order } = props;
+  const { setAuth } = useAuth();
+ 
   const {
     data: orderItem,
     isLoading: orderItemLoading,
@@ -136,7 +124,7 @@ const UpdateOrderModal = (props) => {
             <div className="p-2 grid grid-cols-2 mt-8">
               <div className=""></div>
               <div className="flex-col">
-                <div className="border border-red flex-col flex">
+                <div className="flex-col flex">
                   <div className="flex flex-col gap-1">
                     <h1 className="font-extrabold text-3xl">
                       {orderItem?.menu

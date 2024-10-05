@@ -1,16 +1,14 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useState } from "react";
 import { BiSolidBolt } from "react-icons/bi";
 import { BsCartX } from "react-icons/bs";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { FaLocationDot } from "react-icons/fa6";
 import { FiUser } from "react-icons/fi";
 import { LuBaggageClaim } from "react-icons/lu";
 import { MdOutlineDeliveryDining, MdOutlineDiscount } from "react-icons/md";
 import { TfiShoppingCartFull } from "react-icons/tfi";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
-import { Link } from "react-router-dom";
 import Button from "../../../components/Button";
 import AddNote from "../../../components/modal/restaurant/AddNote";
 import EditCheckoutAddress from "../../../components/modal/restaurant/EditCheckoutAddress";
@@ -47,7 +45,7 @@ const Checkout = () => {
   const [editAddressOpen, setEditAddressOpen] = useState(false);
   const [addNoteOpen, setAddNoteOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [useMyAddress, setUseMyAddress] = useState(false);
+  //const [useMyAddress, setUseMyAddress] = useState(false);
   const handleOpenUpdateModal = useCallback(() => {
     setUpdateOrderOpen(true);
   }, []);
@@ -112,14 +110,17 @@ const Checkout = () => {
       const response = await axios.post(`order/make-order`, data);
       return response?.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAuth((prevAuth) => ({
         ...prevAuth,
         open: false,
         orderDetails: data,
       }));
-      //make post request to create payment intent
-      showSuccessToast("Extra Added Successfully");
+      const orderID = data?.id
+
+      await mutateAsync({ orderID });
+
+      showSuccessToast("Order Successfully Created");
     },
     onError: (error) => {
       console.log(error);
@@ -130,15 +131,42 @@ const Checkout = () => {
   const proceedToPayment = () => {
     let orderItemsPush = [];
     auth?.orders?.forEach((element) => orderItemsPush.push(element.id));
-    mutate({
+    try {
+      mutate({
+      // orderItems:
+      //   auth?.orders?.length > 1 ? orderItemsPush : auth?.orders[0].id,
       orderItems:
-        auth?.orders?.length > 1 ? orderItemsPush : auth?.orders[0].id,
+        orderItemsPush,
       useMyAddress: auth?.deliveryAddress ? auth?.useMyAddress : true,
       address: auth?.deliveryAddress,
       couponNumber: "A3FXJ51275",
     });
-    return orderItemsPush;
+    return
+    } catch (error) {
+      showErrorToast(error.message)
+    }
+    
   };
+
+
+
+
+  const {mutateAsync, isPending: paymentIntentPending} = useMutation({
+    mutationKey: ['createPaymentIntent'],
+    mutationFn:   async (paymentData) => {
+      const response = await axios.post('checkout', paymentData);
+      return response.data;
+    },
+    onSuccess: (paymentResponse) => {
+        // Handle success (e.g., navigate to success page, show a message)
+        console.log('Payment Intent Created:', paymentResponse);
+      },
+    onError: (error) => {
+        console.error('Error proceeding with payment:', error);
+      },
+
+  })
+
 
   if (!auth?.orders || auth?.orders?.length < 1) {
     return (
@@ -159,7 +187,6 @@ const Checkout = () => {
     );
   }
 
-  console.log({ auth: auth?.useMyAddress });
   return (
     <div>
       <UpdateOrderModal
@@ -310,7 +337,7 @@ const Checkout = () => {
               onClick={proceedToPayment}
               className={`mt-4 p-4 font-bold text-white rounded-lg cursor-pointer bg-black border border-black border-2`}
             >
-              {isPending ? (
+              {isPending || paymentIntentPending ? (
                 <Spinner color="white" size="20px" />
               ) : (
                 "Proceed to Payment"
@@ -404,10 +431,9 @@ const Checkout = () => {
             </div>
             <div
               className="flex gap-4 w-full justify-between cursor-pointer "
-              onClick={() => {
-                handleOpenPromoCodeModal();
-                console.log("hey");
-              }}
+              onClick={() => 
+                handleOpenPromoCodeModal()
+              }
             >
               <MdOutlineDiscount className="text-gray-600" size="20px" />
               <div className="flex justify-between items-center flex-grow">
