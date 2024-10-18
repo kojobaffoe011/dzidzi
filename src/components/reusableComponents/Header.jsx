@@ -1,18 +1,9 @@
-import React, { Suspense, useCallback } from "react";
-import { FiFacebook } from "react-icons/fi";
-import { BsTwitterX } from "react-icons/bs";
-import { FaInstagram } from "react-icons/fa";
-import { PiYoutubeLogoLight } from "react-icons/pi";
-import { LuGithub } from "react-icons/lu";
-import { LiaMapSolid } from "react-icons/lia";
+import { Suspense, useCallback } from "react";
 import { RiCloseLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from "react-router";
 import { GiHamburger } from "react-icons/gi";
-import { useLogout } from "../brokers/apicalls";
 import cookie from "../../utils/cookie";
-import { showErrorToast, showSuccessToast } from "../../toast/Toast";
-import { useMutation } from "@tanstack/react-query";
 import Spinner from "../loaders/Spinner";
 import Cart from "./Cart";
 import { TfiMoreAlt } from "react-icons/tfi";
@@ -22,11 +13,12 @@ import burger from "../../assets/images/burger.jpeg";
 import LazyImage from "../LazyImage";
 import { useState } from "react";
 import UpdateOrderModal from "../modal/restaurant/UpdateOrder";
-import LoginModal from "../modal/restaurant/LoginModal";
+import { useLogoutUser } from "../../hooks/useLogoutUser";
+import { HiUser } from "react-icons/hi";
+import PropTypes from "prop-types";
 
 const Orders = ({ auth, setAuth, navigateTo, token }) => {
   const [updateOrderOpen, setUpdateOrderOpen] = useState(false);
-  const [loginModalOpen, setloginModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const handleOpenUpdateModal = useCallback(() => {
     setUpdateOrderOpen(true);
@@ -34,12 +26,7 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
   const handleCloseUpdateModal = useCallback(() => {
     setUpdateOrderOpen(false);
   }, []);
-  const handleOpenLoginModal = useCallback(() => {
-    setloginModalOpen(true);
-  }, []);
-  const handleCloseLoginModal = useCallback(() => {
-    setloginModalOpen(false);
-  }, []);
+
   const totalSum = auth?.orders?.reduce((total, order) => {
     return (
       total +
@@ -56,11 +43,7 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
         order={selectedOrder}
         width="1000px"
       />
-      <LoginModal
-        isOpen={loginModalOpen}
-        handleCancel={handleCloseLoginModal}
-        width="700px"
-      />
+  
 
       <div className="p-4 flex flex-col shadow-md absolute right-0 h-screen w-[450px] z-[15] bg-white shadow-lg top-[-16px] bottom-0">
         <div className="mt-4">
@@ -153,7 +136,7 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
                   return setAuth({ ...auth, open: false });
                 } else {
                   setAuth({ ...auth, open: false });
-                  return navigateTo(`/login`);
+                  return navigateTo(`/auth`);
                 }
               }}
             >
@@ -171,35 +154,27 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
   );
 };
 
+const Profile = () => {
+  return <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
+    <HiUser  className="text-slate-400 cursor-pointer" size={'25px'}/>
+    </div>
+}
+
 const Header = () => {
   const { auth, setAuth } = useAuth();
   const { pathname } = useLocation();
-  const { mutationFn } = useLogout();
+  const { mutate, isPending } = useLogoutUser();
   const loggedIn = cookie.getCipher();
   const navigate = useNavigate();
   const navigateTo = (url) => navigate(url);
 
-  const { mutate, isLoading: cardLoading } = useMutation({
-    mutationFn,
-    onSuccess: (data) => {
-      setAuth({});
 
-      showSuccessToast("Logged in Successfully");
-      navigateTo("/");
-    },
-    onError: (data) => {
-      showErrorToast(data.response.data?.message || "An error occured");
-    },
-  });
 
   const onClick = () => {
     return setAuth({ ...auth, open: true });
   };
 
   const handleLogout = () => {
-    cookie.clearCipher();
-    localStorage.removeItem("dzidzi");
-    localStorage.removeItem("loginTime");
     return mutate();
   };
 
@@ -227,20 +202,22 @@ const Header = () => {
             <Cart numberOfOrders={auth?.orders ? auth.orders.length : 0} />
           </button>
           {loggedIn && (
-            <Link to="/">
-              <button
+            <div className="flex gap-2">
+              <Profile/>
+                 <button
                 className="rounded-full bg-white px-6 py-2 border border-gray-900"
                 onClick={handleLogout}
               >
                 <div className="flex items-center justify-center">
-                  {cardLoading ? (
+                  {isPending ? (
                     <Spinner />
                   ) : (
                     <p className="font-bold font-gray-500 text-xs ">Logout</p>
                   )}
                 </div>
               </button>
-            </Link>
+            </div>
+           
           )}
         </div>
       </div>
@@ -250,3 +227,11 @@ const Header = () => {
 };
 
 export default Header;
+
+
+Orders.propTypes = {
+  auth: PropTypes.object,
+  setAuth: PropTypes.func, 
+  navigateTo: PropTypes.func, 
+  token: PropTypes.string
+}

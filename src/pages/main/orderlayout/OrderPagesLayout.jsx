@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import  { createContext, useState } from "react";
 import Header from "../../../components/reusableComponents/Header";
 import Footer from "../../../components/reusableComponents/Footer";
 import { Outlet } from "react-router";
@@ -10,9 +10,10 @@ const OrderpagesLayout = () => {
     <OrderContext.Provider value={{ order, SetOrder }}>
       <div className="relative">
         <Header />
+        
         <div>
-          {order.length > 0 && <div className="absolute right-0">a</div>}
-          <div className="mx-auto max-w-[1240px]">
+          <div className="mx-auto max-w-[1240px] flex-col">
+            <div className="border border-red--500 ">a</div>
             <Outlet />
           </div>
         </div>

@@ -1,10 +1,14 @@
-import React from "react";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router";
+import DzidziLoader from "../loaders/DzidziLoader";
+import PropTypes from "prop-types";
 
-function RestaurantCard({ title, data, showDelivery }) {
+function RestaurantCard({ title, data, showDelivery, isLoading }) {
   const { pathname } = useLocation();
+
+  if(isLoading){
+    return <DzidziLoader/>
+  }
   return (
     <div className="pb-6">
       <div className="flex justify-between items-center gap-4 p-2">
@@ -63,3 +67,12 @@ function RestaurantCard({ title, data, showDelivery }) {
   );
 }
 export default RestaurantCard;
+
+
+RestaurantCard.propTypes = {
+  title: PropTypes.string, 
+  data: PropTypes.string,
+  showDelivery: PropTypes.bool, 
+  isLoading: PropTypes.bool
+
+}

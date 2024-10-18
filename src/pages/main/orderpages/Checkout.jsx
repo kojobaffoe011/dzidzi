@@ -17,7 +17,9 @@ import UpdateOrderModal from "../../../components/modal/restaurant/UpdateOrder";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
 import Spinner from "../../../components/loaders/Spinner";
+import DzidziLoader from "../../../components/loaders/DzidziLoader";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
+import { useGetActiveUser, useGetActiveUserDetails } from "../../../components/brokers/apicalls";
 
 const deliveryOptions = [
   {
@@ -45,7 +47,6 @@ const Checkout = () => {
   const [editAddressOpen, setEditAddressOpen] = useState(false);
   const [addNoteOpen, setAddNoteOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  //const [useMyAddress, setUseMyAddress] = useState(false);
   const handleOpenUpdateModal = useCallback(() => {
     setUpdateOrderOpen(true);
   }, []);
@@ -74,6 +75,9 @@ const Checkout = () => {
 
   const navigateTo = (url) => navigate(url);
 
+  const {data: userDetails, isLoading: userDetailsLoading} = useGetActiveUser()
+  const {data, isLoading} = useGetActiveUserDetails(userDetails?.currentUserId)
+
   const totalOrderSum = auth?.orders?.reduce((total, order) => {
     return (
       total +
@@ -99,6 +103,8 @@ const Checkout = () => {
       amount: 0.0,
     },
   ];
+
+
 
   const totalPayableAmount = totalBreakdown.reduce((total, item) => {
     return total + item.amount;
@@ -138,8 +144,13 @@ const Checkout = () => {
       orderItems:
         orderItemsPush,
       useMyAddress: auth?.deliveryAddress ? auth?.useMyAddress : true,
-      address: auth?.deliveryAddress,
-      couponNumber: "A3FXJ51275",
+      address: auth?.deliveryAddress?.street ? auth?.deliveryAddress : {
+        city: data?.address?.city,
+        houseNumber: data?.address?.houseNumber,
+        street: data?.address?.street,
+        zip: data?.address?.zip,
+      },
+      // couponNumber: "VK8AK8KCIU",
     });
     return
     } catch (error) {
@@ -158,7 +169,7 @@ const Checkout = () => {
       return response.data;
     },
     onSuccess: (paymentResponse) => {
-        // Handle success (e.g., navigate to success page, show a message)
+        // Handle success, navigate to success page
         console.log('Payment Intent Created:', paymentResponse);
       },
     onError: (error) => {
@@ -166,6 +177,16 @@ const Checkout = () => {
       },
 
   })
+
+
+  if(userDetailsLoading || isLoading){
+    return <DzidziLoader/>
+  }
+
+  if(userDetails?.currentUserRole != 'USER'){
+    //navigate to unauthorized route
+    return <div>Unauthorized</div>
+  }
 
 
   if (!auth?.orders || auth?.orders?.length < 1) {
@@ -202,6 +223,7 @@ const Checkout = () => {
         userRole={"RESTAURANT"}
         order={selectedOrder}
         width="600px"
+        address = {data?.address}
       />
       <PromoCode
         isOpen={promoCodeOpen}
@@ -229,27 +251,29 @@ const Checkout = () => {
           <div className="flex justify-between items-center mt-4">
             <div className="flex gap-4 items-center">
               <LuBaggageClaim className="text-gray-600" size="20px" />
-              {auth?.deliveryAddress ? (
+              {auth?.deliveryAddress?.street ? (
+
+                
                 <div className="flex flex-col">
                   <p className="text-md font-normal">
                     {`${auth?.deliveryAddress?.street},
                     ${auth?.deliveryAddress?.houseNumber}`}
                   </p>
                   <p className="text-sm font-normal text-gray-600">
-                    {`${auth?.deliveryAddress?.zip} 
+                    {`${auth?.deliveryAddress?.zip || ''} 
                     ${auth?.deliveryAddress?.city}`}
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col">
                   <p className="text-md font-normal">
-                    {auth?.userCredentials
-                      ? `${auth?.userCredentials?.activeUserDetails?.address?.street} ${auth?.userCredentials?.activeUserDetails?.address?.houseNumber}`
+                    {data
+                      ? `${data.address?.street} ${data.address?.houseNumber}`
                       : auth?.deliveryAddress?.street}
                   </p>
                   <p className="text-sm font-normal text-gray-600">
-                    {auth?.userCredentials
-                      ? ` ${auth?.userCredentials?.activeUserDetails?.address?.city}`
+                    {data
+                      ? ` ${data.address?.city}`
                       : auth?.deliveryAddress?.city}
                   </p>
                 </div>

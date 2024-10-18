@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { GiHamburger } from "react-icons/gi";
 import { HiLocationMarker } from "react-icons/hi";
 import { LiaPlusSolid } from "react-icons/lia";
@@ -50,12 +50,12 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2">
               {" "}
-              <Link to="login">
+              <Link to="auth">
                 <button className="rounded-full bg-white px-6 py-2 border border-gray-900">
                   <p className="font-bold font-gray-500 ">Login</p>
                 </button>
               </Link>
-              <Link to="login/register">
+              <Link to="auth/register">
                 {" "}
                 <button className="rounded-full bg-gray-900 px-4 py-2 border border-white">
                   <p className="font-bold text-white">Signup</p>
@@ -98,7 +98,7 @@ const Hero = () => {
               <div>
                 <p className="text-white text-sm">
                   Or{" "}
-                  <Link to="login">
+                  <Link to="auth">
                     <span className="underline decoration-white cursor-pointer">
                       Sign In
                     </span>
@@ -180,7 +180,7 @@ const FrequentlyAskedQuestions = () => {
   };
 
   return (
-    <div className="p-48 flex flex-col bg-white items-center justify-center gap-8">
+    <div className="p-48 flex flex-col bg-white items-center justify-center gap-8 mb-80">
       <div className="flex flex-col gap-4 text-center">
         <p className="font-bold text-6xl">Frequently Asked Questions</p>
       </div>
@@ -229,12 +229,15 @@ const FrequentlyAskedQuestions = () => {
 
 const LandingPage = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col relative">
       <Hero />
       <HowItWork />
       <RecruitRestaurants />
       <FrequentlyAskedQuestions />
-      <Footer />
+      <div className="absolute left-0 right-0 bottom-0">
+        <Footer />
+        </div>
+      
     </div>
   );
 };

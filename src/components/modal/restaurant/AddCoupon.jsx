@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
-import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
-import { useAddCoupon, useAddCredentials } from "../../brokers/apicalls";
+import { useAddCoupon } from "../../brokers/apicalls";
+import PropTypes from "prop-types";
 
 const AddCoupon = (props) => {
+  const {userRole, handleCancel} = props
   const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
-  const { userRole } = props;
   const credentialSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     percentage: yup.number().required("Percentage is required"),
@@ -27,7 +25,6 @@ const AddCoupon = (props) => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
   } = useForm({
     resolver: yupResolver(credentialSchema),
   });
@@ -36,15 +33,15 @@ const AddCoupon = (props) => {
 
   const { mutate, isLoading } = useMutation({
     mutationFn, // mutation function goes here
-    onSuccess: (data) => {
+    onSuccess: () => {
       showSuccessToast("Coupon Added Successfully");
       reset();
-      props?.handleCancel();
+      handleCancel();
     },
     onError: (error) => {
       showErrorToast(error?.response?.data?.message || "An error occurred");
       reset();
-      props?.handleCancel();
+      handleCancel();
     },
   });
 
@@ -65,7 +62,6 @@ const AddCoupon = (props) => {
   };
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -137,7 +133,7 @@ const AddCoupon = (props) => {
                 <button
                   className="px-8 py-2 w-full bg-gray-100 rounded border"
                   type="button"
-                  onClick={props.handleCancel}
+                  onClick={handleCancel}
                 >
                   <p className="font-bold text-base text-gray-500">Exit</p>
                 </button>
@@ -146,8 +142,13 @@ const AddCoupon = (props) => {
           </form>
         </div>
       </Modal>
-    </div>
   );
 };
 
 export default AddCoupon;
+
+
+AddCoupon.propTypes = {
+  handleCancel: PropTypes.func,
+  userRole: PropTypes.string
+}

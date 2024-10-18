@@ -1,4 +1,3 @@
-import React from "react";
 import pfp from "../../assets/images/profilephoto.jpeg";
 import { IoLocationSharp } from "react-icons/io5";
 import { RiContactsBookFill } from "react-icons/ri";
@@ -6,6 +5,7 @@ import { MdEmail } from "react-icons/md";
 import { useParams } from "react-router";
 import { useGetSingleUser } from "../../components/brokers/apicalls";
 import Loader from "../../components/loaders/Loader";
+import PropTypes from 'prop-types';
 
 const ViewUsers = (props) => {
   const { id } = useParams();
@@ -32,12 +32,13 @@ const ViewUsers = (props) => {
     return <Loader />;
   }
 
+
   return (
     <div className="grid grid-cols-4 mt-2 gap-4 h-screen">
       <div className="">
         <img src={pfp} alt="pfp" />
       </div>
-      <div className="col-span-2 border flex flex-col">
+      <div className="col-span-2 flex flex-col">
         <div className="flex flex-col gap-2">
           <p className="text-xs italic font-thin">This profile belongs to</p>
           <div className="flex items-center gap-8">
@@ -69,3 +70,9 @@ const ViewUsers = (props) => {
 };
 
 export default ViewUsers;
+
+
+ViewUsers.propTypes = {
+  isLoading: PropTypes.bool,
+  data: PropTypes.object
+}

@@ -1,6 +1,6 @@
-import React from "react";
 import { useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
+import PropTypes from "prop-types";
 
 /**
  * The `Layout` component serves as a basic layout structure for a web page.
@@ -38,3 +38,9 @@ const Layout = (props) => {
 };
 
 export default Layout;
+
+
+Layout.propTypes = {
+  children: PropTypes.node,
+}
+

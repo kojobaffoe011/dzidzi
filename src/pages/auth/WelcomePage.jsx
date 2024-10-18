@@ -1,4 +1,3 @@
-import React from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
@@ -45,7 +44,7 @@ const WelcomePage = () => {
       ...auth,
       userCredentials: { ...auth?.userCredentials, activeUserDetails },
     });
-  }, [auth]);
+  }, [auth, activeUserDetails, setAuth ]);
 
   return (
     <div className="p-16 flex items-center justify-center h-screen flex-col">

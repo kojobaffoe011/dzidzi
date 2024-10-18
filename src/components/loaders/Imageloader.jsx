@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 
 
 
-const Imageloader = ({imageID}) => {
-
+const Imageloader = ({imageID, classNames}) => {
 
      const [imageSrc, setImageSrc] = useState('')
  const {
@@ -28,15 +27,17 @@ const Imageloader = ({imageID}) => {
   }
 }, [imageBlob]);
 
-
-
+if(!imageBlob){
+  return <div className="bg-black w-full h-full">a</div>
+}
 
   return (
     <div> 
         {imageLoading ? (
-              <Spinner size="30px" />
+              <Spinner size='100px' />
             ) : (
-              <img src={imageSrc} alt="img" width="300"/>
+              <img src={imageSrc} 
+               className={`${classNames}`}/>
             )}
     </div>
   )
@@ -45,6 +46,7 @@ const Imageloader = ({imageID}) => {
 export default Imageloader
 
 Imageloader.propTypes = {
-  imageID: PropTypes.string.isRequired,
+  imageID: PropTypes.string,
+  classNames: PropTypes.string
 }
 

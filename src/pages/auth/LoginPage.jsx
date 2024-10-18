@@ -1,23 +1,37 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
 import { AiOutlineEye } from "react-icons/ai";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate } from "react-router";
 import Spinner from "../../components/loaders/Spinner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { useGetActiveUser, useLogin } from "../../components/brokers/apicalls";
+import { useGetActiveUser, useGetActiveUserDetails, useLogin } from "../../components/brokers/apicalls";
 import { useMutation } from "@tanstack/react-query";
 import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
 
-const Form = ({ userType, error, setError }) => {
+const Form = () => {
   const [showPass, setShowPass] = useState(false);
   const { setAuth, auth } = useAuth();
-  const { pathname } = useLocation();
+  const [activeUser, setActiveUer] = useState(null)
   const { mutationFn } = useLogin();
+
+    const {
+    refetch: refetchUser,
+    isLoading: activeUserLoading,
+    // isError: isActiveUserError,
+    // error: activeUserError,
+  } = useGetActiveUser();
+
+  const {
+    refetch: refetchDetails,
+    isLoading: activeUserDetailsLoading,
+    // isError: isActiveUserDetailsError,
+    // error: activeUserDetailsError,
+  } = useGetActiveUserDetails(activeUser);
+
 
   const handleTogglePass = () => {
     setShowPass(!showPass);
@@ -31,7 +45,6 @@ const Form = ({ userType, error, setError }) => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(AltSchema),
@@ -42,21 +55,10 @@ const Form = ({ userType, error, setError }) => {
     navigate(url);
   };
 
-  const { mutate, isPending: cardLoading } = useMutation({
+  const { mutateAsync: login, isPending: cardLoading } = useMutation({
+    mutationKey:["login"],
     mutationFn,
-    onSuccess: (data) => {
-      setLoginTimestamp();
-      cookie.setCipher(data?.data?.access_token);
-      navigateTo(
-        `${
-          pathname.includes("login")
-            ? "/welcome"
-            : `/details/checkout/${auth?.restaurant.id}`
-        }`
-      );
-    },
     onError: (data) => {
-      setError(true);
       showErrorToast(data.response.data?.message || "An error occured");
     },
   });
@@ -66,16 +68,53 @@ const Form = ({ userType, error, setError }) => {
     localStorage.setItem("loginTime", loginTime.toString());
   };
 
-  const formSubmitHandler = (data) => {
+  const formSubmitHandler = async (data) => {
     if (Object.keys(errors).length === 0) {
-      mutate({
+      try {
+       const loggedInUser =  await login({
         username: data.username,
         password: data.password,
       });
+
+        // Store token in cookies
+        cookie.setCipher(loggedInUser?.data?.access_token);
+        setLoginTimestamp()
+
+      if(!activeUserLoading && !activeUserDetailsLoading){
+        const { data: user } = await refetchUser();
+        setActiveUer(user?.currentUserId)        
+
+        showSuccessToast("Logged in Succesfully")
+
+         if (user?.currentUserRole == "USER") {
+           const { data: userDetails } = await refetchDetails();
+             setAuth({
+          ...auth,
+          userCredentials: userDetails,
+          deliveryAddress: {
+            city: userDetails?.address?.city,
+            houseNumber: userDetails?.address?.houseNumber,
+            street: userDetails?.address?.street,
+          },
+          useMyAddress: true
+        });
+          if (auth?.orders && auth?.restaurant) {
+            navigateTo(`/details/checkout/${auth?.restaurant.id}`);
+          } else {
+            navigateTo("/details");
+          }
+        } else {
+          navigateTo("/dashboard");
+        }
+      }
+      } catch (error) {
+
+        console.log({error})
+      }
+     
     }
   };
 
-  console.log({ authFromLogin: auth });
 
   return (
     <div className="mt-[10px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">
@@ -140,7 +179,7 @@ const Form = ({ userType, error, setError }) => {
             </Link>
           </div>
           <button className="w-full mt-5 bg-red-500 p-4 rounded-lg">
-            {cardLoading ? (
+            {cardLoading || activeUserDetailsLoading ? (
               <Spinner color="white" size="20px" />
             ) : (
               <p className="text-white text-sm">Login</p>
@@ -153,15 +192,13 @@ const Form = ({ userType, error, setError }) => {
 };
 
 const LoginPage = () => {
-  const [userType, setUserType] = useState("Customer");
-  const [error, setError] = useState(false);
 
   return (
     <div className="w-full">
       <div className="flex-col mb-2">
         <p className="font-bold text-2xl text-center">Welcome Back!</p>
       </div>
-      <Form userType={userType} error={error} setError={setError} />
+      <Form />
     </div>
   );
 };

@@ -125,7 +125,7 @@ const OrganizationForm = () => {
     mutationFn,
     onSuccess: (deets) => {
       showSuccessToast("Registered Successfully");
-      navigateTo("/login");
+      navigateTo("/auth");
     },
     onError: (error) => {
       showErrorToast(error.message);

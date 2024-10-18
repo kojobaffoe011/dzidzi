@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { Modal } from "../modal";
-import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
-import Spinner from "../../loaders/Spinner";
+import { showErrorToast } from "../../../toast/Toast";
 import useAuth from "../../../hooks/useAuth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
-import { useAddCoupon } from "../../brokers/apicalls";
 import { FaCheckCircle } from "react-icons/fa";
 import { GoLocation } from "react-icons/go";
+import PropTypes from "prop-types";
 
 const EditCheckoutAddress = (props) => {
+  const {handleCancel, isOpen, address} = props
   const { auth, setAuth } = useAuth();
   const [useMyAddress, setUseMyAddress] = useState(true);
   const addressOptions = [
@@ -36,29 +35,12 @@ const EditCheckoutAddress = (props) => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(addressSchema),
   });
 
-  const { mutationFn } = useAddCoupon();
-
-  const { mutate, isLoading } = useMutation({
-    mutationFn,
-    onSuccess: () => {
-      showSuccessToast("Coupon Added Successfully");
-      reset();
-      props?.handleCancel();
-    },
-    onError: (error) => {
-      showErrorToast(error?.response?.data?.message || "An error occurred");
-      reset();
-      props?.handleCancel();
-    },
-  });
-
-  const handleAddCoupon = (data) => {
+  const handleUseDifferentAddress = (data) => {
     try {
       if (Object.keys(errors).length === 0) {
         setAuth({
@@ -72,34 +54,34 @@ const EditCheckoutAddress = (props) => {
             floor: 0,
           },
         });
-        props.handleCancel();
+        handleCancel();
       }
     } catch (error) {
       showErrorToast(error.message);
     }
   };
-  const handleUseMyAddress = (data) => {
+  const handleUseMyAddress = () => {
     try {
       setAuth({
         ...auth,
         useMyAddress: true,
         deliveryAddress: {
-          street: auth?.userCredentials?.activeUserDetails?.address?.street,
+          street: address?.street,
           houseNumber:
-            auth?.userCredentials?.activeUserDetails?.address?.houseNumber,
-          zip: auth?.userCredentials?.activeUserDetails?.address?.zip || 47059,
-          city: auth?.userCredentials?.activeUserDetails?.address?.city,
+            address?.houseNumber,
+          zip: address?.zip || 47059,
+          city: address?.city,
           floor: 0,
         },
       });
-      props.handleCancel();
+      handleCancel();
     } catch (error) {
       showErrorToast(error.message);
     }
   };
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
+    <div handleCancel={handleCancel} isOpen={isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -141,13 +123,13 @@ const EditCheckoutAddress = (props) => {
                 {
                   <div className="flex flex-col">
                     <p className="text-md font-normal">
-                      {auth?.userCredentials
-                        ? `${auth?.userCredentials?.activeUserDetails?.address?.street} ${auth?.userCredentials?.activeUserDetails?.address?.houseNumber}`
+                      {address
+                        ? `${address?.street} ${address?.houseNumber}`
                         : auth?.deliveryAddress?.street}
                     </p>
                     <p className="text-sm font-normal text-gray-600">
-                      {auth?.userCredentials
-                        ? ` ${auth?.userCredentials?.activeUserDetails?.address?.city}`
+                      {address
+                        ? ` ${address?.city}`
                         : auth?.deliveryAddress?.city}
                     </p>
                   </div>
@@ -159,20 +141,16 @@ const EditCheckoutAddress = (props) => {
                     className="px-8 py-2 w-full bg-green-600 rounded"
                     onClick={handleUseMyAddress}
                   >
-                    {isLoading ? (
-                      <Spinner color="white" size="15px" />
-                    ) : (
                       <p className="font-bold text-sm text-white">
                         Use my address
                       </p>
-                    )}
                   </Button>
                 </div>
                 <div className="flex items-center">
                   <button
                     className="px-8 py-2 w-full bg-gray-100 rounded border"
                     type="button"
-                    onClick={props.handleCancel}
+                    onClick={handleCancel}
                   >
                     <p className="font-bold text-sm text-gray-500">Exit</p>
                   </button>
@@ -182,7 +160,7 @@ const EditCheckoutAddress = (props) => {
           )}
 
           {!useMyAddress && (
-            <form onSubmit={handleSubmit(handleAddCoupon)} className="mt-6">
+            <form onSubmit={handleSubmit(handleUseDifferentAddress)} className="mt-6">
               <div className="flex flex-col mb-3 gap-6">
                 <div className="grid grid-cols-3 gap-1">
                   <div className="w-full flex flex-col gap-1 col-span-2 ">
@@ -239,20 +217,16 @@ const EditCheckoutAddress = (props) => {
               <div className="flex justify-center">
                 <div className="flex items-center mr-2">
                   <Button className="px-8 py-2 w-full bg-green-600 rounded">
-                    {isLoading ? (
-                      <Spinner color="white" size="15px" />
-                    ) : (
                       <p className="font-bold text-sm text-white">
                         Use this address
                       </p>
-                    )}
                   </Button>
                 </div>
                 <div className="flex items-center">
                   <button
                     className="px-8 py-2 w-full bg-gray-100 rounded border"
                     type="button"
-                    onClick={props.handleCancel}
+                    onClick={handleCancel}
                   >
                     <p className="font-bold text-sm text-gray-500">Exit</p>
                   </button>
@@ -267,3 +241,9 @@ const EditCheckoutAddress = (props) => {
 };
 
 export default EditCheckoutAddress;
+
+EditCheckoutAddress.propTypes = {
+  handleCancel: PropTypes.func,
+  address: PropTypes.object,
+  isOpen: PropTypes.bool
+}

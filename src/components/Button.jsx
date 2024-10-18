@@ -13,11 +13,11 @@ import { classNames } from "../utils/classNames";
  * @param {...any} props - Additional HTML attributes to apply to the button element.
  * @returns {JSX.Element} The rendered button element.
  */
-const Button = ({ className, children, rounded, variant, color, ...props }) => (
+const Button = ({ className, children, rounded, variant, ...props }) => (
   <button
     className={classNames(
       "cursor-pointer select-none [outline:none] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-100 disabled:shadow-inner",
-      rounded ? "rounded-lg" : "",
+      rounded ? "rounded-md" : "",
       variant === "primary" ? "bg-[#0d1655] text-white font-bold" : "",
       variant === "secondary"
         ? "bg-[#E2A927] hover:bg-[#F0D493] text-white font-bold"

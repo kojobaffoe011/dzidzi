@@ -12,7 +12,6 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterInfo from "./pages/auth/signup/RegisterInfo";
 import DetailsMain from "./components/reusableComponents/DetailsScreen";
 import RestaurantMenu from "./pages/main/orderpages/RestaurantMenu";
-import OrderPagesLayout from "./pages/main/orderlayout/OrderPagesLayout";
 import ReviewOrder from "./pages/main/orderpages/ReviewOrder";
 import PersistLogin from "./components/PersistLogin";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -30,6 +29,7 @@ import ViewCouriers from "./pages/admin/ViewCouriers";
 import VIewServices from "./pages/admin/VIewServices";
 import { OrderProvider } from "./context/orderProvider";
 import Checkout from "./pages/main/orderpages/Checkout";
+import Orders from "./pages/admin/Orders";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +41,7 @@ const App = () => {
           <Layout>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginOutlet />}>
+              <Route path="auth" element={<LoginOutlet />}>
                 <Route path="" element={<LoginPage />} />
                 <Route path="admin" element={<LoginPage />} />
                 <Route path="register" element={<RegisterInfo />} />
@@ -69,8 +69,9 @@ const App = () => {
               <Route element={<PersistLogin />}>
                 <Route path="/welcome" exact element={<WelcomePage />} />
                 <Route path="/dashboard" exact element={<Dashboard />}>
-                  <Route path="profile" exact element={<MyProfileDetails />} />
+                  <Route path="profile-details" exact element={<MyProfileDetails />} />
                   <Route path="restaurants" exact element={<Restaurants />} />
+                  <Route path="orders" exact element={<Orders />} />
                   <Route
                     path="restaurants/:id"
                     exact

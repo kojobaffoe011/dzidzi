@@ -140,7 +140,7 @@ export const useUserList = (firstName, lastName) => {
   };
 
   // Use the useInfiniteQuery hook to manage the paginated query
-  return useInfiniteQuery({ queryKey, fetchUsers, options });
+ return  useInfiniteQuery({ queryKey, queryFn: fetchUsers, ...options });
 };
 
 /// Function to fetch paged restaurants
@@ -163,24 +163,6 @@ const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
   return response.data;
 };
 
-// export const useRestaurantList = (name, rating) => {
-//   const queryKey = ["restaurantList", name, rating];
-
-//   // Determine the next page param
-//   const getNextPageParam = (lastPage) =>
-//     lastPage.hasNextPage ? lastPage.lastCursor : undefined;
-
-//   // Configure options for the useInfiniteQuery hook
-//   const options = {
-//     getNextPageParam,
-//     keepPreviousData: true,
-//     refetchOnWindowFocus: false,
-//   };
-
-//   // Use the useInfiniteQuery hook to manage the paginated query
-//   return useInfiniteQuery(queryKey, fetchRestaurants, options);
-// };
-
 export const useRestaurantList = (name, rating) => {
   const queryKey = ["restaurantList", name, rating];
 
@@ -197,6 +179,7 @@ export const useRestaurantList = (name, rating) => {
     refetchOnWindowFocus: false,
   });
 };
+
 export const useGetSingleRestaurant = (id) => {
   const queryKey = ["restaurant", id];
 
@@ -342,7 +325,7 @@ const fetchMenus = async ({ queryKey, pageParam = {} }) => {
 
   const cursor = pageParam.cursor || null;
   const direction = pageParam.direction || "FORWARD";
-  const limit = 5; // Adjust the limit if necessary
+  const limit = 6; // Adjust the limit if necessary
   let url = `/paged-menus?limit=${limit}`;
 
   if (name) {
@@ -437,7 +420,6 @@ export const useMenuListAlt = (
     return response?.data;
   };
 
-  const enabled = Boolean(cursor, direction);
 
   return useQuery({
     queryKey,
@@ -684,6 +666,7 @@ export const useGetCoupons = () => {
     staleTime: 0,
   });
 };
+
 export const useGetExtras = () => {
   const queryKey = ["coupons"];
 
@@ -740,6 +723,7 @@ export const useLogin = () => {
 
   return { mutationFn };
 };
+
 export const useRegisterUser = () => {
   const mutationFn = (data) => {
     return axios.post(`${NO_AUTH_URL}/user/sign-up`, data, {
@@ -800,21 +784,6 @@ export const useSecured = () => {
 //users requests
 
 //PUT REQUESTS
-export const useUploadExtraDocuments = () => {
-  const uploadMutation = (data) => {
-    return put(`/uploaddocs`, data);
-  };
-
-  return { uploadMutation };
-};
-
-export const useChangeStudentDetails = () => {
-  const mutationFn = (data) => {
-    return put(`/editstudent`, data);
-  };
-
-  return { mutationFn };
-};
 
 export const useChangeDetails = () => {
   const changeRestMut = (data) => {
@@ -852,7 +821,6 @@ export const useSignup = () => {
 export const useAddOrderItem = () => {
   const mutationFn = (data) => {
     const response = post(`/item`, data);
-    console.log(response, "from order item");
     return response?.data;
   };
 
@@ -899,8 +867,6 @@ export const useGetImage = (id) => {
 
   const queryFn = async () => {
     const response = await get(url, { responseType: 'blob' });  // Specify 'blob' to handle binary data
-      console.log({response});  // Check if the response is indeed a Blob
-
     return response;
   };
 
@@ -923,4 +889,131 @@ export const useGetImage = (id) => {
   });
 };
 
-//update order item
+//update get orders
+export const useOrderList = (
+  restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy, 
+  cursor,
+  direction
+) => {
+  const queryKey = [
+  "orderlist",
+  restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy,
+  cursor,
+  direction
+  ];
+
+  const limit = 10; // Adjust the limit if necessary
+  let url = `/paged-orders?limit=${limit}`;
+
+    const queryParams = {
+    restaurantId,
+    courierId,
+    userId,
+    orderId,
+    sortBy,
+    orderBy,
+      cursor,
+    direction,
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+    keepPreviousData: true,
+  });
+};
+
+export const useGetSingleOrder = (id) => {
+  const queryKey = ["singleorder", id];
+
+  let url = `/order/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id)
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+}
+export const useGetOrderItemsByOrderID = (id) => {
+  const queryKey = ["orderitemsbyorderID", id];
+
+  let url = `item/order/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id)
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+}
+
+
+export const useUpdateOrderStaus = (orderId) => {
+  const mutationFn = (data) => {
+    return put(`/restaurant/order/${orderId}`, data);
+  };
+
+  return { mutationFn };
+};

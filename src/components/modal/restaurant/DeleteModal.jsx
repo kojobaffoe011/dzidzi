@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
-import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -16,54 +13,9 @@ const DeleteModal = (props) => {
   const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
   const { userRole } = props;
 
-  const credentialSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email("Please enter a valid email")
-      .required("Email is required"),
-  });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(credentialSchema),
-  });
 
-  const { mutationFn } = useAddCredentials();
-
-  const { mutate, isLoading } = useMutation({
-    mutationFn,
-    onSuccess: (data) => {
-      // if (data.response.status == 200) {
-      showSuccessToast("User Checked In Successfully");
-      // } else {
-      // showErrorToast(data?.response?.data.message);
-      // }
-
-      reset();
-      props?.handleCancel();
-    },
-    onError: (data) => {
-      showErrorToast(data?.response?.error);
-      reset();
-      props?.handleCancel();
-    },
-  });
-
-  const handleAddCredential = (data) => {
-    try {
-      if (types.includes(userRole)) {
-        mutate({
-          variabes: { email: data.email, userRole: userRole },
-        });
-      } else showErrorToast("Fill all fields");
-    } catch (error) {
-      showErrorToast(error.message);
-    }
-  };
+ 
 
   return (
     <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
@@ -87,7 +39,7 @@ const DeleteModal = (props) => {
                 className="px-8 py-2 w-full bg-red-600 rounded"
                 onClick={props.deleteItem}
               >
-                {isLoading ? (
+                {props.isLoading ? (
                   <Spinner color="white" size="15px" />
                 ) : (
                   <p className="font-bold text-base text-white">Delete</p>

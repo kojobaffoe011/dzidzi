@@ -44,7 +44,7 @@ const LoginOutlet = () => {
               <p className="lg:block md:block xs:hidden sm:hidden ss:hidden xss:hidden mr-1">
                 No account yet?
               </p>
-              <Link to="/login/register">
+              <Link to="/auth/register">
                 <p className="text-red-500 underline lg:text-base md:text-base xs:text-xs sm:text-xs ss:text-xs xss:text-xs">
                   Register Now!
                 </p>

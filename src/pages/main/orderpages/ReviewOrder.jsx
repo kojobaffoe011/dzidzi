@@ -1,25 +1,24 @@
-import  { Suspense, useEffect, useState } from "react";
+import  { useContext, useState } from "react";
 import Button from "../../../components/Button";
 import { useParams } from "react-router";
 import {
   useExtrasList,
-  useGetImage,
   useGetSingleMenu,
 } from "../../../components/brokers/apicalls";
 import Loader from "../../../components/loaders/Loader";
 import Spinner from "../../../components/loaders/Spinner";
-import LazyImage from "../../../components/LazyImage";
-import burger from "../../../assets/images/burger.jpeg";
 import useAuth from "../../../hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import axios from "axios";
 import Imageloader from "../../../components/loaders/Imageloader";
+import OrderContext from "../../../context/orderProvider";
+import  PropTypes  from "prop-types";
 
-const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
+const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderItems, menuData }) => {
   const [extraCount, setExtraCount] = useState(1);
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["addExtras"],
     mutationFn: async (data) => {
       const response = await axios.post(`/item`, data);
@@ -48,8 +47,20 @@ const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
           extra: id,
           quantity: extraCount,
         });
-      } else throw Error("Cannot add orders from different restaurants");
+      } else throw Error("DIFFERNTRESTAURANTS");
     } catch (error) {
+      if(error.message == "DIFFERNTRESTAURANTS"){
+         setAuth({ ...auth, restaurantClash: true });
+        setReplaceOrder(true);
+        setOrderItems({
+          orderType: "extra",
+          extra: id,
+          quantity: extraCount,
+          restaurant: menuData?.restaurant?.name
+        })
+
+        return;
+      }
       showErrorToast(error.message);
     }
   };
@@ -81,8 +92,8 @@ const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
               rounded
               onClick={handleAddExtra}
             >
-              {isLoading ? (
-                <Spinner color="WHITE" size="30px" />
+              {isPending ? (
+                <Spinner color="WHITE" size="15px" />
               ) : (
                 <p className="text-white font-bold text-xs">
                   Add {extraCount} to Order{" "}
@@ -97,9 +108,10 @@ const NumberOfExtras = ({ id, setAuth, auth, resID }) => {
 };
 
 const ReviewOrder = () => {
+    const { setReplaceOrder, setOrderItems } = useContext(OrderContext); // Access setReplaceOrder from the context
+
   const [selectedNumber, setSelectedNumber] = useState(1);
   const { auth, setAuth } = useAuth();
-  const [imageSrc, setImageSrc] = useState('')
 
   const [filters, setFilters] = useState({
     name: null,
@@ -141,12 +153,10 @@ const ReviewOrder = () => {
     mutationKey: ["addOrderItem"],
     mutationFn: async (data) => {
       const response = await axios.post(`/item`, data);
-      console.log(data, "from order item");
       return response?.data;
     },
     // mutationFn,
     onSuccess: (data) => {
-      console.log(data);
       setAuth((prevAuth) => ({
         ...prevAuth,
         open: true,
@@ -169,8 +179,20 @@ const ReviewOrder = () => {
           menu: id,
           quantity: selectedNumber,
         });
-      } else throw Error("Cannot Add Orders from different restaurants");
+     } else throw Error("DIFFERNTRESTAURANTS");
     } catch (error) {
+      if(error.message == "DIFFERNTRESTAURANTS"){
+        setAuth({ ...auth, restaurantClash: true });
+        setReplaceOrder(true);
+        setOrderItems({
+          orderType: "menu",
+          menu: id,
+          quantity: selectedNumber,
+          restaurant: menuData?.restaurant?.name
+        })
+
+        return;
+      }
       showErrorToast(error.message);
     }
   };
@@ -186,8 +208,8 @@ const ReviewOrder = () => {
           <p>Back to {menuData?.restaurant?.name}</p>
         </div>
         <div className="grid grid-cols-2 p-2 gap-2">
-          <div className="flex items-center justify-center">
-          <Imageloader imageID={menuData?.image?.id}/>
+          <div className="flex items-center justify-center h-full">
+          <Imageloader imageID={menuData?.image?.id} classNames={'h-[500px] w-full border object-cover'}/>
           </div>
           <div className="flex-col flex">
             <div className="flex flex-col gap-1">
@@ -220,7 +242,7 @@ const ReviewOrder = () => {
                 onClick={handleAddOrder}
               >
                 {isLoading ? (
-                  <Spinner color="WHITE" size="30px" />
+                  <Spinner color="WHITE" size="20px" />
                 ) : (
                   <p className="text-white font-bold">
                     Add {selectedNumber} Order • €{" "}
@@ -244,20 +266,8 @@ const ReviewOrder = () => {
               return (
                 <div className="flex flex-col" key={idx}>
                   <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
-                    <div className="overflow-hidden basis-1/3">
-                      <Suspense
-                        fallback={
-                          <div>
-                            <Spinner color="blue" size="20px" />
-                          </div>
-                        }
-                      >
-                        <LazyImage
-                          src={item?.value.image ? item?.value.image : burger}
-                          alt="imgs"
-                          className="w-[100px] rounded h-[70px]"
-                        />
-                      </Suspense>
+                    <div className="overflow-hidden basis-1/3 h-full">
+                     <Imageloader imageID={item?.value.image?.id}/>
                     </div>
                     <div className="p-1 flex justify-between items-center basis-2/3 w-full h-full group">
                       <div className="flex flex-col w-full gap-1">
@@ -287,6 +297,9 @@ const ReviewOrder = () => {
                             setAuth={setAuth}
                             auth={auth}
                             resID={resID}
+                            setReplaceOrder={setReplaceOrder}
+                            setOrderItems={setOrderItems}
+                            menuData={menuData}
                           />
                         </div>
                       </div>
@@ -317,5 +330,15 @@ const ReviewOrder = () => {
     </div>
   );
 };
+
+NumberOfExtras.propTypes = {
+  id: PropTypes.string, 
+  setAuth: PropTypes.func, 
+  auth: PropTypes.object, 
+  resID: PropTypes.string,
+  setReplaceOrder: PropTypes.func, 
+  setOrderItems: PropTypes.func, 
+  menuData: PropTypes.object
+} 
 
 export default ReviewOrder;

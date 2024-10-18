@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { BiChevronDown } from "react-icons/bi";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
+import { useState } from "react";
+import {  BsArrowRight } from "react-icons/bs";
 import { GiPizzaSlice } from "react-icons/gi";
 import RestaurantCard from "./restaurantCard";
 import MenuDetails from "./menuDetails";
 import { useRestaurantList } from "../brokers/apicalls";
+import DzidziLoader from "../loaders/DzidziLoader";
+import Spinner from "../loaders/Spinner";
 
 export const filters = [
   "Sort",
@@ -67,71 +68,15 @@ const promodata = [
   },
 ];
 
-const categories = [
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-  {
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  },
-];
-
 function Categories() {
   return (
     <div className="flex justify-center gap-8 overflow-x-scroll px-12">
-      {categories.map((item, idx) => {
+      {Array(8).fill({
+    icon: <GiPizzaSlice size={"40px"} />,
+    text: "pizza ",
+  }).map((item, idx) => {
         return (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center" key={idx}>
             <div className=" p-2 rounded-full hover:bg-gray-200 hover:cursor-pointer">
               {" "}
               {item.icon}
@@ -149,7 +94,7 @@ function Promo() {
     <div className="grid grid-cols-3 py-4 gap-6">
       {promodata?.map((item, idx) => {
         return (
-          <div className="cursor-pointer">
+          <div className="cursor-pointer" key={idx}>
             <div className="flex flex-col w-full gap-2">
               <div className="h-[160px] rounded-xl bg-promo-bg bg-cover bg-no-repeat relative">
                 {" "}
@@ -189,24 +134,13 @@ function DetailsMain() {
     hasNextPage: restaurantsHasNextPage,
     fetchNextPage: restaurantsFetchNextPage,
     isFetchingNextPage: restaurantsFetchingNextPage,
-    isError: isUsersError,
+    // isError: isUsersError,
   } = useRestaurantList(name, rating);
 
   let pages = restaurantsList?.pages?.flatMap((page) => page?.results);
 
   if (restaurantsLoading) {
-    return (
-      <div className="p-16 flex items-center justify-center h-screen flex-col">
-        <>
-          <p className="font-logo font-extrabold text-6xl animate-bounce">
-            dzidzi
-          </p>
-          <p className="animate-bounce text-sm text-gray-400">
-            Where food lives
-          </p>
-        </>
-      </div>
-    );
+   return <DzidziLoader/>
   }
 
   return (

@@ -5,24 +5,34 @@ import Spinner from "../../loaders/Spinner";
 import useAuth from "../../../hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import Button from "../../Button";
-import {useGetOrderItemByID } from "../../brokers/apicalls";
+import {useGetOrderItemByID, useGetSingleMenu } from "../../brokers/apicalls";
 import axios from "axios";
+import Imageloader from "../../loaders/Imageloader";
+import PropTypes from "prop-types";
 
 const UpdateOrderModal = (props) => {
   const [selectedNumber, setSelectedNumber] = useState(1);
   const { order } = props;
   const { setAuth } = useAuth();
+
  
   const {
     data: orderItem,
     isLoading: orderItemLoading,
-    isError: isOrderItemError,
-    error: orderItemError,
+    // isError: isOrderItemError,
+    // error: orderItemError,
   } = useGetOrderItemByID(order?.id);
 
   const {
+    data: menuData,
+    isLoading: menuDataLoading,
+    isError:isMenuDataError,
+    error: menuDataError,
+  } = useGetSingleMenu(order?.menu?.id || order?.extra?.id);
+
+  const {
     mutate: updateMutate,
-    isLoading,
+    isPending,
     data,
   } = useMutation({
     mutationKey: ["updateOrder", order?.id],
@@ -48,28 +58,29 @@ const UpdateOrderModal = (props) => {
       props.handleCancel();
     },
     onError: (error) => {
-      console.log({ data });
+      console.log({ error });
       showErrorToast(error.message);
     },
   });
 
-  const { mutate: deleteMutate, isLoading: deleteLoading } = useMutation({
+  const { mutate: deleteMutate, isPending: deleteLoading } = useMutation({
     mutationKey: ["deleteOrderItem", order?.id],
     mutationFn: async (data) => {
       const response = await axios.delete(`/item/${order.id}`, data);
       return response?.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       setAuth((prevAuth) => ({
         ...prevAuth,
-        orders: prevAuth?.orders?.filter((item) => item.id !== order.id),
+        restaurantClash: prevAuth?.orders?.length <= 1 ? false : 0,
+        restaurant: prevAuth?.orders?.length <= 1 ? null : prevAuth?.restaurant,
+        orders: prevAuth?.orders?.filter((item) => item.id !== order.id)
       }));
 
       showSuccessToast("Order Item Deleted Successfully");
       props.handleCancel();
     },
     onError: (error) => {
-      console.log({ data });
       showErrorToast(error.message);
     },
   });
@@ -84,7 +95,7 @@ const UpdateOrderModal = (props) => {
         });
       } else {
         updateMutate({
-          menu: extra.menu.id,
+          menu: order.extra.id,
           quantity: selectedNumber,
           id: order.id,
         });
@@ -112,6 +123,7 @@ const UpdateOrderModal = (props) => {
     }
   };
 
+
   return (
     <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
@@ -121,8 +133,11 @@ const UpdateOrderModal = (props) => {
               <Spinner color="black" size="90px" />
             </div>
           ) : (
-            <div className="p-2 grid grid-cols-2 mt-8">
-              <div className=""></div>
+            <div className="p-2 grid grid-cols-2 mt-8 gap-2">
+              <div className="
+              ">
+                <Imageloader imageID={menuData?.image?.id} classNames="h-[400px] w-full object-contain"/>
+              </div>
               <div className="flex-col">
                 <div className="flex-col flex">
                   <div className="flex flex-col gap-1">
@@ -166,9 +181,10 @@ const UpdateOrderModal = (props) => {
                       className="bg-black py-3 mt-3 hover:bg-gray-600"
                       rounded
                       onClick={handleUpdateOrder}
+                      disabled={deleteLoading || isPending}
                     >
-                      {isLoading ? (
-                        <Spinner color="WHITE" size="30px" />
+                      {isPending ? (
+                        <Spinner color="WHITE" size="20px" />
                       ) : (
                         <p className="text-white font-bold">
                           Update Order • €
@@ -183,8 +199,9 @@ const UpdateOrderModal = (props) => {
                     </Button>
                     <div className="flex justify-center mt-2">
                       <Button
-                        className="font-bold text-md text-red-700 w-full"
+                        className="font-bold text-md text-red-700 w-full disabled:bg-white disabled:text-red-700"
                         onClick={handleDeleteOrder}
+                        disabled={deleteLoading || isPending}
                       >
                         Remove from cart
                       </Button>
@@ -201,3 +218,9 @@ const UpdateOrderModal = (props) => {
 };
 
 export default UpdateOrderModal;
+
+UpdateOrderModal.propTypes = {
+  order: PropTypes.object,
+  handleCancel: PropTypes.func,
+  isOpen: PropTypes.bool
+}

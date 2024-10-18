@@ -1,9 +1,7 @@
-import React from "react";
 import { FiFacebook } from "react-icons/fi";
 import { BsTwitterX } from "react-icons/bs";
 import { FaInstagram } from "react-icons/fa";
 import { PiYoutubeLogoLight } from "react-icons/pi";
-import { LuGithub } from "react-icons/lu";
 import { LiaMapSolid } from "react-icons/lia";
 import { HiOutlineMail } from "react-icons/hi";
 
@@ -38,16 +36,18 @@ const links = [
   },
 ];
 
-const media = [
-  <FiFacebook size="20px" />,
-  <BsTwitterX size="20px" />,
-  <FaInstagram size="20px" />,
-  <PiYoutubeLogoLight size="20px" />,
-  <LuGithub size="20px" />,
-  <LiaMapSolid size="20px" />,
-];
+
 
 const Footer = () => {
+
+  const media = [
+    {icon: <FiFacebook size="20px" />},
+    {icon: <BsTwitterX size="20px" />},
+    {icon:<FaInstagram size="20px" />},
+    {icon: <PiYoutubeLogoLight size="20px" />},
+    {icon: <PiYoutubeLogoLight size="20px" />},
+    {icon: <LiaMapSolid size="20px" />}
+];
   return (
     <div className="p-24 flex flex-col">
       <div className="flex justify-around gap-12 items-center p-4 px-16">
@@ -71,7 +71,7 @@ const Footer = () => {
             {media.map((item, idx) => {
               return (
                 <div key={idx}>
-                  <p className="font-bold text-sm">{item}</p>
+                  <p className="font-bold text-sm">{item.icon}</p>
                 </div>
               );
             })}

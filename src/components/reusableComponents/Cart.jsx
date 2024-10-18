@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { GiShoppingCart } from "react-icons/gi";
 
 const Cart = (props) => {
@@ -19,3 +19,7 @@ const Cart = (props) => {
 };
 
 export default Cart;
+
+Cart.propTypes = {
+  numberOfOrders: PropTypes.number
+}

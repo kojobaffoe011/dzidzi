@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
-import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -11,10 +8,11 @@ import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Button from "../../Button";
 import { useAddCredentials } from "../../brokers/apicalls";
+import PropTypes from "prop-types";
 
 const AddCredentialModal = (props) => {
   const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
-  const { userRole } = props;
+  const { userRole, handleCancel } = props;
 
   const credentialSchema = yup.object().shape({
     email: yup
@@ -27,7 +25,6 @@ const AddCredentialModal = (props) => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
   } = useForm({
     resolver: yupResolver(credentialSchema),
   });
@@ -36,35 +33,17 @@ const AddCredentialModal = (props) => {
 
   const { mutate, isLoading } = useMutation({
     mutationFn, // mutation function goes here
-    onSuccess: (data) => {
+    onSuccess: () => {
       showSuccessToast("User Checked In Successfully");
       reset();
-      props?.handleCancel();
+      handleCancel();
     },
     onError: (error) => {
       showErrorToast(error?.response?.data?.message || "An error occurred");
       reset();
-      props?.handleCancel();
+     handleCancel();
     },
   });
-
-  // const { mutate, isLoading } = useMutation(mutationFn, {
-  //   onSuccess: (data) => {
-  //     // if (data.response.status == 200) {
-  //     showSuccessToast("User Checked In Successfully");
-  //     // } else {
-  //     // showErrorToast(data?.response?.data.message);
-  //     // }
-
-  //     reset();
-  //     props?.handleCancel();
-  //   },
-  //   onError: (data) => {
-  //     showErrorToast(data?.response?.error);
-  //     reset();
-  //     props?.handleCancel();
-  //   },
-  // });
 
   const handleAddCredential = (data) => {
     try {
@@ -80,7 +59,6 @@ const AddCredentialModal = (props) => {
   };
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -119,7 +97,7 @@ const AddCredentialModal = (props) => {
                 <button
                   className="px-8 py-2 w-full bg-gray-100 rounded border"
                   type="button"
-                  onClick={props.handleCancel}
+                  onClick={handleCancel}
                 >
                   <p className="font-bold text-base text-gray-500">Exit</p>
                 </button>
@@ -128,8 +106,12 @@ const AddCredentialModal = (props) => {
           </form>
         </div>
       </Modal>
-    </div>
   );
 };
 
 export default AddCredentialModal;
+
+AddCredentialModal.propTypes = {
+  handleCancel: PropTypes.func,
+  userRole: PropTypes.string
+}

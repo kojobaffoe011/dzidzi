@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import ClipLoader from "react-spinners/ClipLoader";
 
 /**
@@ -8,12 +8,12 @@ import ClipLoader from "react-spinners/ClipLoader";
  *
  * @returns {JSX.Element} The rendered loading spinner.
  */
-const Spinner = (props) => {
+const Spinner = ({color, size}) => {
   return (
     <div className=" flex justify-center items-center">
       <ClipLoader
-        color={props.color}
-        size={props.size}
+        color={color}
+        size={size}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
@@ -22,3 +22,8 @@ const Spinner = (props) => {
 };
 
 export default Spinner;
+
+Spinner.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.string
+}

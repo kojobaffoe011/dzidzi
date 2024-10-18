@@ -1,4 +1,3 @@
-import React from "react";
 import DetailsMain from "../../../components/reusableComponents/DetailsScreen";
 
 function DetailsPage() {
@@ -10,3 +9,4 @@ function DetailsPage() {
 }
 
 export default DetailsPage;
+

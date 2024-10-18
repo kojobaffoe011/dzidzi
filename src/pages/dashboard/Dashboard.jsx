@@ -1,43 +1,33 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiHome } from "react-icons/fi";
 import { Outlet, useLocation } from "react-router";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-import { IoCloseSharp } from "react-icons/io5";
+import { IoCloseSharp, IoFastFood } from "react-icons/io5";
 import { MdPendingActions } from "react-icons/md";
 import { FaBed, FaUserGraduate } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { BsBookmarkStarFill, BsPlayFill } from "react-icons/bs";
-import { useNavigate } from "react-router";
+import { BsBookmarkStarFill } from "react-icons/bs";
 import { ImSwitch } from "react-icons/im";
 import { TbFileUpload } from "react-icons/tb";
 import { AiOutlineFieldTime } from "react-icons/ai";
 import CheckOnlineStatus from "../../components/CheckOnlineStatus";
-import { showErrorToast } from "../../toast/Toast";
 import Loader from "../../components/loaders/Loader";
 // import AccountLocked from "../../components/notices/AccountLocked";
-import cookie from "../../utils/cookie";
 import { useGetActiveUser } from "../../components/brokers/apicalls";
+import { useLogoutUser } from "../../hooks/useLogoutUser";
 
 const Dashboard = () => {
   const pageRef = useRef(null);
   const { pathname } = useLocation();
-  const { auth, setAuth } = useAuth();
   const [show, setShow] = useState(true);
   const [mobileShow, setMobileShow] = useState(false);
+  const {mutate, isPending} = useLogoutUser()
   const {
     data: activeUser,
     isLoading: activeUserLoading,
-    isError: isActiveUserError,
-    error: activeUserError,
+    // isError: isActiveUserError,
+    // error: activeUserError,
   } = useGetActiveUser();
-
-  // const {
-  //   isLoading: campusLoading,
-  //   data: campusData,
-  //   isError: isCampusError,
-  //   error: campusError,
-  // } = useGetSingleCampus(studentInfo?.[0]?.campus);
 
   const showSide = () => {
     setShow(!show);
@@ -47,12 +37,13 @@ const Dashboard = () => {
     setMobileShow(!mobileShow);
   };
 
-  const scrollToTop = () => {
-    // Use the scrollIntoView method to scroll to the top of the page
-    if (pageRef.current) {
-      pageRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  // const scrollToTop = () => {
+  //   // Use the scrollIntoView method to scroll to the top of the page
+  //   if (pageRef.current) {
+  //     pageRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // };
+
 
   useEffect(() => {
     // Scroll to the top of the page with a smooth scrolling effect
@@ -95,6 +86,14 @@ const Dashboard = () => {
       userType: ["ADMIN", "RESTAURANT"],
     },
     {
+      link: "orders",
+      icon: (className = "") => (
+        <IoFastFood className={className} size="25px" />
+      ),
+      text: "Orders",
+      userType: ["ADMIN", "RESTAURANT"],
+    },
+    {
       link: "services",
       icon: (className = "") => (
         <MdPendingActions className={className} size="25px" />
@@ -115,7 +114,7 @@ const Dashboard = () => {
       icon: (className = "") => (
         <AiOutlineFieldTime className={className} size="25px" />
       ),
-      text: "Couriers",
+      text: "Tickets",
       userType: ["RESTAURANT", "SERVICE"],
     },
     {
@@ -127,7 +126,7 @@ const Dashboard = () => {
       userType: ["ADMIN", "RESTAURANT", "SERVICE"],
     },
     {
-      link: "profile",
+      link: "profile-details",
       icon: (className = "") => (
         <FaUserGraduate className={className} size="25px" />
       ),
@@ -136,42 +135,9 @@ const Dashboard = () => {
     },
   ];
 
-  const orgNav = [
-    {
-      link: "",
-      icon: (className = "") => <FiHome className={className} size="25px" />,
-      text: "Home",
-      new: false,
-    },
-    {
-      link: "short-stay",
-      icon: (className = "") => (
-        <AiOutlineFieldTime className={className} size="25px" />
-      ),
-      text: "Short Stay",
-      new: false,
-    },
-    {
-      link: "profile",
-      icon: (className = "") => (
-        <FaUserGraduate className={className} size="25px" />
-      ),
-      text: "Profile",
-      new: false,
-    },
-  ];
-
-  const navigate = useNavigate();
-  const navigateTo = (url) => {
-    navigate(url);
-  };
 
   const handleLogout = () => {
-    setAuth({});
-    localStorage.removeItem("ghlstud");
-    localStorage.removeItem("loginTime");
-    cookie.clearCipher();
-    navigateTo("/");
+    return mutate()
   };
 
   // if (isStudentError || isCampusError || studentError || campusError) {
@@ -184,25 +150,40 @@ const Dashboard = () => {
     }
     return (
       <div className="p-2">
-        <Outlet context={[activeUserLoading]} />
+        <Outlet context={[activeUserLoading, activeUser]} />
       </div>
     );
   };
 
-  // function to check elapsed time and trigger logout
-  const checkLogoutTimeout = () => {
-    const loginTime = parseInt(localStorage.getItem("loginTime"), 10);
-    const currentTime = new Date().getTime();
-    const elapsedSeconds = (currentTime - loginTime) / 1000; // Convert to seconds
+//   useEffect(() => {
+//   const logout = () => {
+//    handleLogout()
+//   };
 
-    if (elapsedSeconds >= 3600) {
-      showErrorToast("Unauthorized Access");
-      handleLogout();
-    }
-  };
+//   // Function to reset the timeout
+//   const resetTimer = () => {
+//     clearTimeout(timer); // Clear the old timer
+//     timer = setTimeout(() => {
+//       logout();
+//     }, 120000); // Reset the timer
+//   };
 
-  // Periodically check the elapsed time
-  setInterval(checkLogoutTimeout(), 60000); // 60000 milliseconds = 1 minute
+//   let timer = setTimeout(() => {
+//     logout();
+//   }, 60000); // Initial timer for 2 minutes
+
+//   // Add event listeners to reset timer on user activity
+//   window.addEventListener("mousemove", resetTimer);
+//   window.addEventListener("keydown", resetTimer);
+
+//   // Clean up the event listeners and timer when component unmounts
+//   return () => {
+//     clearTimeout(timer);
+//     window.removeEventListener("mousemove", resetTimer);
+//     window.removeEventListener("keydown", resetTimer);
+//   };
+// }, [setAuth, navigate, handleLogout]);
+
 
   return (
     <div ref={pageRef}>
@@ -276,7 +257,7 @@ const Dashboard = () => {
                 <div className="border-b p-5 flex items-center justify-between shadow-sm">
                   <div className="flex items-center">
                     <p className="font-bold text-md text-[#0d1655] text-secular">
-                      Ghana Hostels Limited
+                      dzidzi
                     </p>
                   </div>
                   <IoCloseSharp
@@ -367,10 +348,8 @@ const Dashboard = () => {
                   />
                 </div>
                 <div
-                  className="rounded-full border py-2 px-5 bg-[#0d1655] flex items-center cursor-pointer"
-                  onClick={handleLogout}
                 >
-                  <button>
+                  <button disabled={isPending} className="rounded-full border py-2 px-5 bg-[#0d1655] flex items-center cursor-pointer"  onClick={handleLogout}>
                     <ImSwitch size="15px" className="text-white" />
                   </button>
                 </div>
@@ -385,16 +364,16 @@ const Dashboard = () => {
                 />
                 <Link to={"/dashboard/profile"}>
                   <div className="flex w-full justify-end items-center">
-                    <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
-                      <p className="text-xs font-bold">{auth?.name}</p>
-                    </div>
+                    {!activeUserLoading && <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
+                      <p className="text-xs font-bold">{activeUser?.currentUserRole}</p>
+                    </div>}
                     <div
-                      className="rounded-full border py-2 px-5 bg-slate-100 flex items-center cursor-pointer"
-                      onClick={handleLogout}
+                    
                     >
-                      <button>
-                        <ImSwitch size="15px" />
-                      </button>
+                      <button disabled={isPending} className="rounded-full border py-2 px-5 bg-[#0d1655] flex items-center cursor-pointer"  onClick={handleLogout}>
+                    <ImSwitch size="15px" className="text-white" />
+                  </button>
+                       
                     </div>
                   </div>
                 </Link>
