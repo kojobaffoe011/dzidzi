@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
+import { timeOutError } from "../../utils/config";
 
 const Form = () => {
   const [showPass, setShowPass] = useState(false);
@@ -58,8 +59,9 @@ const Form = () => {
   const { mutateAsync: login, isPending: cardLoading } = useMutation({
     mutationKey:["login"],
     mutationFn,
-    onError: (data) => {
-      showErrorToast(data.response.data?.message || "An error occured");
+    onError: (error) => {
+      timeOutError(error)
+      showErrorToast(error.response.data?.message || "An error occured");
     },
   });
 

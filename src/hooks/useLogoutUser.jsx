@@ -24,6 +24,10 @@ export function useLogoutUser (){
     navigateTo("/")
     },
     onError: (error)=>{
+
+      if(error.message.includes('timeout')){
+        return showErrorToast(error.message)
+      }
      showErrorToast(error.message)
     },
     

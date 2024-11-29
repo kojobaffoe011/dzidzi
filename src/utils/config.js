@@ -1,3 +1,5 @@
+import { showErrorToast } from "../toast/Toast";
+
 // LOCAL
 export const BASE_URL = "https://dzidzi-repo.onrender.com";
 export const NO_AUTH_URL = "https://dzidzi-repo.onrender.com";
@@ -136,4 +138,17 @@ export function shuffle(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+export const timeOutError = (error) => {
+   if(error.message == 'Network Error'){
+    console.error(error)
+    return showErrorToast('Network connection lost. Connect and try again')
+  }
+
+  if(error.message.includes('timeout')){
+    console.error(error)
+    return showErrorToast('Connection Timed Out')
+  }
+
 }

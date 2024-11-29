@@ -49,6 +49,10 @@ const queryOptions = {
   staleTime: 86400000,
 };
 
+const axiosInstance = axios.create({
+  timeout: 5000, // 5 seconds
+});
+
 //GET REQUESTS
 //get active user
 export const useGetActiveUser = () => {
@@ -256,7 +260,11 @@ const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
   //   url += `&rating=${encodeURIComponent(rating)}`;
   // }
 
-  const response = await axios.get(url);
+const axiosInstance = axios.create({
+  timeout: 5000, // 5 seconds
+});
+
+  const response = await axiosInstance.get(url);
   return response.data;
 };
 
@@ -274,6 +282,7 @@ export const useRestaurantList = (name, rating, distance, latitude, longitude, s
     getNextPageParam, // getNextPageParam now part of the options object
     keepPreviousData: true, // Other options also as part of the object
     refetchOnWindowFocus: false,
+    retry: 1
   });
 };
 
@@ -357,10 +366,10 @@ export const useRestaurantListPaged = (
   const refetchOnWindowFocus = false;
 
   // Configure options for the useInfiniteQuery hook.
-  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus,  };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchRestaurants, ...options});
+  return useInfiniteQuery({queryKey, queryFn: fetchRestaurants, ...options });
 };
 
 export const useGetSingleRestaurant = (id) => {
@@ -1014,7 +1023,9 @@ export const useAddCoupon = () => {
 
 export const useLogin = () => {
   const mutationFn = (data) => {
-    return axios.post(`${NO_AUTH_URL}/system/auth/login`, data, {
+
+
+    return axiosInstance.post(`${NO_AUTH_URL}/system/auth/login`, data, {
       headers: {
         Authorization: null,
       },
@@ -1038,7 +1049,7 @@ export const useRegisterUser = () => {
 
 export const useLogout = () => {
   const mutationFn = (data) => {
-    return axios.post(`${NO_AUTH_URL}/system/auth/logout`, data, {
+    return axiosInstance.post(`${NO_AUTH_URL}/system/auth/logout`, data, {
       headers: null,
     });
   };

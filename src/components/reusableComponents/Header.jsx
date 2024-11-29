@@ -1,16 +1,11 @@
-import { Suspense, useCallback } from "react";
-import { RiCloseLine } from "react-icons/ri";
+import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from "react-router";
 import { GiHamburger } from "react-icons/gi";
 import cookie from "../../utils/cookie";
-import Spinner from "../loaders/Spinner";
 import Cart from "./Cart";
-import { TfiMoreAlt } from "react-icons/tfi";
 import useAuth from "../../hooks/useAuth";
 import Button from "../Button";
-import burger from "../../assets/images/burger.jpeg";
-import LazyImage from "../LazyImage";
 import { useState } from "react";
 import UpdateOrderModal from "../modal/restaurant/UpdateOrder";
 import { useLogoutUser } from "../../hooks/useLogoutUser";

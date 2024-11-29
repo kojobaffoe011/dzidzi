@@ -43,8 +43,16 @@ import General from "./pages/main/userprofile/General";
 import MyOrders from "./pages/main/userprofile/MyOrders";
 import Support from "./pages/main/userprofile/Support";
 
-const queryClient = new QueryClient();
-
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      onError: (error) => {
+        console.error('Global error handler:', error.message);
+      },
+      retry: 1, // Retry once before failing
+    },
+  },
+});
 const App = () => {
   return (
     <QueryClientProvider client={queryClient} contextSharing={true}>

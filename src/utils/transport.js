@@ -26,8 +26,13 @@ const config = {
   headers: {},
 };
 
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  timeout: 5000, // 5 seconds
+});
+
 // Function to notify about an error
-const notifyError = (msg) => {
+export const notifyError = (msg) => {
   console.error(msg);
 };
 
@@ -35,7 +40,12 @@ const notifyError = (msg) => {
 const errorhandler = (error) => {
   if (error.message === "Network Error") {
     notifyError("Network connection lost. Connect and try again");
-    showErrorToast("Server connection lost. Connect and try again");
+    showErrorToast("Network connection lost. Connect and try again");
+
+    return;
+  }
+  if (error.message.includes('timeout')) {
+    notifyError("Connection timed out");
 
     return;
   }
@@ -90,7 +100,7 @@ export const post = async (route, payload) => {
 // Function to make a PUT request
 export const put = async (route, payload) =>
   await new Promise((resolve, reject) => {
-    axios
+    axiosInstance
       .put(route, payload)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
@@ -99,7 +109,7 @@ export const put = async (route, payload) =>
 // Function to make a GET request
 export const get = async (route) =>
   await new Promise((resolve, reject) => {
-    axios
+    axiosInstance
       .get(route, config)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
@@ -108,7 +118,7 @@ export const get = async (route) =>
 // Function to make a DELETE request
 export const delete_request = async (route) =>
   await new Promise((resolve, reject) => {
-    axios
+    axiosInstance
       .delete(route)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
@@ -117,7 +127,7 @@ export const delete_request = async (route) =>
 // Function to make multiple Axios requests simultaneously
 export const all = async (routes) =>
   await new Promise((resolve, reject) => {
-    axios
+    axiosInstance
       .all(routes)
       .then((res) => resolve(res))
       .catch((err) => reject(err));

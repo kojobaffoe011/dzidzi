@@ -1,7 +1,4 @@
 import { useState } from "react";
-import rider from "../../assets/images/motorbike.png";
-import cerified from "../../assets/images/certified.png";
-import lighting from "../../assets/images/lighting.png";
 import RestaurantCard from "./restaurantCard";
 import MenuDetails from "./menuDetails";
 import { useRestaurantList } from "../brokers/apicalls";
@@ -9,6 +6,7 @@ import DzidziLoader from "../loaders/DzidziLoader";
 import { useAllowLocation } from "../../hooks/useAllowLocation";
 import { useCategoryList } from "../../hooks/useCategoryList";
 import Promo from "./Promo";
+import ErrorOccured from "../notices/ErrorOccured";
 
 export const filters = [
   "Sort",
@@ -148,10 +146,20 @@ function DetailsMain() {
     hasNextPage: restaurantsHasNextPage,
     fetchNextPage: restaurantsFetchNextPage,
     isFetchingNextPage: restaurantsFetchingNextPage,
-    // isError: isUsersError,
+    isError: isRestaurantsError,
+    error: restaurantsError
   } = useRestaurantList(filters.name, filters.rating, filters.distance, filters.latitude, filters.longitude, filters.sortBy, filters.orderBy);
 
   let pages = restaurantsList?.pages?.flatMap((page) => page?.results);
+
+  if(isRestaurantsError){
+    if(restaurantsError.message.includes('timeout')){
+      return <div className="">
+        <ErrorOccured title={'Connection Timed out'}/>
+      </div>
+    }
+    return <ErrorOccured/>
+  }
 
   // useEffect(()=> {
   //   setFilters({...filters, latitude, longitude})
