@@ -4,6 +4,7 @@ import { showErrorToast } from "../toast/Toast";
 import cookie from "../utils/cookie";
 import useAuth from "./useAuth";
 import { useNavigate } from "react-router";
+import { timeOutError } from "../utils/config";
 
 export function useLogoutUser (){
       const {mutationFn} = useLogout()
@@ -24,10 +25,7 @@ export function useLogoutUser (){
     navigateTo("/")
     },
     onError: (error)=>{
-
-      if(error.message.includes('timeout')){
-        return showErrorToast(error.message)
-      }
+     timeOutError(error)
      showErrorToast(error.message)
     },
     

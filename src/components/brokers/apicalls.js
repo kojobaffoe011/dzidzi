@@ -41,15 +41,15 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { NO_AUTH_URL } from "../../utils/config";
 import { delete_request, get, post, put } from "../../utils/transport";
 
-const queryOptions = {
-  refetch0nWindowFocus: false,
-  refetchOnmount: false,
-  refetch0nReconnect: false,
-  retry: false,
-  staleTime: 86400000,
-};
+// const queryOptions = {
+//   refetch0nWindowFocus: false,
+//   refetchOnmount: false,
+//   refetch0nReconnect: false,
+//   retry: false,
+//   staleTime: 86400000,
+// };
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   timeout: 5000, // 5 seconds
 });
 
@@ -1037,7 +1037,7 @@ export const useLogin = () => {
 
 export const useRegisterUser = () => {
   const mutationFn = (data) => {
-    return axios.post(`${NO_AUTH_URL}/user/sign-up`, data, {
+    return axiosInstance.post(`${NO_AUTH_URL}/user/sign-up`, data, {
       headers: {
         Authorization: null,
       },

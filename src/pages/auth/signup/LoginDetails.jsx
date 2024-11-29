@@ -1,6 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -10,6 +9,8 @@ import { showErrorToast } from "../../../toast/Toast";
 import Spinner from "../../../components/loaders/Spinner";
 import { useNavigateTo } from "../../../hooks/useNavigateTo";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
+import { timeOutError } from "../../../utils/config";
+import { axiosInstance } from "../../../components/brokers/apicalls";
 
 
 const LoginDetails = () => {
@@ -93,7 +94,7 @@ const LoginDetails = () => {
    const { mutate, isPending } = useMutation({
     mutationKey: ["checkEmail", userData?.email],
     mutationFn: async (data) => {
-      const response = await axios.post(`/user/exist?email=${encodeURIComponent(userData?.email)}`, data);
+      const response = await axiosInstance.post(`/user/exist?email=${encodeURIComponent(userData?.email)}`, data);
       return response?.data;
     },
     onSuccess: async (data) => {
@@ -121,30 +122,41 @@ const LoginDetails = () => {
 
     },
     onError: (error) => {
-      console.log(error);
-      showErrorToast(error.message);
+      setDataLoading(false)
+      if(error.message.includes('timeout')){
+        return timeOutError(error)
+      } 
+     return showErrorToast(error.message)
     },
   });
 
     const {mutateAsync, isPending: creatingUserPending} = useMutation({
     mutationKey: ['createUser'],
-    mutationFn:   async (paymentData) => {
-      const response = await axios.post('user/sign-up', paymentData);
+    mutationFn:   async (data) => {
+      const response = await axiosInstance.post('user/sign-up', data);
       return response.data;
     },
     onSuccess: () => {
         // Handle success, navigate to success page
+        setDataLoading(false)
         localStorage.removeItem('signup')
         navigateTo('/auth/register/success')
       },
     onError: (error) => {
+        setDataLoading(false)
+        if(error.message.includes('timeout')){
+          return timeOutError(error)
+        }
         if(error?.response?.data.error == "usernameExists"){
           return showErrorToast('Username already taken')
         }
         showErrorToast(error.message)
+        
       },
 
   })
+
+  console.log({isPending, creatingUserPending , dataLoading})
 
 
   const formSubmitHandler = async (data)=> {
