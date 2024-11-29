@@ -24,14 +24,26 @@ const Layout = (props) => {
     } else document.body.style.overflow = "scroll";
   }, [auth?.open]);
 
+
+  const renderContent =()=>{
+    if( auth?.open && auth?.orders?.length > 0){
+        return <div
+          className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
+          onClick={() => setAuth({ ...auth, open: false, modal:false})}
+        ></div>
+      }
+    if( auth?.modal){
+        return <div
+          className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
+          onClick={() => setAuth({ ...auth, modal: false, open:false})}
+        ></div>
+      }
+  }
+ 
+
   return (
     <div className="flex flex-col min-h-screen mx-auto relative">
-      {auth?.open && auth?.orders?.length > 0 && (
-        <div
-          className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
-          onClick={() => setAuth({ ...auth, open: false })}
-        ></div>
-      )}
+     {renderContent()}
       <div className="flex flex-col">{props.children}</div>
     </div>
   );

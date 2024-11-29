@@ -13,7 +13,7 @@ import Button from "../../Button";
 import { useAddCoupon, useAddCredentials } from "../../brokers/apicalls";
 
 const PromoCode = (props) => {
-  const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
+  const types = ["RESTAURANT_ADMIN", "COURIER", "SERVICE", "ADMIN"];
   const { userRole } = props;
   const credentialSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -90,7 +90,7 @@ const PromoCode = (props) => {
 
             <div className="flex justify-center">
               <div className="flex items-center mr-2">
-                <Button className="px-8 py-2 w-full bg-black rounded-md">
+                <Button className="px-8 py-2 w-full bg-black rounded-md" onClick={()=> props.handleCancel()}>
                   {isLoading ? (
                     <Spinner color="white" size="15px" />
                   ) : (

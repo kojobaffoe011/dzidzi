@@ -46,7 +46,6 @@ const AddNote = (props) => {
   const handleAddNote = (data) => {
     try {
       if (Object.keys(errors).length === 0) {
-        console.log("hey");
         setAuth({ ...auth, note: data.note });
         props.handleCancel();
       }
@@ -56,7 +55,6 @@ const AddNote = (props) => {
   };
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -98,7 +96,6 @@ const AddNote = (props) => {
           </form>
         </div>
       </Modal>
-    </div>
   );
 };
 

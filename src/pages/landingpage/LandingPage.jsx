@@ -55,7 +55,7 @@ const Hero = () => {
                   <p className="font-bold font-gray-500 ">Login</p>
                 </button>
               </Link>
-              <Link to="auth/register">
+              <Link to="auth/register/">
                 {" "}
                 <button className="rounded-full bg-gray-900 px-4 py-2 border border-white">
                   <p className="font-bold text-white">Signup</p>

@@ -17,7 +17,9 @@ const OrderpagesLayout = () => {
             <Outlet />
           </div>
         </div>
+       <div className="absolute left-0 right-0 bottom-0">
         <Footer />
+        </div>
       </div>
     </OrderContext.Provider>
   );

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useOrderList } from "../../components/brokers/apicalls";
+import { useOrderList, useOrderListPaged } from "../../components/brokers/apicalls";
 import TableAlt from "../../components/TableAlt";
 import Button from "../../components/Button";
 import { humanDatetime } from "../../utils/config";
@@ -8,17 +8,12 @@ import OrderDetails from "../../components/modal/restaurant/OrderDetails";
 import OrderStatus from "../../components/reusableComponents/orderStatus";
 
 const Orders = () => {
-   const [, activeUser] = useOutletContext();
-    const [cursorHistory, setCursorHistory] = useState({
-    firstCursor: null,
-    lastCursor: null,
-    direction: "FORWARD",
-  });   
+   const [, activeUser] = useOutletContext(); 
     const [orderID, setOrderID] = useState(null);
 
 
  const [filters, setFilters] = useState({
-  restaurantId: activeUser?.currentUserRole == 'RESTAURANT' ? activeUser?.currentUserId :null, 
+  restaurantId: activeUser?.currentUserRole == 'RESTAURANT_ADMIN' ? activeUser?.currentUserId :null, 
   courierId: null, 
   userId: null, 
   orderId: null, 
@@ -34,40 +29,26 @@ const Orders = () => {
     setOpenOrder(false);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1);
   const {
-    data,
+    data: data = [],
     isLoading,
+    hasNextPage,
+    isFetchingNextPage,
     isError,
-    error,
-  } = useOrderList(
+  } = useOrderListPaged(
     filters.restaurantId,
     filters.courierId,
     filters.userId,
     filters.orderId,
     filters.sortBy,
     filters.orderBy,
-    cursorHistory.direction == "FORWARD"
-      ? cursorHistory.lastCursor
-      : cursorHistory.firstCursor, // Pass the current cursor
-    cursorHistory.direction // Pass the current direction
+    currentPage
+
   );
 
-
-   const handlePrevious = () => {
-    setCursorHistory({
-      firstCursor: data?.firstCursor,
-      lastCursor: data?.lastCursor,
-      direction: "BACKWARDS",
-    });
-  };
-
-  const handleNext = () => {
-    setCursorHistory({
-      firstCursor: data?.firstCursor,
-      lastCursor: data?.lastCursor,
-      direction: "FORWARD",
-    });
-  };
+  let orderData = data?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = orderData?.[0].totalPages
 
 
   return (
@@ -75,17 +56,20 @@ const Orders = () => {
           <OrderDetails
         isOpen={openOrder}
         handleCancel={handleCloseOrderModal}
-        userRole={"RESTAURANT"}
         width="800px"
         orderID={orderID}
       />
          <TableAlt
         isLoading={isLoading}
-        list={data}
+        list={orderData}
         title={"No Record Found"}
-        handleNext = {handleNext}
-        handlePrevious = {handlePrevious}
-
+        numberOfPages={numberOfPages}
+        //  data={orderData}
+        totalCount={1}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        isFetchingNextPage={isFetchingNextPage}
+        usersHasNextPage={hasNextPage}
       >
 
 
@@ -132,7 +116,7 @@ const Orders = () => {
                 </td>
               </tr>
             ) : (
-              data?.results?.map((item, idx) => {
+              orderData?.[0]?.results?.map((item, idx) => {
                 return (
                   <tr key={idx}>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -140,36 +124,36 @@ const Orders = () => {
                         <div className="flex items-center">
                           <p className="mr-3 italic">Order Number: </p>
                           <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.value?.orderNumber}
+                            {item?.orderNumber}
                           </span>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Amount: </p>
                           <p className="mr-3 font-extrabold text-xs">
-                            $ {item?.value?.totalAmount}
+                            $ {item?.totalOrderPrice}
                           </p>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Date: </p>
                           <p className="mr-3 font-extrabold text-xs text-red-600">
-                            {humanDatetime (item?.value?.orderDate)}
+                            {humanDatetime (item?.orderDate)}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td><OrderStatus orderStatus={item?.value?.status}/></td>
+                    <td><OrderStatus orderStatus={item?.status}/></td>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                       <div className="flex flex-col">
                         <div className="flex items-center">
                           <p className="mr-3 italic">Name: </p>
                           <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.value?.user?.firstName} {item?.value?.user?.lastName}
+                            {item?.user?.firstName} {item?.user?.lastName}
                           </span>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Contact: </p>
                           <p className="mr-3 font-extrabold text-xs">
-                            {item?.value?.user?.contact}
+                            {item?.user?.contact}
                           </p>
                         </div>
                       
@@ -181,7 +165,7 @@ const Orders = () => {
                         className="px-2 py-1 text-xs rounded-md"
                         onClick={() => {
                           handleOpenOrderModal();
-                          setOrderID(item?.value?.id);
+                          setOrderID(item?.id);
                         }}
                       >
                         View Details

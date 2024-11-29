@@ -11,11 +11,15 @@ const renderStatus = (orderStatus) => {
   } 
 
   if(orderStatus == 'ACCEPTED'){
-   className = 'bg-greeen-200 text-green-900'
+   className = 'bg-green-200 text-green-900'
+  }
+
+  if(orderStatus == 'CANCELLED'){
+   className = 'bg-red-200 text-red-900'
   }
 
 
-    return <span className={`p-1 text-xs uppercase tracking-wider rounded-lg bg-opacity-50 font-extrabold ${className}`}>
+    return <span className={`py-2 px-4 text-xs uppercase tracking-wider rounded-lg bg-opacity-50 font-extrabold ${className}`}>
               {orderStatus}
            </span>
 }

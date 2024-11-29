@@ -1,14 +1,29 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRestaurantList } from "../../components/brokers/apicalls";
+import { useRestaurantList, useRestaurantListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import Table from "../../components/Table";
+import TableAlt from "../../components/TableAlt";
 
 const Restaurants = () => {
-  const [name, setName] = useState(null);
-  const [rating, setRating] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
+  name:null,
+  email:null,
+  username:null,
+  rating:null,
+  visible:null,
+  parentRestaurantId:null,
+  distance:null,
+  latitude:null,
+  longitude:null,
+  restaurantId:null,
+  sortBy:null,
+  orderBy:null,
+
+  });
 
   const [credentialOpen, setCredentialsOpen] = useState(false);
 
@@ -28,28 +43,48 @@ const Restaurants = () => {
     setViewOpen(false);
   }, []);
 
+
+
   const {
-    data: usersList = [],
-    isLoading: usersLoading,
-    hasNextPage: usersHasNextPage,
-    fetchNextPage: usersFetchNextPage,
-    isFetchingNextPage: usersFetchingNextPage,
-    isError: isUsersError,
-  } = useRestaurantList(name, rating);
+    data: restaurantList = [],
+    isLoading: restaurantLoading,
+    hasNextPage: restaurantHasNextPage,
+    fetchNextPage: restaurantFetchNextPage,
+    isFetchingNextPage: restaurantFetchingNextPage,
+    isError: isRestaurantError,
+  } = useRestaurantListPaged(
+  filters.name,
+  filters.email,
+  filters.username,
+  filters.rating,
+  filters.visible,
+  filters.parentRestaurantId,
+  filters.distance,
+  filters.latitude,
+  filters.longitude,
+  filters.restaurantId,
+  filters.sortBy,
+  filters.orderBy,
+  currentPage);
+
+    let restaurantData = restaurantList?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = restaurantData?.[0]?.totalPages
+
+ 
 
   return (
     <>
       <AddCredentialModal
         isOpen={credentialOpen}
         handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="400px"
       />
 
       <ViewRestaurant
         isOpen={viewOpen}
         handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="950px"
         restaurantID={restaurantID}
       />
@@ -69,12 +104,16 @@ const Restaurants = () => {
           </Button>
         </div>
       </div>
-      <Table
-        totalCount={usersList?.pages?.[0].results?.length}
-        usersHasNextPage={usersHasNextPage}
-        isFetchingNextPage={usersFetchingNextPage}
-        data={usersList?.pages?.[0].results}
-        isLoading={usersLoading}
+      <TableAlt
+         isLoading={restaurantLoading}
+        list={restaurantData}
+        title={"No Record Found"}
+          numberOfPages={numberOfPages}
+            totalCount={4}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            isFetchingNextPage={restaurantFetchingNextPage}
+            usersHasNextPage={restaurantHasNextPage}
       >
         <table className="w-full">
           <thead className="bg-gray-50 border-b-2 border-gray-200">
@@ -95,7 +134,7 @@ const Restaurants = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {usersList?.pages?.[0].results?.map((item, idx) => {
+            {restaurantData?.[0]?.results?.map((item, idx) => {
               return (
                 <tr
                   className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
@@ -106,19 +145,19 @@ const Restaurants = () => {
                       <div className="flex items-center">
                         <p className="mr-3 italic">Name: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.value?.name}
+                          {item?.name}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> Contact: </p>
                         <p className="mr-3 font-extrabold text-xs">
-                          {item?.value?.contact}
+                          {item?.contact}
                         </p>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> Email: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.value?.credential?.email}
+                          {item?.credential?.email}
                         </p>
                       </div>
                     </div>
@@ -128,19 +167,19 @@ const Restaurants = () => {
                       <div className="flex items-center">
                         <p className="mr-3 italic">Street: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.value?.address?.street}
+                          {item?.address?.street}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> House Number: </p>
                         <p className="mr-3 font-extrabold text-xs">
-                          {item?.value?.address?.houseNumber}
+                          {item?.address?.houseNumber}
                         </p>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> City: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.value?.address?.city}
+                          {item?.address?.city}
                         </p>
                       </div>
                     </div>
@@ -149,7 +188,7 @@ const Restaurants = () => {
                     <div className="flex flex-col">
                       <div className="flex items-center">
                         <p className="mr-3 font-extrabold">
-                          {item?.value?.averageRating}
+                          {item?.averageRating}
                         </p>
                       </div>
                       <div className="flex items-center">
@@ -158,13 +197,13 @@ const Restaurants = () => {
                     </div>
                   </td>
                   <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <Link to={`${item?.value?.id}`}>
+                    <Link to={`${item?.id}`}>
                       <Button
                         variant="dark"
                         className="px-2 py-1 text-xs rounded-md"
                         // onClick={() => {
                         //   handleOpenViewModal();
-                        //   setRestaurantID(item?.value?.id);
+                        //   setRestaurantID(item?.id);
                         // }}
                       >
                         View Details
@@ -176,7 +215,7 @@ const Restaurants = () => {
             })}
           </tbody>
         </table>
-      </Table>
+      </TableAlt>
     </>
   );
 };

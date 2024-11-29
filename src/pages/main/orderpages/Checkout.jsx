@@ -150,10 +150,11 @@ const Checkout = () => {
         street: data?.address?.street,
         zip: data?.address?.zip,
       },
-      // couponNumber: "VK8AK8KCIU",
+      // couponNumber: "DI9D6J8FHG",
     });
     return
     } catch (error) {
+
       showErrorToast(error.message)
     }
     
@@ -173,6 +174,9 @@ const Checkout = () => {
         console.log('Payment Intent Created:', paymentResponse);
       },
     onError: (error) => {
+      if(error.message == 'Request failed with status code 403'){
+        navigateTo('/details/user-profile/orders')
+      }
         console.error('Error proceeding with payment:', error);
       },
 
@@ -213,14 +217,14 @@ const Checkout = () => {
       <UpdateOrderModal
         isOpen={updateOrderOpen}
         handleCancel={handleCloseUpdateModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="1000px"
       />
       <EditCheckoutAddress
         isOpen={editAddressOpen}
         handleCancel={handleCloseEditAddressModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="600px"
         address = {data?.address}
@@ -228,14 +232,14 @@ const Checkout = () => {
       <PromoCode
         isOpen={promoCodeOpen}
         handleCancel={handleClosePromoCodeModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="350px"
       />
       <AddNote
         isOpen={addNoteOpen}
         handleCancel={handleCloseAddNoteModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="350px"
       />

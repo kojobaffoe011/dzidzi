@@ -62,7 +62,7 @@ export default Button;
 
 // PropTypes definitions for type checking
 Button.propTypes = {
-  classNames: PropTypes.string,
+  className: PropTypes.string,
   children: PropTypes.node.isRequired,
   rounded: PropTypes.bool,
   variant: PropTypes.oneOf([

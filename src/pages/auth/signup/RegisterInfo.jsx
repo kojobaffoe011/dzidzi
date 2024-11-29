@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { otherrespaltalt, resp } from "../../../utils/config";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useMutation } from "@tanstack/react-query";
@@ -451,7 +451,7 @@ const OrganizationForm = () => {
               {" "}
               <div>
                 <button
-                  className="mt-5 bg-red-500 px-16 py-3 rounded disabled:bg-gray-200"
+                  className="mt-5 bg-blue-500 px-16 py-3 rounded disabled:bg-gray-200"
                   //   type="button"
                   // disabled={true}
                 >
@@ -473,7 +473,8 @@ const OrganizationForm = () => {
 const RegisterInfo = () => {
   return (
     <div className="">
-      <OrganizationForm />
+      <Outlet />
+      {/* <OrganizationForm/> */}
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ReplaceOrder from "../components/modal/restaurant/ReplaceOrder";
 import useAuth from "../hooks/useAuth";
+import { useGetActiveUser, useGetActiveUserDetails } from "../components/brokers/apicalls";
+// import CheckLocationStatus from "../components/reusableComponents/CheckLocationStatus";
 
 // Create an empty context to manage order-related data
 const OrderContext = createContext({});
@@ -25,7 +27,8 @@ export const OrderProvider = () => {
   const [replaceOrder, setReplaceOrder] = useState(false);
   const [orderItems, setOrderItems] = useState({})
   const {auth, setAuth} = useAuth()
-  const location = useLocation()
+  const {pathname} = useLocation()
+  console.log(pathname)
 
   const handleOpenReplaceModal = useCallback(() => {
     setReplaceOrder(true);
@@ -34,6 +37,8 @@ export const OrderProvider = () => {
     setReplaceOrder(false);
     setAuth({...auth, restaurantClash: false})
   }, [auth, setAuth]);
+
+
 
 
   // Use useEffect to check for restaurantClash and open the modal when it exists
@@ -49,22 +54,27 @@ export const OrderProvider = () => {
   return (
     // Provide the authentication context with auth, setAuth values
     <OrderContext.Provider value={{ setReplaceOrder, setOrderItems }}>
+      {/* <CheckLocationStatus> */}
         <ReplaceOrder
         isOpen={replaceOrder}
         handleCancel={handleCloseReplaceModal}
         orderItems={orderItems}
         width="500px"
       />
-      <div className="relative h-screen">
+      <div className="relative min-h-screen flex flex-col">
 
         <Header />
-          <div className="mx-auto max-w-[1240px] flex gap-2 flex-col">
-              <Link to={location.state?.from?.pathname.includes("auth") ? "" : -1}><IoArrowBackCircleOutline size='35px' className="cursor-pointer" /></Link>
+          <div className="mx-auto w-[1440px] flex gap-2 flex-col">
+              <Link to={-1}><IoArrowBackCircleOutline size='35px' className={`cursor-pointer ${pathname == '/details' ? 'hidden': ''}`}/></Link>
               
             <Outlet />
           </div>
-        </div>
+        <div className="left-0 right-0 bottom-0">
         <Footer />
+        </div>
+        </div>
+  
+      {/* </CheckLocationStatus> */}
     </OrderContext.Provider>
   );
 };

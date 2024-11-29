@@ -4,13 +4,15 @@ import OrderStatus from "../../reusableComponents/orderStatus";
 import { useGetOrderItemsByOrderID, useGetSingleOrder, useUpdateOrderStaus } from "../../brokers/apicalls";
 import { FaLocationArrow, FaMotorcycle, FaPhone, FaUserTie } from "react-icons/fa6";
 import Spinner from "../../loaders/Spinner";
-import { humanDatetime } from "../../../utils/config";
+import { humanDatetime, toFixedDeciimal } from "../../../utils/config";
 import Select from 'react-select';
 import { RiTimerLine } from "react-icons/ri";
 import Button from "../../Button";
 import { useMutation } from "@tanstack/react-query";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import { useState } from "react";
+import { useLocation, useOutletContext } from "react-router";
+import NoRecord from "../../notices/NoRecord";
 
 
 
@@ -42,18 +44,20 @@ const dot = (color = 'transparent') => ({
 const colorStyles = {
   singleValue: (styles, { data }) => ({ ...styles, ...dot(data.color) }),
 }
-const ChangeOrderStatus = ({orderStatus, orderID})=>{
+const ChangeOrderStatus = ({orderStatus, orderID, props})=>{
   const [selectedOption, setSelectedOption] = useState(null)
 
-  const {mutationFn} = useUpdateOrderStaus(orderID)
+  const {mutationFn} = useUpdateOrderStaus(orderID, selectedOption)
 
 
 
   const {mutate, isPending,} = useMutation({
-    mutationKey: ['updateOrder', orderID],
+    mutationKey: ['updateOrder', orderID, selectedOption],
     mutationFn,
     onSuccess: ()=> {
       showSuccessToast('Order updated successfully')
+      props.handleCancel()
+
     },
     onError: (error)=>{
       showErrorToast(error.message)
@@ -62,7 +66,7 @@ const ChangeOrderStatus = ({orderStatus, orderID})=>{
   })
 
   const updateOrder = ()=> {
-   return mutate(selectedOption)
+   return mutate({})
 
   }
 
@@ -86,8 +90,9 @@ const ChangeOrderStatus = ({orderStatus, orderID})=>{
 
 }
 
-const OrderItems = ({orderItems, isError, isLoading})=> {
-  return <div className="flex flex-col mt-6">
+  const OrderItems = ({orderItems, isError, isLoading})=> {
+    return <>
+    { orderItems?.length > 0 ? <div className="flex flex-col mt-6">
               <p className="font-bold text-xl">Order Items</p>
                <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -127,6 +132,7 @@ const OrderItems = ({orderItems, isError, isLoading})=> {
               </tr>
             ) : (
               orderItems?.map((item, idx) => {
+                const itemPrice = item?.quantity * (item?.menu ?  item.menu.price : item.extra.price )
                 return (
                   <tr key={idx}>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -138,7 +144,7 @@ const OrderItems = ({orderItems, isError, isLoading})=> {
                       {item?.quantity}
                     </td>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap text-right">
-                      {item?.quantity * (item?.menu ? item.menu.price : item.extra.price )}
+                      {toFixedDeciimal(itemPrice,2)}
                     </td>
                   </tr>
                 );
@@ -146,17 +152,23 @@ const OrderItems = ({orderItems, isError, isLoading})=> {
             )}
           </tbody>
                </table>
-            </div>
+            </div> : <NoRecord title="No Items found"/> }
+      
+      </>
+     
 }
 
 
 const OrderDetails = (props) => {
+  const [, activeUser] = useOutletContext()
+
+  
 
   const { orderID } = props
+  const {pathname} =useLocation()
 
   const { data, isLoading } = useGetSingleOrder(orderID)
   const { data: orderItems, isLoading: orderItemsLoading, isError } = useGetOrderItemsByOrderID(orderID)
-
 
   return (
       <Modal {...props}>
@@ -183,8 +195,8 @@ const OrderDetails = (props) => {
               </div>
             </div>
              
-             <div className="col-span-2">
-                 <ChangeOrderStatus orderStatus={data?.status} orderID={orderID}/>
+             <div className={`col-span-2 ${activeUser?.currentUserRole != 'RESTAURANT_ADMIN' ? 'hidden' : ''}`}>
+                 <ChangeOrderStatus orderStatus={data?.status} orderID={orderID} props={props}/>
 
              </div>
             </div>
@@ -234,7 +246,7 @@ const OrderDetails = (props) => {
               <div className="grid grid-cols-3 gap-2">
                   <div className="font-bold text-xl">Total Amount</div>
                   <div/>
-                   <div className="font-bold text-xl flex justify-end">{data?.totalAmount}</div>
+                   <div className="font-bold text-xl flex justify-end">{data?.totalOrderPrice}</div>
               </div>
 
             
@@ -260,6 +272,6 @@ OrderItems.propTypes = {
   isLoading: PropTypes.bool,
 }
 ChangeOrderStatus.propTypes = {
-  orderStatus: PropTypes.string.isRequired,
-  orderID: PropTypes.string.isRequired
+  orderStatus: PropTypes.string,
+  orderID: PropTypes.string
 }

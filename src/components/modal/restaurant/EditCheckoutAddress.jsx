@@ -12,7 +12,7 @@ import { GoLocation } from "react-icons/go";
 import PropTypes from "prop-types";
 
 const EditCheckoutAddress = (props) => {
-  const {handleCancel, isOpen, address} = props
+  const {handleCancel, address} = props
   const { auth, setAuth } = useAuth();
   const [useMyAddress, setUseMyAddress] = useState(true);
   const addressOptions = [
@@ -81,7 +81,6 @@ const EditCheckoutAddress = (props) => {
   };
 
   return (
-    <div handleCancel={handleCancel} isOpen={isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -236,7 +235,6 @@ const EditCheckoutAddress = (props) => {
           )}
         </div>
       </Modal>
-    </div>
   );
 };
 

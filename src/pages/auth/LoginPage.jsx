@@ -175,10 +175,10 @@ const Form = () => {
           </div>
           <div className="flex justify-end my-3">
             <Link to="forgot">
-              <p className="text-sm text-red-500 underline">Forgot Password?</p>
+              <p className="text-sm text-blue-500 underline">Forgot Password?</p>
             </Link>
           </div>
-          <button className="w-full mt-5 bg-red-500 p-4 rounded-lg">
+          <button className="w-full mt-5 bg-blue-500 p-4 rounded-lg">
             {cardLoading || activeUserDetailsLoading ? (
               <Spinner color="white" size="20px" />
             ) : (

@@ -3,15 +3,26 @@ import { Link } from "react-router-dom";
 import {
   useRestaurantList,
   useUserList,
+  useUserListPaged,
 } from "../../components/brokers/apicalls";
 import Button from "../../components/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import Table from "../../components/Table";
+import TableAlt from "../../components/TableAlt";
 
 const Users = () => {
-  const [firstName, setFirstName] = useState(null);
-  const [lastName, setLastName] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filter, setFilters] = useState({
+  firstName:null,
+  lastName:null,
+  enabled:null,
+  email:null,
+  username:null,
+  userId:null,
+  sortBy:null,
+  orderBy:null,
+  })
 
   const [credentialOpen, setCredentialsOpen] = useState(false);
 
@@ -38,7 +49,21 @@ const Users = () => {
     fetchNextPage: usersFetchNextPage,
     isFetchingNextPage: usersFetchingNextPage,
     isError: isUsersError,
-  } = useUserList(firstName, lastName);
+  } = useUserListPaged(
+  filter.firstName, 
+  filter.lastName, 
+  filter.enabled,
+  filter.email,
+  filter.username,
+  filter.userId,
+  filter.sortBy,
+  filter.orderBy,
+  currentPage
+);
+
+
+  let userData = usersList?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = userData?.[0].totalPages
 
 
 
@@ -47,14 +72,14 @@ const Users = () => {
       <AddCredentialModal
         isOpen={credentialOpen}
         handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="400px"
       />
 
       <ViewRestaurant
         isOpen={viewOpen}
         handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="950px"
         restaurantID={restaurantID}
       />
@@ -62,12 +87,16 @@ const Users = () => {
       <div className="mt-2 flex-col gap-2">
         <p className="font-bold text-2xl">Users</p>
       </div>
-      <Table
-        totalCount={usersList?.pages?.[0].results?.length}
-        usersHasNextPage={usersHasNextPage}
-        isFetchingNextPage={usersFetchingNextPage}
-        data={usersList?.pages?.[0].results}
-        isLoading={usersLoading}
+      <TableAlt
+      isLoading={usersLoading}
+        list={userData}
+        title={"No Record Found"}
+          numberOfPages={numberOfPages}
+            totalCount={4}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            isFetchingNextPage={usersFetchingNextPage}
+            usersHasNextPage={usersHasNextPage}
       >
         <table className="w-full">
           <thead className="bg-gray-50 border-b-2 border-gray-200">
@@ -85,7 +114,7 @@ const Users = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {usersList?.pages?.[0].results?.map((item, idx) => {
+            { userData?.[0].results?.map((item, idx) => {
               return (
                 <tr
                   className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
@@ -96,19 +125,19 @@ const Users = () => {
                       <div className="flex items-center">
                         <p className="mr-3 italic">Name: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.value?.firstName} {item?.value?.lastName}
+                          {item?.firstName} {item?.lastName}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> Contact: </p>
                         <p className="mr-3 font-extrabold text-xs">
-                          {item?.value?.contact}
+                          {item?.contact}
                         </p>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> Email: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.value?.credential?.email}
+                          {item?.credential?.email}
                         </p>
                       </div>
                     </div>
@@ -118,32 +147,32 @@ const Users = () => {
                       <div className="flex items-center">
                         <p className="mr-3 italic">Street: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.value?.address?.street}
+                          {item?.address?.street}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> House Number: </p>
                         <p className="mr-3 font-extrabold text-xs">
-                          {item?.value?.address?.houseNumber}
+                          {item?.address?.houseNumber}
                         </p>
                       </div>
                       <div className="flex items-center">
                         <p className="mr-3 italic"> City: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.value?.address?.city}
+                          {item?.address?.city}
                         </p>
                       </div>
                     </div>
                   </td>
 
                   <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <Link to={`users/${item?.value?.id}`}>
+                    <Link to={`${item?.id}`}>
                       <Button
                         variant="dark"
                         className="px-2 py-1 text-xs rounded-md"
                         // onClick={() => {
                         //   handleOpenViewModal();
-                        //   setRestaurantID(item?.value?.id);
+                        //   setRestaurantID(item?.id);
                         // }}
                       >
                         View Details
@@ -155,7 +184,7 @@ const Users = () => {
             })}
           </tbody>
         </table>
-      </Table>
+      </TableAlt>
     </>
   );
 };

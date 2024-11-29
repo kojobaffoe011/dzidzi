@@ -12,7 +12,7 @@ import PropTypes from "prop-types";
 
 const AddCoupon = (props) => {
   const {userRole, handleCancel} = props
-  const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
+  const types = ["RESTAURANT_ADMIN", "COURIER", "SERVICE", "ADMIN"];
   const credentialSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     percentage: yup.number().required("Percentage is required"),

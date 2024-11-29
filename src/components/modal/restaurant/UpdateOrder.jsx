@@ -125,7 +125,6 @@ const UpdateOrderModal = (props) => {
 
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <>
           {orderItemLoading ? (
@@ -136,7 +135,7 @@ const UpdateOrderModal = (props) => {
             <div className="p-2 grid grid-cols-2 mt-8 gap-2">
               <div className="
               ">
-                <Imageloader imageID={menuData?.image?.id} classNames="h-[400px] w-full object-contain"/>
+                <Imageloader imageID={menuData?.image?.id} classNames="h-[300px] w-full object-contain"/>
               </div>
               <div className="flex-col">
                 <div className="flex-col flex">
@@ -213,7 +212,6 @@ const UpdateOrderModal = (props) => {
           )}
         </>
       </Modal>
-    </div>
   );
 };
 

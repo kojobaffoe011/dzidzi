@@ -61,10 +61,10 @@ const Dashboard = () => {
       link: "",
       icon: (className = "") => <FiHome className={className} size="25px" />,
       text: "Home",
-      userType: ["ADMIN", "RESTAURANT", "COURIER", "SERVICE"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
     },
     {
-      link: "",
+      link: "users",
       icon: (className = "") => <FaBed className={className} size="25px" />,
       text: "Users",
       userType: ["ADMIN", "SERVICE"],
@@ -83,7 +83,7 @@ const Dashboard = () => {
         <BsBookmarkStarFill className={className} size="25px" />
       ),
       text: "Coupons",
-      userType: ["ADMIN", "RESTAURANT"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN"],
     },
     {
       link: "orders",
@@ -91,48 +91,48 @@ const Dashboard = () => {
         <IoFastFood className={className} size="25px" />
       ),
       text: "Orders",
-      userType: ["ADMIN", "RESTAURANT"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER"],
     },
-    {
-      link: "services",
-      icon: (className = "") => (
-        <MdPendingActions className={className} size="25px" />
-      ),
-      text: "Services",
-      userType: ["ADMIN", "RESTAURANT", "COURIER", "SERVICE"],
-    },
+    // {
+    //   link: "services",
+    //   icon: (className = "") => (
+    //     <MdPendingActions className={className} size="25px" />
+    //   ),
+    //   text: "Services",
+    //   userType: ["ADMIN"],
+    // },
     {
       link: "couriers",
       icon: (className = "") => (
         <AiOutlineFieldTime className={className} size="25px" />
       ),
       text: "Couriers",
-      userType: ["ADMIN", "RESTAURANT", "COURIER", "SERVICE"],
+      userType: ["ADMIN"],
     },
-    {
-      link: "tickets",
-      icon: (className = "") => (
-        <AiOutlineFieldTime className={className} size="25px" />
-      ),
-      text: "Tickets",
-      userType: ["RESTAURANT", "SERVICE"],
-    },
+    // {
+    //   link: "tickets",
+    //   icon: (className = "") => (
+    //     <AiOutlineFieldTime className={className} size="25px" />
+    //   ),
+    //   text: "Tickets",
+    //   userType: ["RESTAURANT_ADMIN", "SERVICE"],
+    // },
     {
       link: "menus",
       icon: (className = "") => (
         <TbFileUpload className={className} size="25px" />
       ),
       text: "Menus",
-      userType: ["ADMIN", "RESTAURANT", "SERVICE"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE"],
     },
-    {
-      link: "profile-details",
-      icon: (className = "") => (
-        <FaUserGraduate className={className} size="25px" />
-      ),
-      text: "Profile",
-      userType: ["ADMIN", "RESTAURANT", "COURIER", "SERVICE"],
-    },
+    // {
+    //   link: "profile-details",
+    //   icon: (className = "") => (
+    //     <FaUserGraduate className={className} size="25px" />
+    //   ),
+    //   text: "Profile",
+    //   userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
+    // },
   ];
 
 
@@ -362,7 +362,6 @@ const Dashboard = () => {
                     showSide();
                   }}
                 />
-                <Link to={"/dashboard/profile"}>
                   <div className="flex w-full justify-end items-center">
                     {!activeUserLoading && <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
                       <p className="text-xs font-bold">{activeUser?.currentUserRole}</p>
@@ -376,7 +375,6 @@ const Dashboard = () => {
                        
                     </div>
                   </div>
-                </Link>
               </div>
             </div>
             <div

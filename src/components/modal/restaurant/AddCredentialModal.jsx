@@ -11,7 +11,7 @@ import { useAddCredentials } from "../../brokers/apicalls";
 import PropTypes from "prop-types";
 
 const AddCredentialModal = (props) => {
-  const types = ["RESTAURANT", "COURIER", "SERVICE", "ADMIN"];
+  const types = ["RESTAURANT_ADMIN", "COURIER", "SERVICE", "ADMIN"];
   const { userRole, handleCancel } = props;
 
   const credentialSchema = yup.object().shape({

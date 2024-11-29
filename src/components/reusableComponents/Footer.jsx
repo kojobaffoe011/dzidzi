@@ -7,7 +7,7 @@ import { HiOutlineMail } from "react-icons/hi";
 
 const links = [
   {
-    title: "FOR RESTAURANTS",
+    title: "FOR RESTAURANT",
     link: "LINKS",
   },
   {

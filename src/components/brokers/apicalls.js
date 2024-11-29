@@ -126,7 +126,7 @@ const fetchUsers = async ({ pageParam = null, queryKey }) => {
 };
 
 export const useUserList = (firstName, lastName) => {
-  const queryKey = [firstName, lastName, "userList"];
+  const queryKey = [ "userList", firstName, lastName];
 
   // Determine the next page param
   const getNextPageParam = (lastPage) =>
@@ -143,28 +143,125 @@ export const useUserList = (firstName, lastName) => {
  return  useInfiniteQuery({ queryKey, queryFn: fetchUsers, ...options });
 };
 
+
+export const useUserListPaged = (
+  firstName,
+  lastName,
+  enabled,
+  email,
+  username,
+  userId,
+  sortBy,
+  orderBy,
+   page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["userListPaged",
+  firstName,
+  lastName,
+  enabled,
+  email,
+  username,
+  userId,
+  sortBy,
+  orderBy,
+   page];
+
+
+  const fetchUsers = ({ pageParam = page }) => {
+    let url = `/paged-users?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+       const queryParams = {
+  firstName,
+  lastName,
+  enabled,
+  email,
+  username,
+  userId,
+  sortBy,
+  orderBy,
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({queryKey, queryFn: fetchUsers, ...options});
+};
+
 /// Function to fetch paged restaurants
 const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
-  const [, name, rating] = queryKey;
+  const [, name, rating, distance, latitude, longitude, sortBy, orderBy] = queryKey;
   const limit = 20; // Adjust the limit if necessary
   let url = `/paged-restaurants?limit=${limit}`;
 
-  if (pageParam) {
-    url += `&cursor=${encodeURIComponent(pageParam)}`;
-  }
-  if (name) {
-    url += `&name=${encodeURIComponent(name)}`;
-  }
-  if (rating) {
-    url += `&rating=${encodeURIComponent(rating)}`;
-  }
+   const queryParams = {
+    name,
+    rating,
+    distance,
+    latitude,
+    longitude,
+    sortBy,
+    orderBy,
+    pageParam
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+  // const queryFn = () => {
+  //   return get(url);
+  // };
+
+  // if (pageParam) {
+  //   url += `&cursor=${encodeURIComponent(pageParam)}`;
+  // }
+
+  // if (name) {
+  //   url += `&name=${encodeURIComponent(name)}`;
+  // }
+  // if (rating) {
+  //   url += `&rating=${encodeURIComponent(rating)}`;
+  // }
 
   const response = await axios.get(url);
   return response.data;
 };
 
-export const useRestaurantList = (name, rating) => {
-  const queryKey = ["restaurantList", name, rating];
+export const useRestaurantList = (name, rating, distance, latitude, longitude, sortBy, orderBy) => {
+  const queryKey = ["restaurantList", name, rating, distance, latitude, longitude, sortBy, orderBy];
 
   // Determine the next page param
   const getNextPageParam = (lastPage) =>
@@ -178,6 +275,92 @@ export const useRestaurantList = (name, rating) => {
     keepPreviousData: true, // Other options also as part of the object
     refetchOnWindowFocus: false,
   });
+};
+
+export const useRestaurantListPaged = (
+  name,
+  email,
+  username,
+  rating,
+  visible,
+  parentRestaurantId,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+   page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["restaurantsPaged",
+  name,
+  email,
+  username,
+  rating,
+  visible,
+  parentRestaurantId,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+   page];
+
+
+  const fetchRestaurants = ({ pageParam = page }) => {
+    let url = `/paged-restaurants?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+       const queryParams = {
+  name,
+  email,
+  username,
+  rating,
+  visible,
+  parentRestaurantId,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({queryKey, queryFn: fetchRestaurants, ...options});
 };
 
 export const useGetSingleRestaurant = (id) => {
@@ -435,6 +618,91 @@ export const useMenuListAlt = (
   });
 };
 
+export const useMenuListPaged = (
+  minimumPrice,
+  maximumPrice,
+  name,
+  category,
+  rating,
+  visible,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+   page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["menuListPaged",
+  minimumPrice,
+  maximumPrice,
+  name,
+  category,
+  rating,
+  visible,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+   page];
+
+  const fetchMenus = ({ pageParam = page }) => {
+    let url = `/paged-menus?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(6))}`;
+
+       const queryParams = {
+       minimumPrice,
+       maximumPrice,
+       name,
+       category,
+       rating,
+       visible,
+       distance,
+       latitude,
+       longitude,
+       restaurantId,
+       sortBy,
+       orderBy
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({queryKey, queryFn: fetchMenus, ...options});
+};
+
 export const useMenuList = (
   name,
   category,
@@ -479,6 +747,8 @@ export const useMenuList = (
 
   return useInfiniteQuery({ queryKey, queryFn: fetchMenus, ...options });
 };
+
+
 
 const fetchExtras = async ({ queryKey, pageParam = {} }) => {
   const [_key, restaurantID, extraID, rating, minPrice, maxPrice, name] =
@@ -642,7 +912,34 @@ export const useGetServices = () => {
 };
 
 //useGet Coupons
-export const useGetCoupons = () => {
+export const useGetCoupons = (activeUser) => {
+  const queryKey = ["coupons", activeUser];
+
+  const url = activeUser.currentUserRole == 'ADMIN' ? '/coupons' : `/coupons/${activeUser.currentUserId}`
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(activeUser)
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+export const useGetCouponsByRestaurantID = (id) => {
   const queryKey = ["coupons"];
 
   let url = `/coupons`;
@@ -655,10 +952,13 @@ export const useGetCoupons = () => {
     return response?.data;
   };
 
+  const enabled = Boolean(id)
+
   return useQuery({
     queryKey,
     queryFn,
     select,
+    enabled,
     refetch0nWindowFocus: false,
     refetchOnmount: false,
     refetch0nReconnect: false,
@@ -954,6 +1254,237 @@ export const useOrderList = (
   });
 };
 
+export const useOrderListPaged = (
+  restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy, 
+   page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["orderListPaged",  
+  restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy,  
+  page];
+
+  const fetchOrders = ({ pageParam = page }) => {
+    let url = `/paged-orders?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+       const queryParams = {
+     restaurantId, 
+     courierId, 
+     userId, 
+     orderId, 
+     sortBy, 
+     orderBy, 
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({queryKey, queryFn: fetchOrders, ...options});
+};
+
+export const useCourierListPaged = (
+  firstName, 
+  lastName, 
+  email, 
+  username, 
+  averageRating,
+  status,
+  courierId,
+  sortBy, 
+  orderBy, 
+   page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["couriersPaged",  
+  firstName, 
+  lastName, 
+  email, 
+  username, 
+  averageRating,
+  status,
+  courierId,
+  sortBy, 
+  orderBy, 
+   page];
+
+  const fetchCouriers = ({ pageParam = page }) => {
+    let url = `/paged-courier?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+       const queryParams = {
+     firstName, 
+  lastName, 
+  email, 
+  username, 
+  averageRating,
+  status,
+  courierId,
+  sortBy, 
+  orderBy 
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({queryKey, queryFn: fetchCouriers, ...options});
+};
+
+
+const fetchOrders = async ({ queryKey, pageParam = {} }) => {
+  const [,  restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy] =
+    queryKey;
+
+  const cursor = pageParam.cursor || null;
+  const direction = pageParam.direction || "FORWARD";
+  const limit = 5; // Adjust the limit if necessary
+  let url = `/paged-orders?limit=${limit}`;
+
+   const queryParams = {
+    restaurantId,
+    courierId,
+    userId,
+    orderId,
+    sortBy,
+    orderBy,
+      cursor,
+    direction,
+  };
+
+
+   Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url += `&${key}=${encodeURIComponent(value)}`;
+    }
+  });
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Fetching menus failed:", error);
+    throw error;
+  }
+};
+
+export const useOrderListInfinite = (
+ restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy, 
+  cursor,
+  direction
+) => {
+  const queryKey = [
+    "orderListInfinite",
+   restaurantId, 
+  courierId, 
+  userId, 
+  orderId, 
+  sortBy, 
+  orderBy, 
+  cursor,
+  direction
+  ];
+
+  const getNextPageParam = (lastPage, allPages) => {
+    return lastPage?.lastCursor
+      ? { cursor: lastPage.lastCursor, direction: "FORWARD" }
+      : undefined;
+  };
+
+  const getPreviousPageParam = (firstPage, allPages) => {
+    return allPages?.[allPages.length - 1]?.lastCursor
+      ? {
+          cursor: allPages?.[allPages.length - 1]?.lastCursor,
+          direction: "BACKWARDS",
+        }
+      : undefined;
+  };
+
+  const options = {
+    getNextPageParam,
+    getPreviousPageParam,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  };
+
+  return useInfiniteQuery({ queryKey, queryFn: fetchOrders, ...options });
+};
+
 export const useGetSingleOrder = (id) => {
   const queryKey = ["singleorder", id];
 
@@ -1010,10 +1541,51 @@ export const useGetOrderItemsByOrderID = (id) => {
 }
 
 
-export const useUpdateOrderStaus = (orderId) => {
+export const useUpdateOrderStaus = (orderId,status) => {
   const mutationFn = (data) => {
-    return put(`/restaurant/order/${orderId}`, data);
+    return put(`/restaurant/order/${orderId}?status=${status}`, data);
   };
 
   return { mutationFn };
 };
+
+export const useDeleteUser = () => {
+  const mutationFn = (data) => {
+    return delete_request(
+      `/user/remove`,
+      data
+    );
+  };
+
+  return { mutationFn };
+};
+
+//USE VERIFY USER
+export const useVerifyUser = (id) => {
+  const queryKey = ["verifyuser", id];
+
+console.log({id, id2: id.replace('%20', '+')} )
+
+  let url = `/user/verify?verificationCode=${encodeURIComponent(id)}`
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id)
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+}

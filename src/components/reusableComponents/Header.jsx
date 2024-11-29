@@ -16,6 +16,8 @@ import UpdateOrderModal from "../modal/restaurant/UpdateOrder";
 import { useLogoutUser } from "../../hooks/useLogoutUser";
 import { HiUser } from "react-icons/hi";
 import PropTypes from "prop-types";
+import SideModal from "./SideModal";
+import Imageloader from "../loaders/Imageloader";
 
 const Orders = ({ auth, setAuth, navigateTo, token }) => {
   const [updateOrderOpen, setUpdateOrderOpen] = useState(false);
@@ -39,32 +41,15 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
       <UpdateOrderModal
         isOpen={updateOrderOpen}
         handleCancel={handleCloseUpdateModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="1000px"
       />
   
-
-      <div className="p-4 flex flex-col shadow-md absolute right-0 h-screen w-[450px] z-[15] bg-white shadow-lg top-[-16px] bottom-0">
-        <div className="mt-4">
-          <button
-            onClick={() => {
-              setAuth({ ...auth, open: false });
-            }}
-          >
-            <RiCloseLine size={"30px"} className="cursor-pointer" />
-          </button>
-        </div>
+    <SideModal>
 
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <p className="text-3xl whitespace-nowrap font-extrabold">
-              {auth?.restaurant?.name}
-            </p>
-            <TfiMoreAlt size="15px" />
-          </div>
-          <div className="flex justify-between items-center">
-            <p>{auth?.orders && auth.orders.length} item(s)</p>
+          <div className="flex justify-end items-center">
             <p className="font-bold">
               <span className="font-extralight">Subtotal:</span> €
               {totalSum?.toFixed(2)}
@@ -89,19 +74,8 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
                       {item.menu ? item.menu.name : item.extra.name}
                     </p>
                     <div className="flex justify-center items-center">
-                      <Suspense
-                        fallback={
-                          <div>
-                            <Spinner color="blue" size="20px" />
-                          </div>
-                        }
-                      >
-                        <LazyImage
-                          src={item?.value?.image ? item?.value?.image : burger}
-                          alt="imgs"
-                          className="w-[100px] rounded h-[70px] bg-center"
-                        />
-                      </Suspense>
+                   <Imageloader imageID={item?.image?.id} classNames="h-[50px] w-full object-contain"/>
+
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -148,15 +122,17 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
             </div>
           </div>
         </div>
-      </div>
-      {/* </div> */}
+      </SideModal>
+    
     </>
   );
 };
 
 const Profile = () => {
   return <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
-    <HiUser  className="text-slate-400 cursor-pointer" size={'25px'}/>
+    <Link to='/details/user-profile'>
+      <HiUser  className="text-slate-400 cursor-pointer" size={'25px'}/>
+    </Link> 
     </div>
 }
 
@@ -178,6 +154,8 @@ const Header = () => {
     return mutate();
   };
 
+
+
   return (
     <div className={`px-24 ${auth?.open ? "mt-4" : "mt-4"} relative`}>
       {auth?.open && auth?.orders?.length > 0 && (
@@ -189,7 +167,7 @@ const Header = () => {
         />
       )}
       <div className="flex justify-between items-center">
-        <Link to={pathname == "/details" ? "" : -1}>
+        <Link to={pathname == "/details" ? "" : "/details"}>
           <div className="flex items-center gap-4">
             <GiHamburger className="cursor-pointer" size="25px" />
             <p className="font-logo font-extrabold text-3xl">dzidzi</p>
@@ -207,18 +185,44 @@ const Header = () => {
                  <button
                 className="rounded-full bg-white px-6 py-2 border border-gray-900"
                 onClick={handleLogout}
+                disabled={isPending}
               >
                 <div className="flex items-center justify-center">
-                  {isPending ? (
+                  {/* {isPending ? (
                     <Spinner />
-                  ) : (
+                  ) : ( */}
                     <p className="font-bold font-gray-500 text-xs ">Logout</p>
-                  )}
+                  {/* )} */}
                 </div>
               </button>
             </div>
            
           )}
+          {!loggedIn && 
+          <div className="flex gap-2">
+              <Link to='/auth/register'>
+              <button
+                className="rounded-full bg-white px-6 py-2 border border-gray-900"
+              >
+                <div className="flex items-center justify-center">
+               
+                    <p className="font-bold font-gray-500 text-xs ">Register</p>
+                </div>
+              </button>
+            </Link>  
+              <Link to='/auth'>
+              <button
+                className="rounded-full bg-black px-6 py-2 border border-gray-900"
+              >
+                <div className="flex items-center justify-center">
+               
+                    <p className="font-bold text-white text-xs ">Login</p>
+                </div>
+              </button>
+            </Link>  
+          </div>  
+         
+          }
         </div>
       </div>
       <div className="border border-gray-300 my-2" />

@@ -23,7 +23,7 @@ const Table = (props) => {
                 )}
                 <div className="flex flex-col w-full overflow-x-scroll">
                   {props.children}
-                  {(props?.hasNextPage || props?.hasPreviousPage) && (
+                  {/* {(props?.hasNextPage || props?.hasPreviousPage) && (
                     <div className="p-2 border-t bg-white w-full ">
                       <div className="px-2 py-3 flex justify-end items-center border rounded-lg">
                         <div className="flex items-center justify-center">
@@ -49,7 +49,7 @@ const Table = (props) => {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             ) : (

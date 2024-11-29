@@ -1,26 +1,29 @@
 import { useCallback, useState } from "react";
 import {
   useGetSingleMenu,
-  useMenuListAlt,
+  useMenuListPaged,
 } from "../../components/brokers/apicalls";
 import Button from "../../components/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import TableAlt from "../../components/TableAlt";
+import { useOutletContext } from "react-router";
 
 const Menus = () => {
-  const [cursorHistory, setCursorHistory] = useState({
-    firstCursor: null,
-    lastCursor: null,
-    direction: "FORWARD",
-  });
-  const [cursor, setCursor] = useState(null);
+  const [, activeUser] = useOutletContext() 
   const [filters, setFilters] = useState({
-    name: null,
-    category: null,
-    rating: null,
-    minPrice: null,
-    maxPrice: null,
+  minimumPrice: null,
+  maximumPrice: null,
+  name: null,
+  category: null,
+  rating: null,
+  visible: null,
+  distance: null,
+  latitude: null,
+  longitude: null,
+  restaurantID: activeUser?.currentUserRole == 'RESTAURANT_ADMIN' ? [activeUser?.currentUserId] : null,
+  sortBy: null,
+  orderBy: null,
   });
   const [menuID, setMenuID] = useState(null);
 
@@ -32,7 +35,7 @@ const Menus = () => {
     setCredentialsOpen(false);
   }, []);
 
-  const [restaurantID, setRestaurantID] = useState(null);
+  const [restaurantID, setRestaurantID] = useState(activeUser?.currentUserRole == 'RESTAURANT_ADMIN' ? activeUser?.currentUserId : null);
   const [viewOpen, setViewOpen] = useState(false);
   const handleOpenViewModal = useCallback(() => {
     setViewOpen(true);
@@ -41,60 +44,54 @@ const Menus = () => {
     setViewOpen(false);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1);
   const {
-    data: menuListAlt,
+    data: menuListAlt = [],
     isLoading: isMenuLoading,
+    hasNextPage: menuHasNextPage,
+    isFetchingNextPage: menuFetchingNextPage,
     isError: isMenuAltError,
-    error: menuError,
-  } = useMenuListAlt(
+  } = useMenuListPaged(
+    filters.minimumPrice,
+    filters.maximumPrice,
     filters.name,
     filters.category,
     filters.rating,
-    filters.minPrice,
-    filters.maxPrice,
-    restaurantID,
-    cursorHistory.direction == "FORWARD"
-      ? cursorHistory.lastCursor
-      : cursorHistory.firstCursor, // Pass the current cursor
-    cursorHistory.direction // Pass the current direction
+    filters.visible,
+    filters.distance,
+    filters.latitude,
+    filters.longitude,
+    filters.restaurantID,
+    filters.sortBy,
+    filters.orderBy,
+    currentPage
+
   );
+
+  let menuData = menuListAlt?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = menuData?.[0].totalPages
+
 
   const {
     isLoading: restaurantLoading,
     data: restaurantData,
-    isError,
-    error,
+    // isError,
+    // error,
   } = useGetSingleMenu(menuID);
-
-  const handlePrevious = () => {
-    setCursorHistory({
-      firstCursor: menuListAlt?.firstCursor,
-      lastCursor: menuListAlt?.lastCursor,
-      direction: "BACKWARDS",
-    });
-  };
-
-  const handleNext = () => {
-    setCursorHistory({
-      firstCursor: menuListAlt?.firstCursor,
-      lastCursor: menuListAlt?.lastCursor,
-      direction: "FORWARD",
-    });
-  };
 
   return (
     <>
       <AddCredentialModal
         isOpen={credentialOpen}
         handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="400px"
       />
 
       <ViewRestaurant
         isOpen={viewOpen}
         handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="950px"
         restaurantID={restaurantID}
         restaurantData={restaurantData}
@@ -106,10 +103,17 @@ const Menus = () => {
       </div>
       <TableAlt
         isLoading={isMenuLoading}
-        list={menuListAlt}
+        list={menuData}
         title={"No Record Found"}
-        handleNext = {handleNext}
-        handlePrevious = {handlePrevious}
+        // handleNext = {handleNext}
+        // handlePrevious = {handlePrevious}
+          numberOfPages={numberOfPages}
+           data={menuData}
+            totalCount={30}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            isFetchingNextPage={menuFetchingNextPage}
+            usersHasNextPage={menuHasNextPage}
       >
 
         <table className="min-w-full divide-y divide-gray-200">
@@ -149,27 +153,27 @@ const Menus = () => {
                 </td>
               </tr>
             ) : (
-              menuListAlt?.results?.map((item, idx) => {
+              menuData?.[0].results?.map((item, idx) => {
                 return (
-                  <tr key={idx}>
+                  <tr key={idx} className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                       <div className="flex flex-col">
                         <div className="flex items-center">
                           <p className="mr-3 italic">Name: </p>
                           <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.value?.name}
+                            {item?.name}
                           </span>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Price: </p>
                           <p className="mr-3 font-extrabold text-xs">
-                            $ {item?.value?.price}
+                            $ {item?.price}
                           </p>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Category: </p>
                           <p className="mr-3 font-extrabold text-xs text-red-600">
-                            {item?.value?.category}
+                            {item?.category}
                           </p>
                         </div>
                       </div>
@@ -179,21 +183,21 @@ const Menus = () => {
                         <div className="flex items-center">
                           <p className="mr-3 italic">Name: </p>
                           <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.value?.restaurant?.name}
+                            {item?.restaurant?.name}
                           </span>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Contact: </p>
                           <p className="mr-3 font-extrabold text-xs">
-                            {item?.value?.restaurant?.contact}
+                            {item?.restaurant?.contact}
                           </p>
                         </div>
                         <div className="flex items-center">
                           <p className="mr-3 italic"> Rating: </p>
                           <p className="mr-3 font-extrabold text-xs text-red-600">
-                            {item?.value?.restaurant?.averageRating === 0
+                            {item?.restaurant?.averageRating === 0
                               ? 0
-                              : item?.value?.restaurant?.averageRating || 4.9}
+                              : item?.restaurant?.averageRating || 4.9}
                           </p>
                         </div>
                       </div>
@@ -204,7 +208,7 @@ const Menus = () => {
                         className="px-2 py-1 text-xs rounded-md"
                         onClick={() => {
                           handleOpenViewModal();
-                          setMenuID(item?.value?.id);
+                          setMenuID(item?.id);
                         }}
                       >
                         View Details

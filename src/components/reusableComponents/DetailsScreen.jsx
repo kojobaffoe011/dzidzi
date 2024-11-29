@@ -1,11 +1,14 @@
 import { useState } from "react";
-import {  BsArrowRight } from "react-icons/bs";
-import { GiPizzaSlice } from "react-icons/gi";
+import rider from "../../assets/images/motorbike.png";
+import cerified from "../../assets/images/certified.png";
+import lighting from "../../assets/images/lighting.png";
 import RestaurantCard from "./restaurantCard";
 import MenuDetails from "./menuDetails";
 import { useRestaurantList } from "../brokers/apicalls";
 import DzidziLoader from "../loaders/DzidziLoader";
-import Spinner from "../loaders/Spinner";
+import { useAllowLocation } from "../../hooks/useAllowLocation";
+import { useCategoryList } from "../../hooks/useCategoryList";
+import Promo from "./Promo";
 
 export const filters = [
   "Sort",
@@ -45,89 +48,100 @@ export const products = [
   },
 ];
 
-const promodata = [
-  {
-    images: "  ",
-    title: "Welcome Bonus",
-    subtitle: "Use Code DZIDZI()943047ASGFOIDB87",
-    Terms: "LINK",
-  },
 
-  {
-    images: "  ",
-    title: "Welcome Bonus",
-    subtitle: "Use Code DZIDZI()943047ASGFOIDB87",
-    Terms: "LINK",
-  },
 
-  {
-    images: "  ",
-    title: "Welcome Bonus",
-    subtitle: "Use Code DZIDZ1943GI04SGFOIDB87",
-    Terms: "LINK",
-  },
-];
+
 
 function Categories() {
+  const { categories } = useCategoryList()
   return (
-    <div className="flex justify-center gap-8 overflow-x-scroll px-12">
-      {Array(8).fill({
-    icon: <GiPizzaSlice size={"40px"} />,
-    text: "pizza ",
-  }).map((item, idx) => {
+    <div className=" overflow-x-scroll">
+      <div className="pl-16 flex justify-center gap-4 ">
+      {categories.map((item, idx) => {
         return (
-          <div className="flex flex-col items-center" key={idx}>
-            <div className=" p-2 rounded-full hover:bg-gray-200 hover:cursor-pointer">
+          <div className="flex flex-col items-center justify-center"  key={idx} >
+            <div className=" p-2 rounded-full hover:bg-gray-200 hover:cursor-pointer h-12 w-12">
               {" "}
-              {item.icon}
+              <img src={item.icon} alt="icon" width="40px" className=""/>
             </div>
-            <p className="font-bold"> {item.text}</p>
+            <p className="font-bold text-xs"> {item.name}</p>
           </div>
         );
       })}
+       </div>
     </div>
   );
 }
 
-function Promo() {
-  return (
-    <div className="grid grid-cols-3 py-4 gap-6">
-      {promodata?.map((item, idx) => {
-        return (
-          <div className="cursor-pointer" key={idx}>
-            <div className="flex flex-col w-full gap-2">
-              <div className="h-[160px] rounded-xl bg-promo-bg bg-cover bg-no-repeat relative">
-                {" "}
-                <div className="bg-black opacity-[0.75] flex justify-between h-full flex-col p-4 rounded-xl ">
-                  {/* <div className=" flex justify-between h-full flex-col  "> */}
-                  <div>
-                    <p className="text-4xl text-white font-extrabold">
-                      {item.title}
-                    </p>
-                    <p className="text-white">{item.subtitle}</p>
-                  </div>
-                  <div className="bg-black rounded-full">
-                    <button className=" bg-white rounded-full p-2 px-2">
-                      <div className="flex items-center justify-center  gap-2">
-                        {" "}
-                        <p className="text-xs"> Terms and Conditions </p>{" "}
-                        <BsArrowRight />
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+
+
+// function Promo() {
+
+// const promo = [
+//   {
+//     text:  <p className="font-logo font-extrabold text-5xl text-white">
+//                     dzidzi <span className="">riders</span>
+//                   </p>,
+//     subtext: 'fast and accurate',
+//     image: rider,
+//     color: 'blue',
+//     lighting: true
+
+
+//   },
+//   {
+//     text:  <p className="font-logo font-extrabold text-5xl text-white">
+//                     dzidzi <span className="">foods</span>
+//                   </p>,
+//     subtext: 'why choose us?',
+//     image: cerified,
+//     color: 'red',
+//     lighting: false
+
+
+//   },
+// ]
+
+//   return (
+//     <div className="grid grid-cols-2 py-4 gap-6">
+//       {promo.map((i,id)=> {
+//         return (
+//            <div className="w-full gap-2 " key={id}>
+            
+//               <div className={`h-[200px] rounded-xl bg-${i.color}-300 grid grid-cols-5 p-2 z-[2]`}>
+//               <img src={i.image} alt="" width='240' className="col-span-2"/>
+//               <div className="col-span-3 flex flex-col justify-end h-[180px] relative">
+//                {i.lighting && <div className="absolute z-[1] top-[-22px] right-12 from-transparent"><img src={lighting} alt="" width={250} className=""/>
+//                 </div> } 
+//                 <div className="flex flex-col gap-2 font-bold text-3xl absolute z-[2]">
+//                   <p className="font-fast text-white text-4xl">{i.subtext}</p>
+//                   {i.text}
+//                 </div>
+                 
+//               </div>
+//               </div>
+//             </div>
+//         )
+//       })}
+           
+//     </div>
+//   );
+// }
 
 function DetailsMain() {
-  const [name, setName] = useState(null);
-  const [rating, setRating] = useState(null);
+  // const {latitude, longitude} = useAllowLocation()
+
+   const [filters, setFilters] = useState({
+    name: null,
+    rating: null,
+    distance: 5, 
+    latitude: null, 
+    longitude: null,
+    sortBy: null, 
+    orderBy: null
+
+  });
+
   const {
     data: restaurantsList = [],
     isLoading: restaurantsLoading,
@@ -135,12 +149,17 @@ function DetailsMain() {
     fetchNextPage: restaurantsFetchNextPage,
     isFetchingNextPage: restaurantsFetchingNextPage,
     // isError: isUsersError,
-  } = useRestaurantList(name, rating);
+  } = useRestaurantList(filters.name, filters.rating, filters.distance, filters.latitude, filters.longitude, filters.sortBy, filters.orderBy);
 
   let pages = restaurantsList?.pages?.flatMap((page) => page?.results);
 
-  if (restaurantsLoading) {
-   return <DzidziLoader/>
+  // useEffect(()=> {
+  //   setFilters({...filters, latitude, longitude})
+  // }, [latitude, longitude])
+
+
+  if(restaurantsLoading){
+    return <DzidziLoader/>
   }
 
   return (
@@ -148,28 +167,59 @@ function DetailsMain() {
       <Categories />
       <Promo />
       <MenuDetails isRestaurantPage={true} filters={filters}>
-        {" "}
-        <RestaurantCard
+        
+        <div className="mt-8">
+          <RestaurantCard
+       
           showDelivery={true}
           title="Popular Near Me"
-          data={pages}
+          pages={
+            {data: pages,
+              restaurantsHasNextPage,
+              restaurantsFetchNextPage,
+              restaurantsFetchingNextPage
+            }
+          }
         />
-        {restaurantsHasNextPage && (
-          <div className="flex justify-center my-4">
-            <button
-              className="border border-gray-500 px-8 py-2 bg-gray-100 font-bold rounded hover:bg-gray-200"
-              onClick={() => {
-                restaurantsFetchNextPage();
-              }}
-            >
-              {restaurantsFetchingNextPage ? (
-                <Spinner color="blue" size="20px" />
-              ) : (
-                <p className="text-xs">Load more</p>
-              )}
-            </button>
-          </div>
-        )}
+          <RestaurantCard
+       
+          showDelivery={true}
+          title="Most Liked"
+          pages={
+            {data: pages,
+              restaurantsHasNextPage,
+              restaurantsFetchNextPage,
+              restaurantsFetchingNextPage
+            }
+          }
+        />
+          <RestaurantCard
+       
+          showDelivery={true}
+          title="People Also Like"
+          pages={
+            {data: pages,
+              restaurantsHasNextPage,
+              restaurantsFetchNextPage,
+              restaurantsFetchingNextPage
+            }
+          }
+        />
+          <RestaurantCard
+       
+          showDelivery={true}
+          title="Today's Pick"
+          pages={
+            {data: pages,
+              restaurantsHasNextPage,
+              restaurantsFetchNextPage,
+              restaurantsFetchingNextPage
+            }
+          }
+        />
+        </div>
+        
+   
       </MenuDetails>
     </div>
   );

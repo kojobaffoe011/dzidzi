@@ -30,6 +30,18 @@ import VIewServices from "./pages/admin/VIewServices";
 import { OrderProvider } from "./context/orderProvider";
 import Checkout from "./pages/main/orderpages/Checkout";
 import Orders from "./pages/admin/Orders";
+import UserOrders from "./pages/admin/UserOrders";
+import UserSettings from "./pages/admin/UserSettings";
+import Home from "./pages/admin/Home";
+import BasicDetails from "./pages/auth/signup/BasicDetails";
+import AddressInfo from "./pages/auth/signup/AddressInfo";
+import LoginDetails from "./pages/auth/signup/LoginDetails";
+import Success from "./pages/auth/signup/Success";
+import Verify from "./pages/auth/Verify";
+import Profile from "./pages/main/userprofile/profile";
+import General from "./pages/main/userprofile/General";
+import MyOrders from "./pages/main/userprofile/MyOrders";
+import Support from "./pages/main/userprofile/Support";
 
 const queryClient = new QueryClient();
 
@@ -44,8 +56,14 @@ const App = () => {
               <Route path="auth" element={<LoginOutlet />}>
                 <Route path="" element={<LoginPage />} />
                 <Route path="admin" element={<LoginPage />} />
-                <Route path="register" element={<RegisterInfo />} />
-                {/* <Route path="otp/:phone" element={<ForgotOTP />} /> */}
+                <Route path="register" element={<RegisterInfo />} >
+                <Route path="" element={<BasicDetails />} />
+                <Route path="address" element={<AddressInfo />} />
+                <Route path="login-info" element={<LoginDetails />} />
+                <Route path="success" element={<Success />} />
+                
+                </Route>
+                <Route path="verify" element={<Verify />} />
                 {/* <Route path="newpassword/:phone" element={<NewPassword />} /> */}
               </Route>
 
@@ -64,6 +82,12 @@ const App = () => {
                   element={<ReviewOrder />}
                 ></Route>
                 <Route path="checkout/:id" exact element={<Checkout />}></Route>
+                <Route path="user-profile" exact element={<Profile />}>
+                <Route path="" exact element={<General />}/>
+                <Route path="orders" exact element={<MyOrders />}/>
+                <Route path="support" exact element={<Support />}/>
+
+                </Route>
               </Route>
 
               <Route element={<PersistLogin />}>
@@ -77,10 +101,15 @@ const App = () => {
                     exact
                     element={<ViewRestaurantsPage />}
                   />
-                  <Route path="users/:id" exact element={<ViewUsers />} />
+                  <Route path="users/:id" exact element={<ViewUsers />} >
+                      <Route path="" exact element={<UserOrders />} />
+                      <Route path="support" exact element={<UserOrders />} />
+                      <Route path="settings" exact element={<UserSettings />} />
+                  </Route>
                   <Route path="couriers/:id" exact element={<ViewCouriers />} />
                   <Route path="services/:id" exact element={<VIewServices />} />
-                  <Route path="" exact element={<Users />} />
+                  <Route path="" exact element={<Home />} />
+                  <Route path="users" exact element={<Users />} />
                   <Route path="couriers" exact element={<Couriers />} />
                   <Route path="services" exact element={<Services />} />
                   <Route path="coupons" exact element={<Coupons />} />

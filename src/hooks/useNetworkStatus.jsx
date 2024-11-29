@@ -27,7 +27,7 @@ const useNetworkStatus = () => {
 
     return () => {
       window.removeEventListener("online", setOnline);
-      window.removeEventListener("offlien", setOffline);
+      window.removeEventListener("offline", setOffline);
     };
   }, []); // Empty dependency array to ensure the effect runs only once
 

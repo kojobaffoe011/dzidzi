@@ -58,7 +58,6 @@ const ReplaceOrder = (props) => {
   };
 
   return (
-    <div handleCancel={props.handleCancel} isOpen={props.isOpen}>
       <Modal {...props}>
         <div className="p-2 flex flex-col">
           <div className="p-2 flex flex-col pb-4">
@@ -87,7 +86,6 @@ const ReplaceOrder = (props) => {
             </div>
         </div>
       </Modal>
-    </div>
   );
 };
 

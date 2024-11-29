@@ -4,15 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
   useGetSingleRestaurant,
-  useMenuList,
   useDeleteRestaurant,
+  useMenuListPaged,
 } from "../../components/brokers/apicalls";
-import Loader from "../../components/loaders/Loader";
 import Spinner from "../../components/loaders/Spinner";
 import RestaurantDescription from "../../components/reusableComponents/RestaurantDescription";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import Imageloader from "../../components/loaders/Imageloader";
+import DzidziLoader from "../../components/loaders/DzidziLoader";
 
 const ViewRestaurantsPage = () => {
   const { id } = useParams();
@@ -31,12 +31,19 @@ const ViewRestaurantsPage = () => {
     navigate(url);
   };
 
-  const [filters, setFilters] = useState({
-    name: null,
-    category: null,
-    rating: null,
-    minPrice: null,
-    maxPrice: null,
+const [filters, setFilters] = useState({
+  minimumPrice: null,
+  maximumPrice: null,
+  name: null,
+  category: null,
+  rating: null,
+  visible: null,
+  distance: null,
+  latitude: null,
+  longitude: null,
+  restaurantID: id,
+  sortBy: null,
+  orderBy: null,
   });
 
   const {
@@ -46,23 +53,33 @@ const ViewRestaurantsPage = () => {
     error,
   } = useGetSingleRestaurant(id);
 
+  const [currentPage, setCurrentPage] = useState(1);
   const {
-    data: menuList = [],
-    isLoading: menuLoading,
+    data: menuListAlt = [],
+    isLoading: isMenuLoading,
     hasNextPage: menuHasNextPage,
-    fetchNextPage: menuFetchNextPage,
     isFetchingNextPage: menuFetchingNextPage,
-    isError: ismenuError,
-  } = useMenuList(
+    fetchNextPage: menuFetchNextPage,
+    isError: isMenuAltError,
+  } = useMenuListPaged(
+    filters.minimumPrice,
+    filters.maximumPrice,
     filters.name,
     filters.category,
     filters.rating,
-    filters.maxPrice,
-    filters.maxPrice,
-    id
+    filters.visible,
+    filters.distance,
+    filters.latitude,
+    filters.longitude,
+    filters.restaurantID,
+    filters.sortBy,
+    filters.orderBy,
+    currentPage
+
   );
 
-  let pages = menuList?.pages?.flatMap((page) => page?.results);
+  let menuData = menuListAlt?.pages?.flatMap((page) => page?.data?.results);
+  const numberOfPages = menuData?.[0].totalPages
 
   const { mutationFn } = useDeleteRestaurant(id);
 
@@ -86,10 +103,10 @@ const ViewRestaurantsPage = () => {
     }
   };
 
-  if (restaurantLoading || menuLoading) {
+  if (restaurantLoading || isMenuLoading) {
     return (
       <div>
-        <Loader />
+        <DzidziLoader />
       </div>
     );
   }
@@ -98,9 +115,9 @@ const ViewRestaurantsPage = () => {
       <DeleteModal
         isOpen={credentialOpen}
         handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT"}
+        userRole={"RESTAURANT_ADMIN"}
         width="400px"
-        action={"RESTAURANT"}
+        action={"RESTAURANT_ADMIN"}
         deleteItem={handleDelete}
         isLoading={isPending}
       />
@@ -115,38 +132,38 @@ const ViewRestaurantsPage = () => {
               <div className="flex flex-col gap-3">
           <p className="text-2xl font-bold">Menu</p>
           <div className="grid grid-cols-3 gap-2">
-            {pages?.map((item, idx) => {
+            {menuData?.map((item, idx) => {
               return (
-                <div className="flex flex-col" key={idx} onClick={()=> navigateTo( pathname.includes("dashboard") ? "" : `/details/menu/revieworder/${item.value.restaurant.id}/${item.value.id}`)}>
+                <div className="flex flex-col" key={idx} onClick={()=> navigateTo( pathname.includes("dashboard") ? "" : `/details/menu/revieworder/${item.restaurant.id}/${item.id}`)}>
                   <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
                     <div className="overflow-hidden basis-1/3 h-full">
-                     <Imageloader imageID={item?.value.image?.id} classNames="h-[89px] object-cover w-full"/>
+                     <Imageloader imageID={item?.image?.id} classNames={'object-center w-[100px] h-[100px]'}/>
                     </div>
                     <div className="p-1 flex justify-between items-center basis-2/3 w-full h-full group">
                       <div className="flex flex-col w-full gap-1">
                         <p className="font-bold text-xs font-thin">
                           <span className="italic text-gray-500">Name: </span>{" "}
-                          {item?.value?.name}
+                          {item?.name}
                         </p>
                         <p className="font-bold text-xs text-green-500">
                           <span className="italic text-gray-500 font-thin">
                             Price:{" "}
                           </span>{" "}
-                          ${item?.value.price}
+                          ${item?.price}
                         </p>
                         <p className="text-gray-700 text-xs font-bold"></p>
                         <p className="text-xs whitespace-nowrap">
-                          {item?.value.description}
+                          {item?.description}
                         </p>
                         <div className="flex justify-between  item-center">
                           <button className="flex px-2 rounded-full text-xs bg-gray-100 text-gray-600 items-center font-bold">
-                            {item?.value.category}
+                            {item?.category}
                           </button>
                         </div>
                         {/* <div className="opacity-0 group-hover:opacity-100">
                           <NumberOfExtras
                             pages={pages}
-                            id={item.value.id}
+                            id={item.id}
                             setAuth={setAuth}
                             auth={auth}
                             resID={resID}

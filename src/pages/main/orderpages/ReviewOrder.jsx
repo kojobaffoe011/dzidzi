@@ -14,6 +14,7 @@ import axios from "axios";
 import Imageloader from "../../../components/loaders/Imageloader";
 import OrderContext from "../../../context/orderProvider";
 import  PropTypes  from "prop-types";
+import DzidziLoader from "../../../components/loaders/DzidziLoader";
 
 const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderItems, menuData }) => {
   const [extraCount, setExtraCount] = useState(1);
@@ -47,9 +48,9 @@ const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderIte
           extra: id,
           quantity: extraCount,
         });
-      } else throw Error("DIFFERNTRESTAURANTS");
+      } else throw Error("DIFFERNTRESTAURANT_ADMINS");
     } catch (error) {
-      if(error.message == "DIFFERNTRESTAURANTS"){
+      if(error.message == "DIFFERNTRESTAURANT_ADMINS"){
          setAuth({ ...auth, restaurantClash: true });
         setReplaceOrder(true);
         setOrderItems({
@@ -179,9 +180,9 @@ const ReviewOrder = () => {
           menu: id,
           quantity: selectedNumber,
         });
-     } else throw Error("DIFFERNTRESTAURANTS");
+     } else throw Error("DIFFERNTRESTAURANT_ADMINS");
     } catch (error) {
-      if(error.message == "DIFFERNTRESTAURANTS"){
+      if(error.message == "DIFFERNTRESTAURANT_ADMINS"){
         setAuth({ ...auth, restaurantClash: true });
         setReplaceOrder(true);
         setOrderItems({
@@ -198,7 +199,7 @@ const ReviewOrder = () => {
   };
 
   if (menuLoading || extraLoading) {
-    return <Loader />;
+    return <DzidziLoader />;
   }
 
   return (
@@ -209,7 +210,7 @@ const ReviewOrder = () => {
         </div>
         <div className="grid grid-cols-2 p-2 gap-2">
           <div className="flex items-center justify-center h-full">
-          <Imageloader imageID={menuData?.image?.id} classNames={'h-[500px] w-full border object-cover'}/>
+          <Imageloader imageID={menuData?.image?.id} classNames={'object-center w-[400px] h-[400px]'}/>
           </div>
           <div className="flex-col flex">
             <div className="flex flex-col gap-1">
@@ -265,35 +266,35 @@ const ReviewOrder = () => {
             {pages?.map((item, idx) => {
               return (
                 <div className="flex flex-col" key={idx}>
-                  <div className="flex rounded overflow-hidden cursor-pointer border mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
+                  <div className="flex rounded overflow-hidden cursor-pointer mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
                     <div className="overflow-hidden basis-1/3 h-full">
-                     <Imageloader imageID={item?.value.image?.id}/>
+                     <Imageloader imageID={item?.image?.id}  classNames={'object-center w-[100px] h-[100px]'}/>
                     </div>
                     <div className="p-1 flex justify-between items-center basis-2/3 w-full h-full group">
                       <div className="flex flex-col w-full gap-1">
                         <p className="font-bold text-xs font-thin">
                           <span className="italic text-gray-500">Name: </span>{" "}
-                          {item?.value?.name}
+                          {item.name}
                         </p>
                         <p className="font-bold text-xs text-green-500">
                           <span className="italic text-gray-500 font-thin">
                             Price:{" "}
                           </span>{" "}
-                          ${item?.value.price}
+                          ${item.price}
                         </p>
                         <p className="text-gray-700 text-xs font-bold"></p>
                         <p className="text-xs whitespace-nowrap">
-                          {item?.value.description}
+                          {item.description}
                         </p>
                         <div className="flex justify-between  item-center">
                           <button className="flex px-2 rounded-full text-xs bg-gray-100 text-gray-600 items-center font-bold">
-                            {item?.value.category}
+                            {item.category}
                           </button>
                         </div>
                         <div className="opacity-0 group-hover:opacity-100">
                           <NumberOfExtras
                             pages={pages}
-                            id={item.value.id}
+                            id={item.id}
                             setAuth={setAuth}
                             auth={auth}
                             resID={resID}
