@@ -6,7 +6,6 @@ import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ReplaceOrder from "../components/modal/restaurant/ReplaceOrder";
 import useAuth from "../hooks/useAuth";
-import { useGetActiveUser, useGetActiveUserDetails } from "../components/brokers/apicalls";
 // import CheckLocationStatus from "../components/reusableComponents/CheckLocationStatus";
 
 // Create an empty context to manage order-related data
