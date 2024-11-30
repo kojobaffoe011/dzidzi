@@ -1,4 +1,3 @@
-import Loader from "./loaders/Loader";
 import Spinner from "./loaders/Spinner";
 import NoRecord from "./notices/NoRecord";
 import ForwardSVG from "./ForwardSVG";

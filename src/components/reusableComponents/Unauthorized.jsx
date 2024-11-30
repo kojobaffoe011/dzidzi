@@ -1,11 +1,12 @@
 
 import { FcLock } from "react-icons/fc";
 import { Link } from "react-router-dom";
-import Button from "../Button";
+// import Button from "../reusableComponents/Button";
+import Button from "./Button"
 
 /**
  * The `Unauthorized` component displays a message and an optional icon when a user's
- * account is locked. It typically provides an option to continue and unlock the account.
+ * account is locked. It typically provides an option to continue and unlock the account
  *
  * @param {Object} props - React props for configuring the component.
  * @param {ReactNode} props.icon - An optional icon to display (default is a lock icon).

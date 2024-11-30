@@ -6,9 +6,10 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
-import Button from "../../Button";
+// import Button from "../../Button";
 import { useAddCredentials } from "../../brokers/apicalls";
 import PropTypes from "prop-types";
+import Button from "../../reusableComponents/Button";
 
 const AddCredentialModal = (props) => {
   const types = ["RESTAURANT_ADMIN", "COURIER", "SERVICE", "ADMIN"];

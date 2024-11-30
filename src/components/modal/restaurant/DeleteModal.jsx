@@ -2,9 +2,10 @@ import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
 import { RiErrorWarningFill } from "react-icons/ri";
-import Button from "../../Button";
+// import Button from "../../Button";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
+import Button from "../../reusableComponents/Button";
 
 const DeleteModal = (props) => {
   const { action, handleCancel, mutationFn} = props;

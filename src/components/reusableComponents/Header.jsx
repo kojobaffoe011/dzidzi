@@ -5,7 +5,7 @@ import { GiHamburger } from "react-icons/gi";
 import cookie from "../../utils/cookie";
 import Cart from "./Cart";
 import useAuth from "../../hooks/useAuth";
-import Button from "../Button";
+// import Button from "../Button";
 import { useState } from "react";
 import UpdateOrderModal from "../modal/restaurant/UpdateOrder";
 import { useLogoutUser } from "../../hooks/useLogoutUser";
@@ -13,6 +13,7 @@ import { HiUser } from "react-icons/hi";
 import PropTypes from "prop-types";
 import SideModal from "./SideModal";
 import Imageloader from "../loaders/Imageloader";
+import Button from "./Button";
 
 const Orders = ({ auth, setAuth, navigateTo, token }) => {
   const [updateOrderOpen, setUpdateOrderOpen] = useState(false);

@@ -9,7 +9,7 @@ import { MdOutlineDeliveryDining, MdOutlineDiscount } from "react-icons/md";
 import { TfiShoppingCartFull } from "react-icons/tfi";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
-import Button from "../../../components/Button";
+import Button from "../../../components/reusableComponents/Button";
 import AddNote from "../../../components/modal/restaurant/AddNote";
 import EditCheckoutAddress from "../../../components/modal/restaurant/EditCheckoutAddress";
 import PromoCode from "../../../components/modal/restaurant/PromoCode";

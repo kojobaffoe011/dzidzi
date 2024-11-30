@@ -2,7 +2,8 @@ import React from "react";
 import { AiFillStar, AiOutlineHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { FaMedal } from "react-icons/fa";
-import Button from "../Button";
+import Button from "./Button";
+// import Button from "../Button";
 
 function RestaurantImage({ props }) {
   return (

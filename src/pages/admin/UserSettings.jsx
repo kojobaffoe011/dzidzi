@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import Button from "../../components/Button"
+import Button from "../../components/reusableComponents/Button"
 import DeleteModal from "../../components/modal/restaurant/DeleteModal"
 import { useDeleteUser } from "../../components/brokers/apicalls"
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRestaurantList, useRestaurantListPaged } from "../../components/brokers/apicalls";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import Table from "../../components/Table";

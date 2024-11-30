@@ -3,7 +3,7 @@ import {
   useGetSingleMenu,
   useMenuListPaged,
 } from "../../components/brokers/apicalls";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import TableAlt from "../../components/TableAlt";

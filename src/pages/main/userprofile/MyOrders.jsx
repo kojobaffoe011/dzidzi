@@ -1,6 +1,6 @@
 import MyOrdersTable from "../../../components/MyOrdersTable";
 import { useGetOrderItemsByOrderID, useGetSingleOrder, useOrderListPaged } from "../../../components/brokers/apicalls";
-import Button from "../../../components/Button";
+import Button from "../../../components/reusableComponents/Button";
 import { humanDatetime } from "../../../utils/config";
 import OrderStatus from "../../../components/reusableComponents/orderStatus";
 import useAuth from "../../../hooks/useAuth";

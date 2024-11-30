@@ -10,7 +10,8 @@ import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
 import { timeOutError } from "../../utils/config";
-import CustomInput from "../../components/CustomInput";
+import CustomInput from "../../components/reusableComponents/CustomInput";
+import Button from "../../components/reusableComponents/Button";
 
 const Form = () => {
   const { setAuth, auth } = useAuth();
@@ -20,7 +21,7 @@ const Form = () => {
     const {
     refetch: refetchUser,
     isLoading: activeUserLoading,
-    // isError: isActiveUserError,
+    // isError: isActiveUserError, 
     // error: activeUserError,
   } = useGetActiveUser();
 
@@ -65,8 +66,6 @@ const Form = () => {
     const loginTime = new Date().getTime(); // Current timestamp in milliseconds
     localStorage.setItem("loginTime", loginTime.toString());
   };
-
-console.log(errors)
 
   const formSubmitHandler = async (data) => {
     if (Object.keys(errors).length === 0) {
@@ -120,7 +119,7 @@ console.log(errors)
     <div className="mt-[10px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">
       <div className="flex flex-col">
         <form onSubmit={handleSubmit(formSubmitHandler)}>
-            <CustomInput register={register} name={"username"} errors={errors} label={'USERNAME'} type={'text'} required={true}/>
+          <CustomInput register={register} name={"username"} errors={errors} label={'USERNAME'} type={'text'} required={true}/>
 
           <div className="relative mt-5">
           <CustomInput register={register} name={"password"} errors={errors} label={'PASSWORD'} type={'password'} required={true}/>
@@ -130,13 +129,17 @@ console.log(errors)
               <p className="text-sm text-blue-500 underline">Forgot Password?</p>
             </Link>
           </div>
-          <button className="w-full mt-5 bg-blue-500 p-4 rounded-lg">
+          <Button className="w-full mt-5 p-4" 
+                  disabled={cardLoading || activeUserDetailsLoading}
+                  variant="primary"
+                  rounded
+          >
             {cardLoading || activeUserDetailsLoading ? (
               <Spinner color="white" size="20px" />
             ) : (
               <p className="text-white text-sm">Login</p>
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

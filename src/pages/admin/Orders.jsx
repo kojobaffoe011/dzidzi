@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useOrderList, useOrderListPaged } from "../../components/brokers/apicalls";
 import TableAlt from "../../components/TableAlt";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 import { humanDatetime } from "../../utils/config";
 import { useOutletContext } from "react-router";
 import OrderDetails from "../../components/modal/restaurant/OrderDetails";

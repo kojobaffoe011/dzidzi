@@ -10,7 +10,8 @@ import { useNavigateTo } from "../../../hooks/useNavigateTo";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
 import { timeOutError } from "../../../utils/config";
 import { axiosInstance } from "../../../components/brokers/apicalls";
-import CustomInput from "../../../components/CustomInput";
+import CustomInput from "../../../components/reusableComponents/CustomInput";
+import Button from "../../../components/reusableComponents/Button";
 
 
 const LoginDetails = () => {
@@ -183,7 +184,7 @@ const LoginDetails = () => {
                   name={"email"} 
                   label={'EMAIL'} 
                   type={'text'} 
-                 // required={true} 
+                 required={true} 
                   placeholder={'Enter email here'}
                   />
                 </div>
@@ -248,19 +249,19 @@ const LoginDetails = () => {
 
                <div className=" mb-8 w-full flex">
               {" "}
-                <button
-                  className="mt-5 bg-blue-500 px-16 py-4 rounded disabled:bg-gray-200 w-full"
+                <Button
+                  className="mt-5 px-16 py-4 w-full"
+                  variant="primary"
+                  rounded
                   disabled={isPending || creatingUserPending || dataLoading}
-                  // onClick={()=>formSubmitHandler()}
                 >
-                  {(isPending || creatingUserPending || dataLoading )? (
+                  {(isPending || creatingUserPending || dataLoading ) ? (
                     <Spinner color="white" size="20px" />
                   ) : (
-                    // <p className="text-white text-sm">Finish</p>
                      <p className='font-bold text-white'>Finish</p>
                   )}
                  
-                </button>
+                </Button>
             </div>
             </form>
         </div>

@@ -9,8 +9,9 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { RiErrorWarningFill } from "react-icons/ri";
-import Button from "../../Button";
+// import Button from "../../Button";
 import { useAddCoupon, useAddCredentials } from "../../brokers/apicalls";
+import Button from "../../reusableComponents/Button";
 
 const AddNote = (props) => {
   const { auth, setAuth } = useAuth();

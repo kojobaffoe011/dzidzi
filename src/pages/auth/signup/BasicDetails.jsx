@@ -3,7 +3,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useNavigateTo } from '../../../hooks/useNavigateTo';
-import CustomInput from '../../../components/CustomInput';
+import CustomInput from '../../../components/reusableComponents/CustomInput';
+import Button from '../../../components/reusableComponents/Button';
 
 const BasicDetails = () => {
     const {navigateTo} = useNavigateTo()
@@ -47,11 +48,12 @@ const BasicDetails = () => {
 
                <div className=" mb-8 w-full flex">
               {" "}
-                <button
-                  className="mt-5 bg-blue-500 px-16 py-4 rounded disabled:bg-gray-200 w-full"
+                <Button
+                  className="mt-5 px-16 py-4 rounded w-full"
+                  variant='primary'
                 >
                   <p className='font-bold text-white'>Continue</p>
-                </button>
+                </Button>
             </div>
             </form>
         </div>

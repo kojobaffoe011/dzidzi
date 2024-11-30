@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { classNames } from "../utils/classNames";
+import { classNames } from "../../utils/classNames";
 
 /**
  * The `Button` component represents a customizable button element with various styles.
@@ -17,8 +17,8 @@ const Button = ({ className, children, rounded, variant, ...props }) => (
   <button
     className={classNames(
       "cursor-pointer select-none [outline:none] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-100 disabled:shadow-inner",
-      rounded ? "rounded-md" : "",
-      variant === "primary" ? "bg-[#0d1655] text-white font-bold" : "",
+      rounded ? "rounded" : "",
+      variant === "primary" ? "bg-blue-500 text-white" : "",
       variant === "secondary"
         ? "bg-[#E2A927] hover:bg-[#F0D493] text-white font-bold"
         : "",

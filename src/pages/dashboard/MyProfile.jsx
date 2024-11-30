@@ -15,9 +15,9 @@ import { useChangeDetails } from "../../components/brokers/apicalls";
 import { MdEditNote } from "react-icons/md";
 // import EditStudentProfile from "../../components/modal/studentModals/EditDetailsModal";
 import { useOutletContext } from "react-router";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 // import RefundBalanceModal from "../../components/modal/studentModals/RefundBalanceModal";
-import Breadcrumbs from "../../components/Breadcrumbs";
+import Breadcrumbs from "../../components/reusableComponents/Breadcrumbs";
 
 const StudentDetails = () => {
   const { auth } = useAuth();

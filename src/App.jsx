@@ -98,7 +98,7 @@ const App = () => {
                 </Route>
               </Route>
 
-              <Route element={<PersistLogin />}>
+              {/* <Route element={<PersistLogin />}> */}
                 <Route path="/welcome" exact element={<WelcomePage />} />
                 <Route path="/dashboard" exact element={<Dashboard />}>
                   <Route path="profile-details" exact element={<MyProfileDetails />} />
@@ -123,7 +123,7 @@ const App = () => {
                   <Route path="coupons" exact element={<Coupons />} />
                   <Route path="menus" exact element={<Menus />} />
                 </Route>
-              </Route>
+              {/* </Route> */}
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useGetServices } from "../../components/brokers/apicalls";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import Couriers from "./Couriers";
 

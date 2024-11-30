@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import {
   useGetCoupons,
 } from "../../components/brokers/apicalls";
-import Button from "../../components/Button";
+import Button from "../../components/reusableComponents/Button";
 import AddCoupon from "../../components/modal/restaurant/AddCoupon";
 import Couriers from "./Couriers";
 import { useOutletContext } from "react-router";

@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { RiErrorWarningFill } from "react-icons/ri";
-import Button from "../../Button";
+import Button from "../../reusableComponents/Button";
 import { FaCheckCircle } from "react-icons/fa";
 import { GoLocation } from "react-icons/go";
 import PropTypes from "prop-types";

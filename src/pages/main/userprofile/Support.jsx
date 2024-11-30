@@ -1,3 +1,5 @@
+import Button from "../../../components/reusableComponents/Button"
+
 const SupportForm = ()=>{
     return <div>
          <form action="" className='flex flex-col w-full gap-6'>
@@ -56,7 +58,7 @@ const SupportForm = ()=>{
 
                <div className=" mb-8 w-full flex">
               {" "}
-                <button
+                <Button
                   className="mt-5 bg-blue-500 px-16 py-4 rounded disabled:bg-gray-200 w-full"
                   // disabled={isPending || creatingUserPending || dataLoading}
                 >
@@ -67,7 +69,7 @@ const SupportForm = ()=>{
                      <p className='font-bold text-white'>Send Message</p>
                   {/* )} */}
                  
-                </button>
+                </Button>
             </div>
             </div>
             </form>
