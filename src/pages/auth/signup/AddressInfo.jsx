@@ -3,6 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
+import CustomInput from "../../../components/CustomInput";
 
 const AddressInfo = () => {
 
@@ -55,65 +56,21 @@ const AddressInfo = () => {
               <div className="flex flex-col gap-6 col-span-2 mt-4">
               <div className="grid grid-cols-3 gap-1">
                 <div className="w-full flex flex-col gap-1 col-span-2 ">
-                  
-                   <label className="text-xs font-light text-gray-500">
-                    Street Address
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                      {...register("street")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter address here"
-                    name="street"
-                
-                    required
-                  />
+                  <CustomInput register={register} name={"street"} label={'STREET ADDRESS'} type={'text'} required={true} placeholder={'Enter address here'}/>
+
                 </div>
                 <div className="w-full flex flex-col gap-1">
-                   <label className="text-xs font-light text-gray-500">
-                    House Number
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                  {...register("houseNumber")}   
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter apt number here"
-                    name="houseNumber"
-                    
-                    required
-                  />
+                <CustomInput register={register} name={"houseNumber"} label={'HOUSE NUMBER'} type={'text'} required={true} placeholder={'Enter apt number here'}/>
                 </div>
               </div>
 
               <div className="w-full grid grid-cols-2 gap-1">
                 <div className="flex flex-col gap-1">
-                   <label className="text-xs font-light text-gray-500">
-                    City
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                   {...register("city")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter Apartment Number"
-                    name="city"
-                   
-                    required
-                  />
+                <CustomInput register={register} name={"city"} label={'CITY'} type={'text'} required={true} placeholder={'Enter city here'}/>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-light text-gray-500">
-                    Zip Code
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                  {...register("zip")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter Apartment Number"
-                    name="zip"
-                    required
-                    type="number"
-                  />
+                  <CustomInput register={register} name={"zip"} label={'ZIP CODE'} type={'number'} required={true} placeholder={'Enter zip code here'}/>
                 </div>
               </div>
             </div>
@@ -123,14 +80,7 @@ const AddressInfo = () => {
               {" "}
                 <button
                   className="mt-5 bg-blue-500 px-16 py-4 rounded disabled:bg-gray-200 w-full"
-                  //   type="button"
-                  // disabled={true}
                 >
-                  {/* {cardLoading ? (
-                    <Spinner color="white" size="20px" />
-                  ) : (
-                    <p className="text-white text-sm">Finish</p>
-                  )} */}
                   <p className='font-bold text-white'>Continue</p>
                 </button>
             </div>

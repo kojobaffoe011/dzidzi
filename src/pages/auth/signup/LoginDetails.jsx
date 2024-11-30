@@ -2,7 +2,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import * as yup from "yup";
 import { showErrorToast } from "../../../toast/Toast";
@@ -11,18 +10,16 @@ import { useNavigateTo } from "../../../hooks/useNavigateTo";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
 import { timeOutError } from "../../../utils/config";
 import { axiosInstance } from "../../../components/brokers/apicalls";
+import CustomInput from "../../../components/CustomInput";
 
 
 const LoginDetails = () => {
   const {navigateTo} = useNavigateTo()
-  const [showPass, setShowPass] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [userData, setUserData] = useState(null);
   const [dataLoading, setDataLoading]  = useState(false)
   const userDetails = localStorage.getItem('signup')
   const parsedUserDetails = JSON.parse(userDetails)
-
-   
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -33,9 +30,7 @@ const LoginDetails = () => {
     setIsFocused(false);
   };
 
-  const handleTogglePass = () => {
-    setShowPass(!showPass);
-  };
+
 
     const userSchema = yup.object().shape({
     email: yup
@@ -156,11 +151,9 @@ const LoginDetails = () => {
 
   })
 
-  console.log({isPending, creatingUserPending , dataLoading})
-
-
   const formSubmitHandler = async (data)=> {
-    if(Object.keys(errors))
+
+    if(Object.keys(errors).length === 0)
       setDataLoading(true)
       await setUserData(data)
       setTimeout( 
@@ -184,74 +177,38 @@ const LoginDetails = () => {
             <form action="" className='flex flex-col w-full gap-6' onSubmit={handleSubmit(formSubmitHandler)}>
               <div className="flex flex-col gap-6 col-span-2 mt-4">
               <div className="grid grid-cols-3 gap-1">
-                <div className="w-full flex flex-col gap-1 col-span-2 ">
-                  
-                   <label className="text-xs font-light text-gray-500">
-                    Email
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                   {...register("email")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter email here"
-                    name="email"
-                    required
+                <div className="w-full col-span-2 ">
+                  <CustomInput 
+                  register={register} 
+                  name={"email"} 
+                  label={'EMAIL'} 
+                  type={'text'} 
+                 // required={true} 
+                  placeholder={'Enter email here'}
                   />
                 </div>
-                <div className="w-full flex flex-col gap-1">
-                   <label className="text-xs font-light text-gray-500">
-                    Username
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                   {...register("username")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter username here"
-                    name="username"
-                    required
+                  <CustomInput 
+                  register={register} 
+                  name={"username"} 
+                  label={'USERNAME'} 
+                  type={'text'} 
+                  required={true}
+                  placeholder={'Enter username'}
                   />
-                </div>
               </div>
 
               <div className="w-full grid grid-cols-2 gap-1">
                 <div className="flex flex-col gap-1 relative">
-                   <label className="text-xs font-light text-gray-500">
-                    Password
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter password here"
-                    {...register("password")}
-                    name="password"
-                    type={showPass ? "text" : "password"}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    required
+                  <CustomInput 
+                  register={register} 
+                  name={"password"} 
+                  label={'PASSWORD'} 
+                  type={'password'} 
+                  required={true} 
+                  placeholder={'Enter password'} 
+                  onFocus={handleFocus} 
+                  onBlur={handleBlur}
                   />
-                   <div className="cursor-pointer">
-                {showPass ? (
-                  <AiOutlineEye
-                    className="absolute right-5 top-[52px]"
-                    style={{ color: "#6b7280 " }}
-                    size="15px"
-                    onClick={() => {
-                      handleTogglePass();
-                      setIsFocused(true);
-                    }}
-                  />
-                ) : (
-                  <AiOutlineEyeInvisible
-                    className="absolute right-5 top-[52px]"
-                    style={{ color: "#6b7280 " }}
-                    size="15px"
-                    onClick={() => {
-                      handleTogglePass();
-                      setIsFocused(true);
-                    }}
-                  />
-                )}
-              </div>
                 {isFocused && (
                 <div className="flex flex-col mt-1">
                   {passReq.map((item, idx) => {
@@ -277,42 +234,14 @@ const LoginDetails = () => {
                 </div>
               )}
                 </div>
-
-                <div className="flex flex-col gap-1 relative">
-                  <label className="text-xs font-light text-gray-500">
-                    Repeat Password
-                    <span className="text-red-600 text-lg ">*</span>
-                    </label>
-                  <input
-                   {...register("repeatpassword")}
-                    className="border outline-none p-4 text-sm border border-black w-full rounded placeholder:text-xs"
-                    placeholder="Enter password again"
-                    name="repeatpassword"
-                    required
-                    type={showPass ? "text" : "password"}
+                  <CustomInput
+                  register={register} 
+                  name={"repeatpassword"} 
+                  label={'REPEAT PASSWORD'} 
+                  type={'password'} 
+                  required={true} 
+                  placeholder={'Retype Password'}
                   />
-                  {showPass ? (
-                  <AiOutlineEye
-                    className="absolute right-5 top-[52px]"
-                    style={{ color: "#6b7280 " }}
-                    size="15px"
-                    onClick={() => {
-                      handleTogglePass();
-                      setIsFocused(true);
-                    }}
-                  />
-                ) : (
-                  <AiOutlineEyeInvisible
-                    className="absolute right-5 top-[52px]"
-                    style={{ color: "#6b7280 " }}
-                    size="15px"
-                    onClick={() => {
-                      handleTogglePass();
-                      setIsFocused(true);
-                    }}
-                  />
-                )}
-                </div>
               </div>
             </div>
 
@@ -322,6 +251,7 @@ const LoginDetails = () => {
                 <button
                   className="mt-5 bg-blue-500 px-16 py-4 rounded disabled:bg-gray-200 w-full"
                   disabled={isPending || creatingUserPending || dataLoading}
+                  // onClick={()=>formSubmitHandler()}
                 >
                   {(isPending || creatingUserPending || dataLoading )? (
                     <Spinner color="white" size="20px" />

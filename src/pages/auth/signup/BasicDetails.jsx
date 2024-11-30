@@ -3,6 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useNavigateTo } from '../../../hooks/useNavigateTo';
+import CustomInput from '../../../components/CustomInput';
 
 const BasicDetails = () => {
     const {navigateTo} = useNavigateTo()
@@ -11,10 +12,6 @@ const BasicDetails = () => {
             lastname: yup.string().required("Last Name is required"),
             firstname: yup.string().required("Other Names is required"),
             contact: yup.string().required("Contact"),
-            // street: yup.string().required("Street is required"),
-            // houseNumber: yup.string().required("House number is required"),
-            // zip: yup.string().required("Zip is required"),
-            // city: yup.string().required("City is required"),
         })
 
         const {
@@ -37,45 +34,14 @@ const BasicDetails = () => {
 
             <form action="" className='flex flex-col w-full gap-6'>
             <div className={`flex flex-col gap-1 ${resp}`}>
-              <label className="text-xs font-light text-gray-500">
-                Last name
-                <span className="text-red-600 text-lg ">*</span>
-              </label>
-              <input
-                {...register("lastname")}
-                name="lastname"
-                className="rounded border border-gray-600 w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-400"
-                placeholder="Agyemang"
-                required
-              />
-            </div>
-            <div className={`flex flex-col gap-1 ${resp}`}>
-               <label className="text-xs font-light text-gray-500">
-                First names
-                <span className="text-red-600 text-lg ">*</span>
-              </label>
-              <input
-                {...register("firstname")}
-                name="firstname"
-                className="rounded border border-gray-600 w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-400"
-                placeholder="Otojor Kwame"
-                required
-              />
-            </div>
-            <div className={`flex flex-col gap-1 ${resp}`}>
-               <label className="text-xs font-light text-gray-500">
-                Contact
-                <span className="text-red-600 text-lg ">*</span>
-              </label>
-              <input
-                {...register("contact")}
-                name="contact"
-                className={`rounded border border-gray-600 w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-400`}
-                placeholder="01761178292"
-                required
-                type='number'
+              <CustomInput register={register} name={"lastname"} label={'LASTNAME'} type={'text'} required={true} placeholder={'Agyemang'}/>
 
-              />
+            </div>
+            <div className={`flex flex-col gap-1 ${resp}`}>
+              <CustomInput register={register} name={"firstname"} label={'FIRSTNAME'} type={'text'} required={true} placeholder={'Otojor Kwame'}/>
+            </div>
+            <div className={`flex flex-col gap-1 ${resp}`}>
+            <CustomInput register={register} name={"contact"} label={'CONTACT'} type={'number'} required={true} placeholder={'017611671617'}/>
             </div>
 
 

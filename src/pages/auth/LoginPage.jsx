@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { AiOutlineEyeInvisible } from "react-icons/ai";
-import { AiOutlineEye } from "react-icons/ai";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Spinner from "../../components/loaders/Spinner";
@@ -12,9 +10,9 @@ import * as yup from "yup";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import cookie from "../../utils/cookie";
 import { timeOutError } from "../../utils/config";
+import CustomInput from "../../components/CustomInput";
 
 const Form = () => {
-  const [showPass, setShowPass] = useState(false);
   const { setAuth, auth } = useAuth();
   const [activeUser, setActiveUer] = useState(null)
   const { mutationFn } = useLogin();
@@ -34,14 +32,12 @@ const Form = () => {
   } = useGetActiveUserDetails(activeUser);
 
 
-  const handleTogglePass = () => {
-    setShowPass(!showPass);
-  };
 
   const AltSchema = yup.object().shape({
     password: yup.string().required("Password is required"),
     username: yup.string().required("Username is required"),
   });
+
 
   const {
     register,
@@ -69,6 +65,8 @@ const Form = () => {
     const loginTime = new Date().getTime(); // Current timestamp in milliseconds
     localStorage.setItem("loginTime", loginTime.toString());
   };
+
+console.log(errors)
 
   const formSubmitHandler = async (data) => {
     if (Object.keys(errors).length === 0) {
@@ -122,58 +120,10 @@ const Form = () => {
     <div className="mt-[10px] lg:w-[50%] md:w-[50%] sm:w-full xs:w-full ss:w-full xs:w-full mx-auto">
       <div className="flex flex-col">
         <form onSubmit={handleSubmit(formSubmitHandler)}>
-          <div className="relative">
-            <label>
-              <p className="mb-2 text-gray-600 text-sm">USERNAME</p>
-            </label>
-            <input
-              {...register("username")}
-              name="username"
-              className="rounded-lg border border-gray-600  w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-500"
-            />
-            {errors.username ? (
-              <span className="text-red-600 text-sm mt-3">
-                {errors.username.message}
-              </span>
-            ) : (
-              ""
-            )}
-          </div>
+            <CustomInput register={register} name={"username"} errors={errors} label={'USERNAME'} type={'text'} required={true}/>
 
           <div className="relative mt-5">
-            <label>
-              <p className="mb-2 text-gray-600 text-sm">PASSWORD</p>
-            </label>
-            <input
-              {...register("password")}
-              name="password"
-              type={showPass ? "text" : "password"}
-              className="rounded-lg border border-gray-600  w-full p-4 outline-none text-sm placeholder:text-sm placeholder:text-gray-500"
-            />
-            <div className="cursor-pointer">
-              {showPass ? (
-                <AiOutlineEye
-                  className="absolute right-5 top-[43px]"
-                  style={{ color: "#6b7280 " }}
-                  size="25px"
-                  onClick={handleTogglePass}
-                />
-              ) : (
-                <AiOutlineEyeInvisible
-                  className="absolute right-5 top-[43px]"
-                  style={{ color: "#6b7280 " }}
-                  size="25px"
-                  onClick={handleTogglePass}
-                />
-              )}
-            </div>
-            {errors.password ? (
-              <span className="text-red-600 text-sm mt-3">
-                {errors.password.message}
-              </span>
-            ) : (
-              ""
-            )}
+          <CustomInput register={register} name={"password"} errors={errors} label={'PASSWORD'} type={'password'} required={true}/>
           </div>
           <div className="flex justify-end my-3">
             <Link to="forgot">
