@@ -53,7 +53,7 @@ const Orders = ({ auth, setAuth, navigateTo, token }) => {
           </div>
         </div>
 
-        <div className="flex flex-col h-full justify-between">
+        <div className="flex flex-col h-full justify-between ">
           <div className="flex flex-col gap-3 mt-8 h-[600px] overflow-scroll">
             {auth?.orders?.map((item, idx) => {
               return (

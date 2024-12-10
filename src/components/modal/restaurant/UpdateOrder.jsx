@@ -10,6 +10,7 @@ import axios from "axios";
 import Imageloader from "../../loaders/Imageloader";
 import PropTypes from "prop-types";
 import Button from "../../reusableComponents/Button";
+import { delete_request, put } from "../../../utils/transport";
 
 const UpdateOrderModal = (props) => {
   const [selectedNumber, setSelectedNumber] = useState(1);
@@ -38,7 +39,7 @@ const UpdateOrderModal = (props) => {
   } = useMutation({
     mutationKey: ["updateOrder", order?.id],
     mutationFn: async (data) => {
-      const response = await axios.put(`/item/${order.id}`, data);
+      const response = await put(`/item/${order.id}`, data);
       return response?.data;
     },
     onSuccess: (data) => {
@@ -67,7 +68,7 @@ const UpdateOrderModal = (props) => {
   const { mutate: deleteMutate, isPending: deleteLoading } = useMutation({
     mutationKey: ["deleteOrderItem", order?.id],
     mutationFn: async (data) => {
-      const response = await axios.delete(`/item/${order.id}`, data);
+      const response = await delete_request(`/item/${order.id}`, data);
       return response?.data;
     },
     onSuccess: () => {

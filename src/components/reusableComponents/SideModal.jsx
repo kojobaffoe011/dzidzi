@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 const SideModal = ({children, right, top, bottom, left, title, subtext}) => {
     const {auth, setAuth} = useAuth()
   return (
-    <div className={`p-4 flex flex-col h-[1015px] shadow-md absolute ${right ? right : 'right-4'} ${top ? top : 'top-[-0px]'} ${bottom ? bottom : ' bottom-5'} ${left ? left : ' '}  h-full w-[450px] z-[15] bg-white shadow-lg  rounded-lg`}>
+    <div className={`p-4 flex flex-col border h-[1015px] shadow-md absolute ${right ? right : 'right-4'} ${top ? top : 'top-[-0px]'} ${bottom ? bottom : ' bottom-5'} ${left ? left : ' '} w-[450px] z-[15] bg-white shadow-lg  rounded-lg`}>
         <div className="mt-4 flex justify-between items-center border-b">
           <div className="flex flex-col">
             <p className="font-bold text-2xl whitespace-nowrap font-extrabold">

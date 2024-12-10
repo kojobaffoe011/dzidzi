@@ -19,7 +19,8 @@ import axios from "axios";
 import Spinner from "../../../components/loaders/Spinner";
 import DzidziLoader from "../../../components/loaders/DzidziLoader";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
-import { useGetActiveUser, useGetActiveUserDetails } from "../../../components/brokers/apicalls";
+import { axiosInstance, useGetActiveUser, useGetActiveUserDetails } from "../../../components/brokers/apicalls";
+import { post } from "../../../utils/transport";
 
 const deliveryOptions = [
   {
@@ -113,7 +114,7 @@ const Checkout = () => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["checkOutOrderItem"],
     mutationFn: async (data) => {
-      const response = await axios.post(`order/make-order`, data);
+      const response = await post(`order/make-order`, data);
       return response?.data;
     },
     onSuccess: async (data) => {
@@ -139,8 +140,6 @@ const Checkout = () => {
     auth?.orders?.forEach((element) => orderItemsPush.push(element.id));
     try {
       mutate({
-      // orderItems:
-      //   auth?.orders?.length > 1 ? orderItemsPush : auth?.orders[0].id,
       orderItems:
         orderItemsPush,
       useMyAddress: auth?.deliveryAddress ? auth?.useMyAddress : true,

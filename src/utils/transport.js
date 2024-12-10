@@ -76,13 +76,13 @@ const setToken = (config = {}) => {
 };
 
 // Add Axios response interceptor to handle success and error
-axios.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => successHandler(response),
   (error) => errorhandler(error)
 );
 
 // Add Axios request interceptor to set the token
-axios.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => setToken(config),
   (error) => Promise.reject(error)
 );
@@ -90,7 +90,7 @@ axios.interceptors.request.use(
 // Function to make a POST request
 export const post = async (route, payload) => {
   await new Promise((resolve, reject) => {
-    axios
+    axiosInstance
       .post(route, payload)
       .then((res) => resolve(res))
       .catch((err) => reject(err));

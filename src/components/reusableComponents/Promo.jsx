@@ -13,7 +13,7 @@ const promo = [
                   </p>,
     subtext: 'fast and accurate',
     image: rider,
-    color: 'blue',
+    color: 'bg-red-300',
     lighting: true
 
 
@@ -24,7 +24,7 @@ const promo = [
                   </p>,
     subtext: 'why choose us?',
     image: cerified,
-    color: 'red',
+    color: 'bg-blue-300',
     lighting: false
 
 
@@ -37,7 +37,7 @@ const promo = [
         return (
            <div className="w-full gap-2 " key={id}>
             
-              <div className={`h-[200px] rounded-xl bg-${i.color}-300 grid grid-cols-5 p-2 z-[2]`}>
+              <div className={`h-[200px] rounded-xl ${i.color} grid grid-cols-5 p-2 z-[2]`}>
               <img src={i.image} alt="" width='240' className="col-span-2"/>
               <div className="col-span-3 flex flex-col justify-end h-[180px] relative">
                {i.lighting && <div className="absolute z-[1] top-[-22px] right-12 from-transparent"><img src={lighting} alt="" width={250} className=""/>

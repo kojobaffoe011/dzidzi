@@ -27,7 +27,6 @@ export const OrderProvider = () => {
   const [orderItems, setOrderItems] = useState({})
   const {auth, setAuth} = useAuth()
   const {pathname} = useLocation()
-  console.log(pathname)
 
   const handleOpenReplaceModal = useCallback(() => {
     setReplaceOrder(true);
@@ -61,7 +60,7 @@ export const OrderProvider = () => {
         width="500px"
       />
       <div className="relative min-h-screen flex flex-col">
-
+      <Header/>
         <div/>
           <div className="mx-auto w-[1440px] flex gap-2 flex-col">
               <Link to={-1}><IoArrowBackCircleOutline size='35px' className={`cursor-pointer ${pathname == '/details' ? 'hidden': ''}`}/></Link>
