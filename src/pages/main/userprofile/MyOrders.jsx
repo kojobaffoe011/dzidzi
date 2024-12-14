@@ -1,14 +1,19 @@
-import MyOrdersTable from "../../../components/MyOrdersTable";
+import PaginatedTable from "../../../components/PaginatedTable";
 import { useGetOrderItemsByOrderID, useGetSingleOrder, useOrderListPaged } from "../../../components/brokers/apicalls";
 import Button from "../../../components/reusableComponents/Button";
 import { humanDatetime } from "../../../utils/config";
 import OrderStatus from "../../../components/reusableComponents/orderStatus";
 import useAuth from "../../../hooks/useAuth";
 import SideModal from "../../../components/reusableComponents/SideModal";
+import ErrorOccured from "../../../components/notices/ErrorOccured";
 import Spinner from "../../../components/loaders/Spinner";
 import { useOutletContext } from "react-router";
 import OrdersSummary from "./OrdersSummary";
 import { useState } from "react";
+import TableComponent from "../../../components/reusableComponents/TableComponent";
+import PropTypes from "prop-types";
+import TableColumnContent from "../../../components/reusableComponents/TableColumnContent";
+import TableRow from "../../../components/reusableComponents/TableRow";
 
 
 
@@ -16,7 +21,8 @@ import { useState } from "react";
 
 
 
-const OrderModal = ({setAuth, auth, orderID})=> {
+
+const OrderModal = ({orderID})=> {
 
     const { data, isLoading } = useGetSingleOrder(orderID)
   const { data: orderItems, isLoading: orderItemsLoading, isError } = useGetOrderItemsByOrderID(orderID)
@@ -76,7 +82,11 @@ const OrderModal = ({setAuth, auth, orderID})=> {
     },
   ] : null
 
-
+if(isError){
+  <div>
+    <ErrorOccured/>
+  </div>
+}
   
 
   return  <SideModal 
@@ -210,6 +220,15 @@ const MyOrders = ({userID}) => {
   let orderData = orderList?.pages?.flatMap((page) => page?.data);
    const numberOfPages = orderData?.[0].totalPages
 
+   const tablehead = [
+    {title: 'Name'},
+    {title: 'Price'},
+    {title: 'Status'},
+    {title: 'Address'},
+    {title: 'Action'},
+  ]
+
+  const tabledata = orderData?.[0].results
 
   return (
     <div className="relative">
@@ -219,19 +238,16 @@ const MyOrders = ({userID}) => {
           auth={auth}
           setAuth={setAuth}
           orderID={orderID}
-          // navigateTo={navigateTo}
-          // token={loggedIn}
         />
       )}
 
-       <div className="flex flex-col gap-4">
-          <div className="flex flex-col ">
-                <p className="font-bold">My Orders</p>
-                <OrdersSummary />
-            </div>
-            <div>
-
-              <MyOrdersTable 
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col ">
+          <p className="font-bold">My Orders</p>
+          <OrdersSummary />
+        </div>
+        <div>
+          <PaginatedTable 
               title={'No Orders Found'}
               list={orderData} 
               totalCount={6} 
@@ -240,86 +256,35 @@ const MyOrders = ({userID}) => {
               isLoading={isLoading}
               numberOfPages={numberOfPages}
               isFetchingNextPage={isFetchingNextPage}
-              usersHasNextPage={hasNextPage}
-
-
+              dataHasNextPage={hasNextPage}
               >
-
-                  <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Name
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Price
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Address
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan="3" className="p-4 text-center">
-                  Loading...
-                </td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td colSpan="3" className="p-4 text-center">
-                  Error loading menus
-                </td>
-              </tr>
-            ) : (
-              orderData?.[0].results?.map((item, idx) => {
-                return (
-                  <tr key={idx} className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                <TableComponent tabledata={tabledata} tablehead={tablehead}>
+                     {tabledata?.map((item, idx) => {
+                        return (
+                        <TableRow key={idx} index={idx}>
+                    <TableColumnContent >
                       <div className="flex flex-col">
-                        <p className="font-light text-sm">{item.orderNumber}</p>
-                        <p className="font-light text-xs">{humanDatetime(item.orderDate)}</p>
+                        <p className="text-sm">{item.orderNumber}</p>
+                        <p className="text-xs">{humanDatetime(item.orderDate)}</p>
 
                       </div>
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                    </TableColumnContent>
+                    <TableColumnContent >
                       <div className="flex flex-col">
-                        <p className="font-light text-sm">¢{item.totalAmountToPay}</p>
+                        <p className="text-sm">¢{item.totalAmountToPay}</p>
                       </div>
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                    </TableColumnContent>
+                    <TableColumnContent >
                       <div className="flex flex-col">
                         <OrderStatus orderStatus={item.status}/>
                       </div>
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                    </TableColumnContent>
+                    <TableColumnContent >
                       <div className="flex flex-col">
-                       <p className="font-light text-sm">{item.address.street} {item.address.houseNumber}, {item.address.city}</p>
+                       <p className="text-sm">{item.address.street} {item.address.houseNumber}, {item.address.city}</p>
                       </div>
-                    </td>
-                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                    </TableColumnContent>
+                    <TableColumnContent >
                       <Button
                         variant="dark"
                         className="px-2 py-1 text-xs rounded-md"
@@ -331,25 +296,30 @@ const MyOrders = ({userID}) => {
                       >
                         View Details
                       </Button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-              </MyOrdersTable>
-            </div>
-            {/* <Table/> */}
-             <div className="grid grid-cols-4 mt-4 gap-4 h-48">
-              {/* <EditPassword/>
-              <EditAddress/> */}
+                    </TableColumnContent>
+                        </TableRow>
+                        );
+                    })}
+                   
+                </TableComponent>
+          </PaginatedTable>
+        </div>
+        <div className="mt-16"/>
 
-             </div>
-    </div>
+      </div>
     </div>
     
   )
 }
 
 export default MyOrders
+
+MyOrders.propTypes = {
+  userID: PropTypes.string,
+}
+
+OrderModal.propTypes = {
+  setAuth: PropTypes.func,
+  auth: PropTypes.object,
+  orderID: PropTypes.string,
+}

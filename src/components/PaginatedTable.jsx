@@ -2,9 +2,11 @@ import Spinner from "./loaders/Spinner";
 import NoRecord from "./notices/NoRecord";
 import ForwardSVG from "./ForwardSVG";
 import SVG from "./SVG";
+import PropTypes from "prop-types";
 
-const MyOrdersTable = (props) => {
-  const {isLoading, list, totalCount, usersHasNextPage, children, title, numberOfPages, currentPage, setCurrentPage } = props
+
+const PaginatedTable = (props) => {
+  const {isLoading, list, totalCount, dataHasNextPage, children, title, numberOfPages, currentPage, setCurrentPage } = props
 
  const itemsPerPage = 10; // You can adjust this based on your preference.
 
@@ -39,8 +41,8 @@ const MyOrdersTable = (props) => {
     <>
       <div>
         {isLoading ? (
-        //   <Loader />
-          ''
+          <Spinner />
+          // ''
         ) : (
           <div>
             {list?.[0]?.results?.length > 0 ? (
@@ -52,10 +54,10 @@ const MyOrdersTable = (props) => {
                 )}
                 <div className="flex flex-col w-full overflow-x-scroll">
 
-                    
+                    {/* TABLE CONTENT GOES HERE */}
                   {children}
 
-              <div className="p-2 border-t bg-white w-full ">
+                  <div className="p-2 border-t bg-white w-full ">
                     <div className="px-2 py-3 flex justify-between items-center border rounded-lg">
                       <p className="text-sm">
                         Records{" "}
@@ -66,7 +68,7 @@ const MyOrdersTable = (props) => {
                         </span>
                       </p>
 
-                      {usersHasNextPage && (
+                      {dataHasNextPage && (
                         <div className="flex items-center justify-center">
                           <button
                             onClick={() => handlePageChange(1)}
@@ -129,6 +131,20 @@ const MyOrdersTable = (props) => {
   );
 };
 
-export default MyOrdersTable;
+export default PaginatedTable;
 
 
+PaginatedTable.propTypes = {
+
+  isLoading: PropTypes.bool, 
+  list:  PropTypes.array, 
+  totalCount:  PropTypes.number, 
+  dataHasNextPage:  PropTypes.bool, 
+  children:  PropTypes.node, 
+  title:  PropTypes.string, 
+  numberOfPages:  PropTypes.number, 
+  currentPage:  PropTypes.number, 
+  setCurrentPage:  PropTypes.func
+   
+
+}

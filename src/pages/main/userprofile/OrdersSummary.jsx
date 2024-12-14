@@ -8,26 +8,30 @@ const OrdersSummary = () => {
       text: `Total Orders`,
       icon: (className) =><IoLocationSharp className={className}/>,
       count: 6,
-      color:'blue'
+      color:'blue',
+      border: 'border-blue-500'
     },
     {
       text: `Pending Orders`,
       icon: (className) =><RiContactsBookFill className={className}/>,
       count: 5,
-      color:'orange'
+      color:'gray',
+      border: 'border-gray-500'
     },
     {
       text: `Cancelled Orders`,
       icon:(className) => <MdEmail className={className}/>,
        count: 0,
-      color:'red'
+      color:'red',
+      border: 'border-red-500'
     },
-    {
-      text: `Delivered Safely`,
-      icon: (className) =><MdEmail className={className}/>,
-       count: 0,
-      color:'green'
-    },
+    // {
+    //   text: `Delivered Safely`,
+    //   icon: (className) =><MdEmail className={className}/>,
+    //    count: 0,
+    //   color:'green',
+    //   border: 'border-green-500'
+    // },
   ];
 
   return  <div className="col-span-2 flex flex-col mt-6">
@@ -38,7 +42,7 @@ const OrdersSummary = () => {
 
             <div className="grid-cols-4 grid gap-2">
               {ordersum.map((item,idx)=>{
-               return <div key={idx} className={` border ${`border-${item.color}-500`} rounded-lg p-4 flex gap-4 items-center`}>
+               return <div key={idx} className={`border- border ${item.border} rounded-lg p-4 flex gap-4 items-center hover:cursor-pointer`}>
                 <div className={`p-3 border ${`border-${item.color}-500`} rounded`}>{item.icon('text-gray-600')}</div>
                 <div className="flex flex-col">
                   <p className="text-gray-600 font-light">{item.text}</p>

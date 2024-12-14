@@ -5,13 +5,17 @@ import {
 } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
-import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
-import TableAlt from "../../components/TableAlt";
+import ErrorOccured from "../../components/notices/ErrorOccured";
+import PaginatedTable from "../../components/PaginatedTable";
+import TableComponent from "../../components/reusableComponents/TableComponent";
+import TableRow from "../../components/reusableComponents/TableRow";
+import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
+import FilterComponent from "../../components/reusableComponents/FilterComponent";
 
 const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilters] = useState({
-  firstName:null,
+  firstName: null,
   lastName:null,
   enabled:null,
   email:null,
@@ -23,27 +27,17 @@ const Users = () => {
 
   const [credentialOpen, setCredentialsOpen] = useState(false);
 
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
-  }, []);
   const handleCloseInvoiceModal = useCallback(() => {
     setCredentialsOpen(false);
   }, []);
 
-  const [restaurantID, setRestaurantID] = useState(null);
-  const [viewOpen, setViewOpen] = useState(false);
-  const handleOpenViewModal = useCallback(() => {
-    setViewOpen(true);
-  }, []);
-  const handleCloseViewModal = useCallback(() => {
-    setViewOpen(false);
-  }, []);
+
 
   const {
     data: usersList = [],
     isLoading: usersLoading,
     hasNextPage: usersHasNextPage,
-    fetchNextPage: usersFetchNextPage,
+    // fetchNextPage: usersFetchNextPage,
     isFetchingNextPage: usersFetchingNextPage,
     isError: isUsersError,
   } = useUserListPaged(
@@ -56,11 +50,25 @@ const Users = () => {
   filter.sortBy,
   filter.orderBy,
   currentPage
-);
+  );
 
 
   let userData = usersList?.pages?.flatMap((page) => page?.data);
   const numberOfPages = userData?.[0].totalPages
+
+  const tablehead = [
+    {title: 'Restaurant Details'},
+    {title: 'Address'},
+    // {title: 'Status'},
+    // {title: 'Address'},
+    {title: 'Action'},
+  ]
+
+  const tabledata = userData?.[0].results
+
+  if(isUsersError){
+    return <ErrorOccured/>
+  }
 
 
 
@@ -73,96 +81,74 @@ const Users = () => {
         width="400px"
       />
 
-      <ViewRestaurant
-        isOpen={viewOpen}
-        handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="950px"
-        restaurantID={restaurantID}
-      />
 
       <div className="mt-2 flex-col gap-2">
         <p className="font-bold text-2xl">Users</p>
       </div>
-      <TableAlt
-      isLoading={usersLoading}
-        list={userData}
-        title={"No Record Found"}
-          numberOfPages={numberOfPages}
-            totalCount={4}
-            setCurrentPage={setCurrentPage}
-            currentPage={currentPage}
-            isFetchingNextPage={usersFetchingNextPage}
-            usersHasNextPage={usersHasNextPage}
-      >
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Restaurant Details
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Address
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Actions
-              </th>
-            </tr>
-          </thead>
 
-          <tbody className="divide-y divide-gray-100">
-            { userData?.[0].results?.map((item, idx) => {
-              return (
-                <tr
-                  className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
-                  key={idx}
-                >
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+      <FilterComponent filterType={'INPUTFIELD'} handleFilterChange={(event)=>setFilters({...filter, email:event.target.value})}/>
+        
+      <PaginatedTable
+       title={'No Orders Found'}
+       list={userData} 
+       totalCount={6} 
+       currentPage={currentPage}
+       setCurrentPage={setCurrentPage}
+       isLoading={usersLoading}
+       numberOfPages={numberOfPages}
+       isFetchingNextPage={usersFetchingNextPage}
+       dataHasNextPage={usersHasNextPage}
+      >
+          <TableComponent tablehead={tablehead} tabledata={tabledata}>
+              {tabledata?.map((item, idx)=>{
+                return (
+                <TableRow key={idx} index={idx}>
+                    <TableColumnContent>
                     <div className="flex flex-col">
                       <div className="flex items-center">
-                        <p className="mr-3 italic">Name: </p>
+                        <p className="mr-3 ">Name: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
                           {item?.firstName} {item?.lastName}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <p className="mr-3 italic"> Contact: </p>
+                        <p className="mr-3 "> Contact: </p>
                         <p className="mr-3 font-extrabold text-xs">
                           {item?.contact}
                         </p>
                       </div>
                       <div className="flex items-center">
-                        <p className="mr-3 italic"> Email: </p>
+                        <p className="mr-3 "> Email: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
                           {item?.credential?.email}
                         </p>
                       </div>
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  </TableColumnContent>
+                  <TableColumnContent>
                     <div className="flex flex-col">
                       <div className="flex items-center">
-                        <p className="mr-3 italic">Street: </p>
+                        <p className="mr-3 ">Street: </p>
                         <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
                           {item?.address?.street}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <p className="mr-3 italic"> House Number: </p>
+                        <p className="mr-3 "> House Number: </p>
                         <p className="mr-3 font-extrabold text-xs">
                           {item?.address?.houseNumber}
                         </p>
                       </div>
                       <div className="flex items-center">
-                        <p className="mr-3 italic"> City: </p>
+                        <p className="mr-3 "> City: </p>
                         <p className="mr-3 font-extrabold text-xs text-red-600">
                           {item?.address?.city}
                         </p>
                       </div>
                     </div>
-                  </td>
+                  </TableColumnContent>
 
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  <TableColumnContent>
                     <Link to={`${item?.id}`}>
                       <Button
                         variant="dark"
@@ -175,13 +161,12 @@ const Users = () => {
                         View Details
                       </Button>
                     </Link>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </TableAlt>
+                  </TableColumnContent>
+                </TableRow>
+                )
+              })}
+          </TableComponent>
+      </PaginatedTable>
     </>
   );
 };

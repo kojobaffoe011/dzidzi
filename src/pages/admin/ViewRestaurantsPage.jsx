@@ -13,6 +13,7 @@ import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 import { showErrorToast, showSuccessToast } from "../../toast/Toast";
 import Imageloader from "../../components/loaders/Imageloader";
 import DzidziLoader from "../../components/loaders/DzidziLoader";
+import ErrorOccured from "../../components/notices/ErrorOccured";
 
 const ViewRestaurantsPage = () => {
   const { id } = useParams();
@@ -30,6 +31,7 @@ const ViewRestaurantsPage = () => {
   const navigateTo = (url) => {
     navigate(url);
   };
+
 
 const [filters, setFilters] = useState({
   minimumPrice: null,
@@ -79,7 +81,7 @@ const [filters, setFilters] = useState({
   );
 
   let menuData = menuListAlt?.pages?.flatMap((page) => page?.data?.results);
-  const numberOfPages = menuData?.[0].totalPages
+  // const numberOfPages = menuData?.[0]?.totalPages
 
   const { mutationFn } = useDeleteRestaurant(id);
 
@@ -88,7 +90,7 @@ const [filters, setFilters] = useState({
     onSuccess: () => {
       showSuccessToast("Restaurant Deleted Successfully");
       navigateTo("/dashboard");
-      reset();
+      // reset();
     },
     onError: (data) => {
       showErrorToast(data?.response?.error);
@@ -109,6 +111,10 @@ const [filters, setFilters] = useState({
         <DzidziLoader />
       </div>
     );
+  }
+
+  if(isMenuAltError){
+    <ErrorOccured/>
   }
   return (
     <>

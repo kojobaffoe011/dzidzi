@@ -195,8 +195,8 @@ const OrderDetails = (props) => {
 
               </div>
             </div>
-             
-             <div className={`col-span-2 ${activeUser?.currentUserRole != 'RESTAURANT_ADMIN' ? 'hidden' : ''}`}>
+             {/* //'hidden' : ' */}
+             <div className={`col-span-2 ${activeUser?.currentUserRole == ('RESTAURANT_ADMIN' || 'COURIER')}`}>
                  <ChangeOrderStatus orderStatus={data?.status} orderID={orderID} props={props}/>
 
              </div>
