@@ -1,5 +1,4 @@
 import PropTypes from "prop-types"
-import { useState } from "react";
 
 const FilterComponent = ({filterType, handleFilterChange}) => {
     const types = ['DROPDOWN', 'INPUTFIELD']

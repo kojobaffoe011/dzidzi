@@ -86,7 +86,7 @@ const Users = () => {
         <p className="font-bold text-2xl">Users</p>
       </div>
 
-      <FilterComponent filterType={'INPUTFIELD'} handleFilterChange={(event)=>setFilters({...filter, email:event.target.value})}/>
+      <FilterComponent filterType={'INPUTFIELD'} handleFilterChange={(event)=>setFilters({...filter, firstName:event.target.value})}/>
         
       <PaginatedTable
        title={'No Orders Found'}
