@@ -3,7 +3,7 @@ import { useAllowLocation } from '../../hooks/useAllowLocation'
 import Button from '../Button'
 
 const CheckLocationStatus = ({children}) => {
-    const { locationState} = useAllowLocation()
+  const { locationState} = useAllowLocation()
   return (
     <>
       {

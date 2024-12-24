@@ -132,7 +132,7 @@ export const resizeImageToMaxKB = (
   });
 };
 
-export const toFixedDeciimal = (num, decimal) => Number(num).toFixed(decimal)
+export const toFixedDeciimal = (num, decimal) => Number(num).toFixed(decimal);
 
 export function shuffle(array) {
   for (let i = array?.length - 1; i > 0; i--) {
@@ -143,14 +143,81 @@ export function shuffle(array) {
 }
 
 export const timeOutError = (error) => {
-   if(error.message == 'Network Error'){
-    console.error(error)
-    return showErrorToast('Network connection lost. Connect and try again')
+  if (error.message == "Network Error") {
+    console.error(error);
+    return showErrorToast("Network connection lost. Connect and try again");
   }
 
-  if(error.message.includes('timeout')){
-    console.error(error)
-    return showErrorToast('Connection Timed Out')
+  if (error.message.includes("timeout")) {
+    console.error(error);
+    return showErrorToast("Connection Timed Out");
   }
+};
 
-}
+const flipOrder = (order) => {
+  if (order === null) {
+    return "DESC";
+  }
+  return order === "ASC" ? "DESC" : "ASC";
+};
+
+export const sortByColumn = (sortKey, filters, setFilters) => {
+  const value = filters.map((item) => {
+    if (item.name === "sortBy") {
+      return {
+        ...item,
+        value: sortKey,
+        enabled: true,
+      };
+    }
+    if (item.name === "orderBy") {
+      return {
+        ...item,
+        value: flipOrder(item.value),
+        enabled: true,
+      };
+    }
+
+    return item;
+  });
+
+  setFilters(value);
+};
+
+export const handleFilterChange = (event, name, filters, setFilters) => {
+  const value = filters.map((item) => {
+    if (item.name === name) {
+      return {
+        ...item,
+        value: event.target.value.trim(),
+        enabled: false,
+      };
+    } else {
+      return item;
+    }
+  });
+
+  setFilters(value);
+};
+
+export const clearSingleFilter = (name, filters, setFilters) => {
+  const value = filters.map((item) => {
+    if (item.name === name) {
+      return {
+        ...item,
+        value: null,
+        enabled: false,
+      };
+    } else {
+      return item;
+    }
+  });
+
+  setFilters(value);
+};
+
+export const activeFilters = (filters) => {
+  return filters.filter(
+    (item) => item.enabled && item.name !== "sortBy" && item.name !== "orderBy"
+  );
+};

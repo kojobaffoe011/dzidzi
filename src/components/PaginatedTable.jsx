@@ -4,14 +4,23 @@ import ForwardSVG from "./ForwardSVG";
 import SVG from "./SVG";
 import PropTypes from "prop-types";
 
-
 const PaginatedTable = (props) => {
-  const {isLoading, list, totalCount, dataHasNextPage, children, title, numberOfPages, currentPage, setCurrentPage } = props
+  const {
+    isLoading,
+    list,
+    totalCount,
+    dataHasNextPage,
+    children,
+    title,
+    numberOfPages,
+    currentPage,
+    setCurrentPage,
+  } = props;
 
- const itemsPerPage = 10; // You can adjust this based on your preference.
+  const itemsPerPage = 10; // You can adjust this based on your preference.
 
   // Calculate the total number of pages based on the total record count and items per page.
-  const totalPages = numberOfPages
+  const totalPages = numberOfPages;
 
   // Function to handle page change.
   const handlePageChange = (page) => {
@@ -25,10 +34,7 @@ const PaginatedTable = (props) => {
   const maxVisiblePages = 5; // Adjust this number to control how many page numbers to display at a time.
 
   // Calculate the start and end page numbers to display.
-  const startPage = Math.max(
-    1,
-   currentPage - Math.floor(maxVisiblePages / 2)
-  );
+  const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
   // Generate an array of page numbers to display within the specified range.
@@ -42,8 +48,8 @@ const PaginatedTable = (props) => {
       <div>
         {isLoading ? (
           <Spinner />
-          // ''
         ) : (
+          // ''
           <div>
             {list?.[0]?.results?.length > 0 ? (
               <div className="flex flex-col relative shadow-sm">
@@ -53,8 +59,7 @@ const PaginatedTable = (props) => {
                   </div>
                 )}
                 <div className="flex flex-col w-full overflow-x-scroll">
-
-                    {/* TABLE CONTENT GOES HERE */}
+                  {/* TABLE CONTENT GOES HERE */}
                   {children}
 
                   <div className="p-2 border-t bg-white w-full ">
@@ -62,8 +67,7 @@ const PaginatedTable = (props) => {
                       <p className="text-sm">
                         Records{" "}
                         <span className="font-bold">
-                          {startIndex + 1} -{" "}
-                          {Math.min(endIndex, totalCount)} of{" "}
+                          {startIndex + 1} - {Math.min(endIndex, totalCount)} of{" "}
                           {totalCount}
                         </span>
                       </p>
@@ -73,16 +77,14 @@ const PaginatedTable = (props) => {
                           <button
                             onClick={() => handlePageChange(1)}
                             disabled={currentPage === 1}
-                            className="mr-6 hover:bg-[#edf0fa] px-4 py-2 rounded-lg disabled:cursor-not-allowed disabled:hover:bg-gray-50"
+                            className="mr-6 hover:bg-blue-100  px-4 py-2 rounded-lg disabled:cursor-not-allowed disabled:hover:bg-gray-50"
                           >
                             <SVG />
                           </button>
                           <button
-                            onClick={() =>
-                              handlePageChange(currentPage - 1)
-                            }
+                            onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className="px-4 py-2 rounded-lg mr-2 hover:bg-[#edf0fa] disabled:cursor-not-allowed disabled:hover:bg-gray-50"
+                            className="px-4 py-2 rounded-lg mr-2 hover:bg-blue-100 disabled:cursor-not-allowed disabled:hover:bg-gray-50"
                           >
                             <ForwardSVG />
                           </button>
@@ -90,9 +92,9 @@ const PaginatedTable = (props) => {
                             <button
                               key={page}
                               onClick={() => handlePageChange(page)}
-                              className={`mx-1 hover:bg-[#edf0fa] px-4 py-2 rounded-lg ${
+                              className={`mx-1 hover:bg-blue-100 hover:text-white px-4 py-2 rounded-lg ${
                                 currentPage === page
-                                  ? "bg-[#CED6F1]"
+                                  ? "bg-blue-200 text-white"
                                   : "bg-transaparent"
                               }`}
                             >
@@ -100,18 +102,16 @@ const PaginatedTable = (props) => {
                             </button>
                           ))}
                           <button
-                            onClick={() =>
-                              handlePageChange(currentPage + 1)
-                            }
+                            onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className="px-4 py-2 rounded-lg ml-2 hover:bg-[#edf0fa] disabled:cursor-not-allowed disabled:hover:bg-gray-50"
+                            className="px-4 py-2 rounded-lg ml-2 hover:bg-blue-100 disabled:cursor-not-allowed disabled:hover:bg-gray-50"
                           >
                             <ForwardSVG transform={true} />
                           </button>
                           <button
                             onClick={() => handlePageChange(totalPages)}
                             disabled={currentPage === totalPages}
-                            className="px-4 py-2 rounded-lg ml-6 hover:bg-[#edf0fa] disabled:cursor-not-allowed disabled:hover:bg-gray-50"
+                            className="px-4 py-2 rounded-lg ml-6 hover:bg-blue-100 disabled:cursor-not-allowed disabled:hover:bg-gray-50"
                           >
                             <SVG transform={true} />
                           </button>
@@ -133,18 +133,14 @@ const PaginatedTable = (props) => {
 
 export default PaginatedTable;
 
-
 PaginatedTable.propTypes = {
-
-  isLoading: PropTypes.bool, 
-  list:  PropTypes.array, 
-  totalCount:  PropTypes.number, 
-  dataHasNextPage:  PropTypes.bool, 
-  children:  PropTypes.node, 
-  title:  PropTypes.string, 
-  numberOfPages:  PropTypes.number, 
-  currentPage:  PropTypes.number, 
-  setCurrentPage:  PropTypes.func
-   
-
-}
+  isLoading: PropTypes.bool,
+  list: PropTypes.array,
+  totalCount: PropTypes.number,
+  dataHasNextPage: PropTypes.bool,
+  children: PropTypes.node,
+  title: PropTypes.string,
+  numberOfPages: PropTypes.number,
+  currentPage: PropTypes.number,
+  setCurrentPage: PropTypes.func,
+};

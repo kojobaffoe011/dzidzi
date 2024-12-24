@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes  from "prop-types";
 import { HiChevronRight } from "react-icons/hi";
 
 /**
@@ -34,3 +34,8 @@ const Breadcrumbs = ({ breadcrumbs }) => {
 };
 
 export default Breadcrumbs;
+
+
+Breadcrumbs.propTypes = {
+  breadcrumbs: PropTypes.array
+}

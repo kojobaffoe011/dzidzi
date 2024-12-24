@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [show, setShow] = useState(true);
   const [mobileShow, setMobileShow] = useState(false);
   const {mutate, isPending} = useLogoutUser()
+  
   const {
     data: activeUser,
     isLoading: activeUserLoading,
