@@ -1,28 +1,31 @@
 import { useEffect, useRef, useState } from "react";
-import { FiHome } from "react-icons/fi";
 import { Outlet, useLocation } from "react-router";
 import { Link } from "react-router-dom";
-import { IoCloseSharp, IoFastFood } from "react-icons/io5";
-import { MdPendingActions } from "react-icons/md";
-import { FaBed, FaUserGraduate } from "react-icons/fa";
+import {
+  IoCloseSharp,
+  IoFastFoodOutline,
+  IoRestaurantOutline,
+} from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { BsBookmarkStarFill } from "react-icons/bs";
+import { RiCoupon2Line } from "react-icons/ri";
 import { ImSwitch } from "react-icons/im";
-import { TbFileUpload } from "react-icons/tb";
-import { AiOutlineFieldTime } from "react-icons/ai";
+import { TbUsersGroup } from "react-icons/tb";
 import CheckOnlineStatus from "../../components/CheckOnlineStatus";
 import Loader from "../../components/loaders/Loader";
-// import AccountLocked from "../../components/notices/AccountLocked";
+import { GrRestaurant } from "react-icons/gr";
 import { useGetActiveUser } from "../../components/brokers/apicalls";
 import { useLogoutUser } from "../../hooks/useLogoutUser";
+import { MdOutlineDeliveryDining, MdOutlineHome } from "react-icons/md";
+import useAuth from "../../hooks/useAuth";
 
 const Dashboard = () => {
   const pageRef = useRef(null);
   const { pathname } = useLocation();
   const [show, setShow] = useState(true);
   const [mobileShow, setMobileShow] = useState(false);
-  const {mutate, isPending} = useLogoutUser()
-  
+  const { mutate, isPending } = useLogoutUser();
+  const { auth, setAuth } = useAuth();
+
   const {
     data: activeUser,
     isLoading: activeUserLoading,
@@ -45,7 +48,6 @@ const Dashboard = () => {
   //   }
   // };
 
-
   useEffect(() => {
     // Scroll to the top of the page with a smooth scrolling effect
     if (window.scrollY > 100) {
@@ -60,20 +62,24 @@ const Dashboard = () => {
   const sideBarNav = [
     {
       link: "",
-      icon: (className = "") => <FiHome className={className} size="25px" />,
+      icon: (className = "") => (
+        <MdOutlineHome className={className} size="25px" />
+      ),
       text: "Home",
       userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
     },
     {
       link: "users",
-      icon: (className = "") => <FaBed className={className} size="25px" />,
+      icon: (className = "") => (
+        <TbUsersGroup className={className} size="25px" />
+      ),
       text: "Users",
       userType: ["ADMIN", "SERVICE"],
     },
     {
       link: "restaurants",
       icon: (className = "") => (
-        <BsBookmarkStarFill className={className} size="25px" />
+        <GrRestaurant className={className} size="25px" />
       ),
       text: "Restaurants",
       userType: ["ADMIN", "SERVICE"],
@@ -81,7 +87,7 @@ const Dashboard = () => {
     {
       link: "coupons",
       icon: (className = "") => (
-        <BsBookmarkStarFill className={className} size="25px" />
+        <RiCoupon2Line className={className} size="25px" />
       ),
       text: "Coupons",
       userType: ["ADMIN", "RESTAURANT_ADMIN"],
@@ -89,7 +95,7 @@ const Dashboard = () => {
     {
       link: "orders",
       icon: (className = "") => (
-        <IoFastFood className={className} size="25px" />
+        <IoFastFoodOutline className={className} size="25px" />
       ),
       text: "Orders",
       userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER"],
@@ -105,7 +111,7 @@ const Dashboard = () => {
     {
       link: "couriers",
       icon: (className = "") => (
-        <AiOutlineFieldTime className={className} size="25px" />
+        <MdOutlineDeliveryDining className={className} size="25px" />
       ),
       text: "Couriers",
       userType: ["ADMIN"],
@@ -121,7 +127,7 @@ const Dashboard = () => {
     {
       link: "menus",
       icon: (className = "") => (
-        <TbFileUpload className={className} size="25px" />
+        <IoRestaurantOutline className={className} size="25px" />
       ),
       text: "Menus",
       userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE"],
@@ -136,9 +142,8 @@ const Dashboard = () => {
     // },
   ];
 
-
   const handleLogout = () => {
-    return mutate()
+    return mutate();
   };
 
   // if (isStudentError || isCampusError || studentError || campusError) {
@@ -156,95 +161,96 @@ const Dashboard = () => {
     );
   };
 
-//   useEffect(() => {
-//   const logout = () => {
-//    handleLogout()
-//   };
+  //   useEffect(() => {
+  //   const logout = () => {
+  //    handleLogout()
+  //   };
 
-//   // Function to reset the timeout
-//   const resetTimer = () => {
-//     clearTimeout(timer); // Clear the old timer
-//     timer = setTimeout(() => {
-//       logout();
-//     }, 120000); // Reset the timer
-//   };
+  //   // Function to reset the timeout
+  //   const resetTimer = () => {
+  //     clearTimeout(timer); // Clear the old timer
+  //     timer = setTimeout(() => {
+  //       logout();
+  //     }, 120000); // Reset the timer
+  //   };
 
-//   let timer = setTimeout(() => {
-//     logout();
-//   }, 60000); // Initial timer for 2 minutes
+  //   let timer = setTimeout(() => {
+  //     logout();
+  //   }, 60000); // Initial timer for 2 minutes
 
-//   // Add event listeners to reset timer on user activity
-//   window.addEventListener("mousemove", resetTimer);
-//   window.addEventListener("keydown", resetTimer);
+  //   // Add event listeners to reset timer on user activity
+  //   window.addEventListener("mousemove", resetTimer);
+  //   window.addEventListener("keydown", resetTimer);
 
-//   // Clean up the event listeners and timer when component unmounts
-//   return () => {
-//     clearTimeout(timer);
-//     window.removeEventListener("mousemove", resetTimer);
-//     window.removeEventListener("keydown", resetTimer);
-//   };
-// }, [setAuth, navigate, handleLogout]);
-
+  //   // Clean up the event listeners and timer when component unmounts
+  //   return () => {
+  //     clearTimeout(timer);
+  //     window.removeEventListener("mousemove", resetTimer);
+  //     window.removeEventListener("keydown", resetTimer);
+  //   };
+  // }, [setAuth, navigate, handleLogout]);
 
   return (
     <div ref={pageRef}>
       <CheckOnlineStatus>
-        <div className="grid grid-cols-5 h-screen">
+        <div className="grid grid-cols-6 h-screen">
           {show && (
-            <div className="col-span-1 lg:flex-col lg:flex md:hidden sm:hidden xs:hidden ss:hidden xss:hidden">
-              <div className="flex flex-col">
-                <div className="p-5 flex items-center justify-center">
-                  <p className="font-bold text-md text-[#0d1655] text-secular">
-                    dzidzi
-                  </p>
+            <div className="relative flex">
+              <div className="col-span-1 lg:flex-col lg:flex md:hidden sm:hidden xs:hidden ss:hidden xss:hidden fixed w-[16.7%] h-full">
+                <div className="flex flex-col">
+                  <div className="p-5 flex items-center justify-center">
+                    <p className="font-logo font-extrabold text-4xl text-blue-600">
+                      dzidzi
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="">
-                {sideBarNav
-                  .filter((item) =>
-                    item.userType.includes(activeUser?.currentUserRole)
-                  )
-                  .map((item, idx) => {
-                    return (
-                      <Link to={item.link} key={idx}>
-                        <div
-                          className={`flex items-center cursor-pointer ${
-                            pathname == `/dashboard/${item.link}` ||
-                            pathname == `/dashboard` + item.link
-                              ? "bg-blue-50"
-                              : "hover:bg-gray-50"
-                          }`}
-                        >
+                <div className="">
+                  {sideBarNav
+                    .filter((item) =>
+                      item.userType.includes(activeUser?.currentUserRole)
+                    )
+                    .map((item, idx) => {
+                      return (
+                        <Link to={item.link} key={idx}>
                           <div
-                            className={` ${
+                            className={`flex items-center cursor-pointer ${
                               pathname == `/dashboard/${item.link}` ||
                               pathname == `/dashboard` + item.link
-                                ? "border h-full w-[10px] py-7 bg-[#0d1655] rounded-r"
-                                : "h-full w-[10px] py-7"
-                            }`}
-                          />
-                          {item.icon(
-                            `ml-5 mr-3  ${
-                              pathname == `/dashboard/${item.link}` ||
-                              pathname == `/dashboard` + item.link
-                                ? "text-[#0d1655]"
-                                : "text-slate-500"
-                            }`
-                          )}
-                          <p
-                            className={`text-xs ${
-                              pathname == `/dashboard/${item.link}` ||
-                              pathname == `/dashboard` + item.link
-                                ? "text-[#0d1655] font-bold"
-                                : "text-slate-500"
-                            }`}
+                                ? "bg-blue-100"
+                                : "hover:bg-gray-50"
+                            } ${idx == 0 ? "mt-2" : ""}`}
                           >
-                            {item.text}
-                          </p>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                            <div
+                              className={` ${
+                                pathname == `/dashboard/${item.link}` ||
+                                pathname == `/dashboard` + item.link
+                                  ? "border h-full w-[10px] py-7 bg-blue-600 rounded-r"
+                                  : "h-full w-[10px] py-7"
+                              }`}
+                            />
+                            {item.icon(
+                              `ml-5 mr-3  ${
+                                pathname == `/dashboard/${item.link}` ||
+                                pathname == `/dashboard` + item.link
+                                  ? "text-blue-600"
+                                  : "text-blue-300"
+                              }`
+                            )}
+                            <p
+                              className={`text-xs ${
+                                pathname == `/dashboard/${item.link}` ||
+                                pathname == `/dashboard` + item.link
+                                  ? "text-blue-600 font-bold"
+                                  : "text-slate-500"
+                              }`}
+                            >
+                              {item.text}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                </div>
               </div>
             </div>
           )}
@@ -257,12 +263,12 @@ const Dashboard = () => {
               <div className="flex flex-col justify-center">
                 <div className="border-b p-5 flex items-center justify-between shadow-sm">
                   <div className="flex items-center">
-                    <p className="font-bold text-md text-[#0d1655] text-secular">
+                    <p className="font-bold text-md text-blue-600 text-secular">
                       dzidzi
                     </p>
                   </div>
                   <IoCloseSharp
-                    className="text-[#0d1655]"
+                    className="text-blue-600"
                     size="1.5rem"
                     onClick={() => {
                       setMobileShow(false);
@@ -293,7 +299,7 @@ const Dashboard = () => {
                             className={` ${
                               pathname == `/${item.link}` ||
                               pathname == `` + item.link
-                                ? "border h-full w-[10px] py-7 bg-[#0d1655] rounded-r"
+                                ? "border h-full w-[10px] py-7 bg-blue-600 rounded-r"
                                 : "h-full w-[10px] py-7"
                             }`}
                           />
@@ -301,14 +307,14 @@ const Dashboard = () => {
                             `ml-5 mr-3  ${
                               pathname == `/${item.link}` ||
                               pathname == `` + item.link
-                                ? "text-[#0d1655]"
+                                ? "text-blue-600"
                                 : "text-slate-500"
                             }`
                           )}
                           <p
                             className={`text-xs ${
                               pathname == `/dashboard/${item.link}`
-                                ? "text-[#0d1655] font-bold"
+                                ? "text-blue-600 font-bold"
                                 : "text-slate-500"
                             }`}
                           >
@@ -324,20 +330,20 @@ const Dashboard = () => {
           <div
             className={`${
               show
-                ? "lg:col-span-4 md:col-span-5 sm:col-span-5 xs:col-span-5 ss:col-span-5 xss:col-span-5"
-                : "lg:col-span-5 md:col-span-5 sm:col-span-5 xs:col-span-5 ss:col-span-5 xss:col-span-5"
+                ? "lg:col-span-5 md:col-span-6 sm:col-span-6 xs:col-span-6 ss:col-span-6 xss:col-span-6"
+                : "lg:col-span-6 md:col-span-6 sm:col-span-6 xs:col-span-6 ss:col-span-6 xss:col-span-6"
             } flex flex-col `}
           >
             <div
               className={`${
                 show
-                  ? "lg:left-[20%] md:left-0 sm:left-0 ss:left-0 xss:left-0 xs:left-0"
+                  ? "lg:left-[16.6%] md:left-0 sm:left-0 ss:left-0 xss:left-0 xs:left-0"
                   : "left-0"
-              } border-b p-5 flex items-center shadow-sm fixed right-0  bg-white z-[3]`}
+              } border-b p-5 flex items-center fixed right-0  bg-white z-[3]`}
             >
               <div className="flex items-center justify-between w-full cursor-pointer lg:hidden md:flex">
                 <div
-                  className="flex items-center border px-1 py-1 justify-between rounded bg-[#0d1655] cursor-pointer"
+                  className="flex items-center border px-1 py-1 justify-between rounded bg-blue-600 cursor-pointer"
                   onClick={() => {
                     mobileShowSide();
                   }}
@@ -348,9 +354,12 @@ const Dashboard = () => {
                     className="text-white cursor-pointer"
                   />
                 </div>
-                <div
-                >
-                  <button disabled={isPending} className="rounded-full border py-2 px-5 bg-[#0d1655] flex items-center cursor-pointer"  onClick={handleLogout}>
+                <div>
+                  <button
+                    disabled={isPending}
+                    className="rounded-full border py-2 px-5 bg-blue-600 flex items-center cursor-pointer"
+                    onClick={handleLogout}
+                  >
                     <ImSwitch size="15px" className="text-white" />
                   </button>
                 </div>
@@ -358,32 +367,32 @@ const Dashboard = () => {
               <div className="lg:flex w-full justify-between items-center cursor-pointer  md:hidden sm:hidden xs:hidden ss:hidden xxs:hidden">
                 <GiHamburgerMenu
                   size="20px"
-                  className="text-[#0d1655] mr-2 cursor-pointer"
+                  className="text-blue-600 mr-2 cursor-pointer"
                   onClick={() => {
                     showSide();
                   }}
                 />
-                  <div className="flex w-full justify-end items-center">
-                    {!activeUserLoading && <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
-                      <p className="text-xs font-bold">{activeUser?.currentUserRole}</p>
-                    </div>}
-                    <div
-                    
-                    >
-                      <button disabled={isPending} className="rounded-full border py-2 px-5 bg-[#0d1655] flex items-center cursor-pointer"  onClick={handleLogout}>
-                    <ImSwitch size="15px" className="text-white" />
-                  </button>
-                       
+                <div className="flex w-full justify-end items-center">
+                  {!activeUserLoading && (
+                    <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
+                      <p className="text-xs font-bold text-blue-600">
+                        {activeUser?.currentUserRole}
+                      </p>
                     </div>
+                  )}
+                  <div>
+                    <button
+                      disabled={isPending}
+                      className="rounded-full border py-2 px-5 bg-blue-600 flex items-center cursor-pointer"
+                      onClick={handleLogout}
+                    >
+                      <ImSwitch size="15px" className="text-white" />
+                    </button>
                   </div>
+                </div>
               </div>
             </div>
-            <div
-              className="mt-16"
-              style={{ overflowY: "scroll", height: "calc(100vh - 64px)" }}
-            >
-              {renderContent()}
-            </div>
+            <div className="mt-16 p-4 bg-blue-50 h-full">{renderContent()}</div>
           </div>
         </div>
       </CheckOnlineStatus>

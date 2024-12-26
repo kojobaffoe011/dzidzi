@@ -42,12 +42,13 @@ import Profile from "./pages/main/userprofile/profile";
 import General from "./pages/main/userprofile/General";
 import MyOrders from "./pages/main/userprofile/MyOrders";
 import Support from "./pages/main/userprofile/Support";
+import { ModalProvider } from "./context/modalProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       onError: (error) => {
-        console.error('Global error handler:', error.message);
+        console.error("Global error handler:", error.message);
       },
       retry: 1, // Retry once before failing
     },
@@ -64,12 +65,11 @@ const App = () => {
               <Route path="auth" element={<LoginOutlet />}>
                 <Route path="" element={<LoginPage />} />
                 <Route path="admin" element={<LoginPage />} />
-                <Route path="register" element={<RegisterInfo />} >
-                <Route path="" element={<BasicDetails />} />
-                <Route path="address" element={<AddressInfo />} />
-                <Route path="login-info" element={<LoginDetails />} />
-                <Route path="success" element={<Success />} />
-                
+                <Route path="register" element={<RegisterInfo />}>
+                  <Route path="" element={<BasicDetails />} />
+                  <Route path="address" element={<AddressInfo />} />
+                  <Route path="login-info" element={<LoginDetails />} />
+                  <Route path="success" element={<Success />} />
                 </Route>
                 <Route path="verify" element={<Verify />} />
                 {/* <Route path="newpassword/:phone" element={<NewPassword />} /> */}
@@ -91,17 +91,20 @@ const App = () => {
                 ></Route>
                 <Route path="checkout/:id" exact element={<Checkout />}></Route>
                 <Route path="user-profile" exact element={<Profile />}>
-                <Route path="" exact element={<General />}/>
-                <Route path="orders" exact element={<MyOrders />}/>
-                <Route path="support" exact element={<Support />}/>
-
+                  <Route path="" exact element={<General />} />
+                  <Route path="orders" exact element={<MyOrders />} />
+                  <Route path="support" exact element={<Support />} />
                 </Route>
               </Route>
 
               <Route element={<PersistLogin />}>
                 <Route path="/welcome" exact element={<WelcomePage />} />
                 <Route path="/dashboard" exact element={<Dashboard />}>
-                  <Route path="profile-details" exact element={<MyProfileDetails />} />
+                  <Route
+                    path="profile-details"
+                    exact
+                    element={<MyProfileDetails />}
+                  />
                   <Route path="restaurants" exact element={<Restaurants />} />
                   <Route path="orders" exact element={<Orders />} />
                   <Route
@@ -109,10 +112,10 @@ const App = () => {
                     exact
                     element={<ViewRestaurantsPage />}
                   />
-                  <Route path="users/:id" exact element={<ViewUsers />} >
-                      <Route path="" exact element={<UserOrders />} />
-                      <Route path="support" exact element={<UserOrders />} />
-                      <Route path="settings" exact element={<UserSettings />} />
+                  <Route path="users/:id" exact element={<ViewUsers />}>
+                    <Route path="" exact element={<UserOrders />} />
+                    <Route path="support" exact element={<UserOrders />} />
+                    <Route path="settings" exact element={<UserSettings />} />
                   </Route>
                   <Route path="couriers/:id" exact element={<ViewCouriers />} />
                   <Route path="services/:id" exact element={<VIewServices />} />

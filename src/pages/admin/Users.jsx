@@ -9,12 +9,10 @@ import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
 import FilterType from "../../components/reusableComponents/FilterType";
-import { BiXCircle } from "react-icons/bi";
 import { HiUser } from "react-icons/hi";
 import FilterComponent from "../../components/reusableComponents/FilterComponent";
 import {
   activeFilters,
-  clearSingleFilter,
   handleFilterChange,
   sortByColumn,
 } from "../../utils/config";
@@ -23,12 +21,12 @@ import RenderActiveFilters from "../../components/reusableComponents/RenderActiv
 const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState([
-    { name: "name", value: null, enabled: false },
-    { name: "lastName", value: null, enabled: false },
-    { name: "enabled", value: null, enabled: false },
-    { name: "Email", value: null, enabled: false },
-    { name: "Username", value: null, enabled: false },
-    { name: "userId", value: null, enabled: false },
+    { name: "NAME", value: null, enabled: false },
+    { name: "LASTNAME", value: null, enabled: false },
+    { name: "ENABLED", value: null, enabled: false },
+    { name: "EMAIL", value: null, enabled: false },
+    { name: "USERNAME", value: null, enabled: false },
+    { name: "USERID", value: null, enabled: false },
     { name: "sortBy", value: null, enabled: false },
     { name: "orderBy", value: null, enabled: false },
   ]);
@@ -93,25 +91,26 @@ const Users = () => {
         filters={filters}
         setFilters={setFilters}
         activeFilters={activeFilters(filters)}
+        top={"top-[-120px]"}
       >
         <FilterType
           filterType={"INPUTFIELD"}
           handleFilterChange={(event) =>
-            handleFilterChange(event, "name", filters, setFilters)
+            handleFilterChange(event, "NAME", filters, setFilters)
           }
           placeholder={"Name"}
         />
         <FilterType
           filterType={"INPUTFIELD"}
           handleFilterChange={(event) =>
-            handleFilterChange(event, "Email", filters, setFilters)
+            handleFilterChange(event, "EMAIL", filters, setFilters)
           }
           placeholder={"Email"}
         />
         <FilterType
           filterType={"INPUTFIELD"}
           handleFilterChange={(event) =>
-            handleFilterChange(event, "Username", filters, setFilters)
+            handleFilterChange(event, "USERNAME", filters, setFilters)
           }
           placeholder={"Username"}
         />

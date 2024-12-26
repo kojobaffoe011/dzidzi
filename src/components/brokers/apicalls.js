@@ -130,7 +130,7 @@ const fetchUsers = async ({ pageParam = null, queryKey }) => {
 };
 
 export const useUserList = (firstName, lastName) => {
-  const queryKey = [ "userList", firstName, lastName];
+  const queryKey = ["userList", firstName, lastName];
 
   // Determine the next page param
   const getNextPageParam = (lastPage) =>
@@ -144,9 +144,8 @@ export const useUserList = (firstName, lastName) => {
   };
 
   // Use the useInfiniteQuery hook to manage the paginated query
- return  useInfiniteQuery({ queryKey, queryFn: fetchUsers, ...options });
+  return useInfiniteQuery({ queryKey, queryFn: fetchUsers, ...options });
 };
-
 
 export const useUserListPaged = (
   firstName,
@@ -157,45 +156,43 @@ export const useUserListPaged = (
   userId,
   sortBy,
   orderBy,
-   page) => {
+  page
+) => {
   //queryKey based on the provided parameters.
-  const queryKey = ["userListPaged",
-  firstName,
-  lastName,
-  enabled,
-  email,
-  username,
-  userId,
-  sortBy,
-  orderBy,
-   page];
-
+  const queryKey = [
+    "userListPaged",
+    firstName,
+    lastName,
+    enabled,
+    email,
+    username,
+    userId,
+    sortBy,
+    orderBy,
+    page,
+  ];
 
   const fetchUsers = ({ pageParam = page }) => {
     let url = `/paged-users?page=${encodeURIComponent(
       parseInt(pageParam)
     )}&limit=${encodeURIComponent(parseInt(10))}`;
 
-       const queryParams = {
-  firstName,
-  lastName,
-  enabled,
-  email,
-  username,
-  userId,
-  sortBy,
-  orderBy,
-  };
+    const queryParams = {
+      firstName,
+      lastName,
+      enabled,
+      email,
+      username,
+      userId,
+      sortBy,
+      orderBy,
+    };
 
-
-
-
-   Object.entries(queryParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value != '') {
-      url += `&${key}=${encodeURIComponent(value)}`;
-    }
-  });
-
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value != "") {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
 
     return get(`${url}`);
   };
@@ -221,16 +218,17 @@ export const useUserListPaged = (
   const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchUsers, ...options});
+  return useInfiniteQuery({ queryKey, queryFn: fetchUsers, ...options });
 };
 
 /// Function to fetch paged restaurants
 const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
-  const [, name, rating, distance, latitude, longitude, sortBy, orderBy] = queryKey;
+  const [, name, rating, distance, latitude, longitude, sortBy, orderBy] =
+    queryKey;
   const limit = 20; // Adjust the limit if necessary
   let url = `/paged-restaurants?limit=${limit}`;
 
-   const queryParams = {
+  const queryParams = {
     name,
     rating,
     distance,
@@ -238,11 +236,10 @@ const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
     longitude,
     sortBy,
     orderBy,
-    pageParam
+    pageParam,
   };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
+  Object.entries(queryParams).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       url += `&${key}=${encodeURIComponent(value)}`;
     }
@@ -262,16 +259,33 @@ const fetchRestaurants = async ({ pageParam = null, queryKey }) => {
   //   url += `&rating=${encodeURIComponent(rating)}`;
   // }
 
-const axiosInstance = axios.create({
-  timeout: 5000, // 5 seconds
-});
+  const axiosInstance = axios.create({
+    timeout: 5000, // 5 seconds
+  });
 
   const response = await axiosInstance.get(url);
   return response.data;
 };
 
-export const useRestaurantList = (name, rating, distance, latitude, longitude, sortBy, orderBy) => {
-  const queryKey = ["restaurantList", name, rating, distance, latitude, longitude, sortBy, orderBy];
+export const useRestaurantList = (
+  name,
+  rating,
+  distance,
+  latitude,
+  longitude,
+  sortBy,
+  orderBy
+) => {
+  const queryKey = [
+    "restaurantList",
+    name,
+    rating,
+    distance,
+    latitude,
+    longitude,
+    sortBy,
+    orderBy,
+  ];
 
   // Determine the next page param
   const getNextPageParam = (lastPage) =>
@@ -284,7 +298,7 @@ export const useRestaurantList = (name, rating, distance, latitude, longitude, s
     getNextPageParam, // getNextPageParam now part of the options object
     keepPreviousData: true, // Other options also as part of the object
     refetchOnWindowFocus: false,
-    retry: 1
+    retry: 1,
   });
 };
 
@@ -301,51 +315,51 @@ export const useRestaurantListPaged = (
   restaurantId,
   sortBy,
   orderBy,
-   page) => {
+  page
+) => {
   //queryKey based on the provided parameters.
-  const queryKey = ["restaurantsPaged",
-  name,
-  email,
-  username,
-  rating,
-  visible,
-  parentRestaurantId,
-  distance,
-  latitude,
-  longitude,
-  restaurantId,
-  sortBy,
-  orderBy,
-   page];
-
+  const queryKey = [
+    "restaurantsPaged",
+    name,
+    email,
+    username,
+    rating,
+    visible,
+    parentRestaurantId,
+    distance,
+    latitude,
+    longitude,
+    restaurantId,
+    sortBy,
+    orderBy,
+    page,
+  ];
 
   const fetchRestaurants = ({ pageParam = page }) => {
     let url = `/paged-restaurants?page=${encodeURIComponent(
       parseInt(pageParam)
     )}&limit=${encodeURIComponent(parseInt(10))}`;
 
-       const queryParams = {
-  name,
-  email,
-  username,
-  rating,
-  visible,
-  parentRestaurantId,
-  distance,
-  latitude,
-  longitude,
-  restaurantId,
-  sortBy,
-  orderBy,
-  };
+    const queryParams = {
+      name,
+      email,
+      username,
+      rating,
+      visible,
+      parentRestaurantId,
+      distance,
+      latitude,
+      longitude,
+      restaurantId,
+      sortBy,
+      orderBy,
+    };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url += `&${key}=${encodeURIComponent(value)}`;
-    }
-  });
-
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
 
     return get(`${url}`);
   };
@@ -368,10 +382,10 @@ export const useRestaurantListPaged = (
   const refetchOnWindowFocus = false;
 
   // Configure options for the useInfiniteQuery hook.
-  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus,  };
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchRestaurants, ...options });
+  return useInfiniteQuery({ queryKey, queryFn: fetchRestaurants, ...options });
 };
 
 export const useGetSingleRestaurant = (id) => {
@@ -614,7 +628,6 @@ export const useMenuListAlt = (
     return response?.data;
   };
 
-
   return useQuery({
     queryKey,
     queryFn,
@@ -642,50 +655,51 @@ export const useMenuListPaged = (
   restaurantId,
   sortBy,
   orderBy,
-   page) => {
+  page
+) => {
   //queryKey based on the provided parameters.
-  const queryKey = ["menuListPaged",
-  minimumPrice,
-  maximumPrice,
-  name,
-  category,
-  rating,
-  visible,
-  distance,
-  latitude,
-  longitude,
-  restaurantId,
-  sortBy,
-  orderBy,
-   page];
+  const queryKey = [
+    "menuListPaged",
+    minimumPrice,
+    maximumPrice,
+    name,
+    category,
+    rating,
+    visible,
+    distance,
+    latitude,
+    longitude,
+    restaurantId,
+    sortBy,
+    orderBy,
+    page,
+  ];
 
   const fetchMenus = ({ pageParam = page }) => {
     let url = `/paged-menus?page=${encodeURIComponent(
       parseInt(pageParam)
-    )}&limit=${encodeURIComponent(parseInt(6))}`;
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
 
-       const queryParams = {
-       minimumPrice,
-       maximumPrice,
-       name,
-       category,
-       rating,
-       visible,
-       distance,
-       latitude,
-       longitude,
-       restaurantId,
-       sortBy,
-       orderBy
-  };
+    const queryParams = {
+      minimumPrice,
+      maximumPrice,
+      name,
+      category,
+      rating,
+      visible,
+      distance,
+      latitude,
+      longitude,
+      restaurantId,
+      sortBy,
+      orderBy,
+    };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url += `&${key}=${encodeURIComponent(value)}`;
-    }
-  });
-
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
 
     return get(`${url}`);
   };
@@ -711,7 +725,7 @@ export const useMenuListPaged = (
   const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchMenus, ...options});
+  return useInfiniteQuery({ queryKey, queryFn: fetchMenus, ...options });
 };
 
 export const useMenuList = (
@@ -758,8 +772,6 @@ export const useMenuList = (
 
   return useInfiniteQuery({ queryKey, queryFn: fetchMenus, ...options });
 };
-
-
 
 const fetchExtras = async ({ queryKey, pageParam = {} }) => {
   const [_key, restaurantID, extraID, rating, minPrice, maxPrice, name] =
@@ -926,7 +938,10 @@ export const useGetServices = () => {
 export const useGetCoupons = (activeUser) => {
   const queryKey = ["coupons", activeUser];
 
-  const url = activeUser.currentUserRole == 'ADMIN' ? '/coupons' : `/coupons/${activeUser.currentUserId}`
+  const url =
+    activeUser.currentUserRole == "ADMIN"
+      ? "/coupons"
+      : `/coupons/${activeUser.currentUserId}`;
 
   const queryFn = () => {
     return get(url);
@@ -936,7 +951,7 @@ export const useGetCoupons = (activeUser) => {
     return response?.data;
   };
 
-  const enabled = Boolean(activeUser)
+  const enabled = Boolean(activeUser);
 
   return useQuery({
     queryKey,
@@ -963,7 +978,7 @@ export const useGetCouponsByRestaurantID = (id) => {
     return response?.data;
   };
 
-  const enabled = Boolean(id)
+  const enabled = Boolean(id);
 
   return useQuery({
     queryKey,
@@ -1025,8 +1040,6 @@ export const useAddCoupon = () => {
 
 export const useLogin = () => {
   const mutationFn = (data) => {
-
-
     return axiosInstance.post(`${NO_AUTH_URL}/system/auth/login`, data, {
       headers: {
         Authorization: null,
@@ -1175,11 +1188,10 @@ export const useGetImage = (id) => {
 
   const url = `/load/image/${id}`;
 
-  const get = (url) => axios.get(url, { responseType: 'blob' });  // This forces Axios to handle the data as a binary Blob
-
+  const get = (url) => axios.get(url, { responseType: "blob" }); // This forces Axios to handle the data as a binary Blob
 
   const queryFn = async () => {
-    const response = await get(url, { responseType: 'blob' });  // Specify 'blob' to handle binary data
+    const response = await get(url, { responseType: "blob" }); // Specify 'blob' to handle binary data
     return response;
   };
 
@@ -1204,43 +1216,42 @@ export const useGetImage = (id) => {
 
 //update get orders
 export const useOrderList = (
-  restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy, 
+  restaurantId,
+  courierId,
+  userId,
+  orderId,
+  sortBy,
+  orderBy,
   cursor,
   direction
 ) => {
   const queryKey = [
-  "orderlist",
-  restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy,
-  cursor,
-  direction
-  ];
-
-  const limit = 10; // Adjust the limit if necessary
-  let url = `/paged-orders?limit=${limit}`;
-
-    const queryParams = {
+    "orderlist",
     restaurantId,
     courierId,
     userId,
     orderId,
     sortBy,
     orderBy,
-      cursor,
+    cursor,
+    direction,
+  ];
+
+  const limit = 10; // Adjust the limit if necessary
+  let url = `/paged-orders?limit=${limit}`;
+
+  const queryParams = {
+    restaurantId,
+    courierId,
+    userId,
+    orderId,
+    sortBy,
+    orderBy,
+    cursor,
     direction,
   };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
+  Object.entries(queryParams).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       url += `&${key}=${encodeURIComponent(value)}`;
     }
@@ -1252,7 +1263,6 @@ export const useOrderList = (
   const select = (response) => {
     return response?.data;
   };
-
 
   return useQuery({
     queryKey,
@@ -1268,44 +1278,48 @@ export const useOrderList = (
 };
 
 export const useOrderListPaged = (
-  restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy, 
-   page) => {
+  restaurantId,
+  courierId,
+  userId,
+  orderId,
+  // date,
+  sortBy,
+  orderBy,
+  page
+) => {
   //queryKey based on the provided parameters.
-  const queryKey = ["orderListPaged",  
-  restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy,  
-  page];
+  const queryKey = [
+    "orderListPaged",
+    restaurantId,
+    courierId,
+    userId,
+    orderId,
+    // date,
+    sortBy,
+    orderBy,
+    page,
+  ];
 
   const fetchOrders = ({ pageParam = page }) => {
     let url = `/paged-orders?page=${encodeURIComponent(
       parseInt(pageParam)
     )}&limit=${encodeURIComponent(parseInt(10))}`;
 
-       const queryParams = {
-     restaurantId, 
-     courierId, 
-     userId, 
-     orderId, 
-     sortBy, 
-     orderBy, 
-  };
+    const queryParams = {
+      restaurantId,
+      courierId,
+      userId,
+      orderId,
+      // date,
+      sortBy,
+      orderBy,
+    };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url += `&${key}=${encodeURIComponent(value)}`;
-    }
-  });
-
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
 
     return get(`${url}`);
   };
@@ -1331,57 +1345,58 @@ export const useOrderListPaged = (
   const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchOrders, ...options});
+  return useInfiniteQuery({ queryKey, queryFn: fetchOrders, ...options });
 };
 
 export const useCourierListPaged = (
-  firstName, 
-  lastName, 
-  email, 
-  username, 
+  firstName,
+  lastName,
+  email,
+  username,
   averageRating,
   status,
   courierId,
-  sortBy, 
-  orderBy, 
-   page) => {
+  sortBy,
+  orderBy,
+  page
+) => {
   //queryKey based on the provided parameters.
-  const queryKey = ["couriersPaged",  
-  firstName, 
-  lastName, 
-  email, 
-  username, 
-  averageRating,
-  status,
-  courierId,
-  sortBy, 
-  orderBy, 
-   page];
+  const queryKey = [
+    "couriersPaged",
+    firstName,
+    lastName,
+    email,
+    username,
+    averageRating,
+    status,
+    courierId,
+    sortBy,
+    orderBy,
+    page,
+  ];
 
   const fetchCouriers = ({ pageParam = page }) => {
     let url = `/paged-courier?page=${encodeURIComponent(
       parseInt(pageParam)
     )}&limit=${encodeURIComponent(parseInt(10))}`;
 
-       const queryParams = {
-     firstName, 
-  lastName, 
-  email, 
-  username, 
-  averageRating,
-  status,
-  courierId,
-  sortBy, 
-  orderBy 
-  };
+    const queryParams = {
+      firstName,
+      lastName,
+      email,
+      username,
+      averageRating,
+      status,
+      courierId,
+      sortBy,
+      orderBy,
+    };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url += `&${key}=${encodeURIComponent(value)}`;
-    }
-  });
-
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
 
     return get(`${url}`);
   };
@@ -1407,17 +1422,11 @@ export const useCourierListPaged = (
   const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
 
   // Use the useInfiniteQuery hook to manage the paginated query.
-  return useInfiniteQuery({queryKey, queryFn: fetchCouriers, ...options});
+  return useInfiniteQuery({ queryKey, queryFn: fetchCouriers, ...options });
 };
 
-
 const fetchOrders = async ({ queryKey, pageParam = {} }) => {
-  const [,  restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy] =
+  const [, restaurantId, courierId, userId, orderId, sortBy, orderBy] =
     queryKey;
 
   const cursor = pageParam.cursor || null;
@@ -1425,19 +1434,18 @@ const fetchOrders = async ({ queryKey, pageParam = {} }) => {
   const limit = 5; // Adjust the limit if necessary
   let url = `/paged-orders?limit=${limit}`;
 
-   const queryParams = {
+  const queryParams = {
     restaurantId,
     courierId,
     userId,
     orderId,
     sortBy,
     orderBy,
-      cursor,
+    cursor,
     direction,
   };
 
-
-   Object.entries(queryParams).forEach(([key, value]) => {
+  Object.entries(queryParams).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       url += `&${key}=${encodeURIComponent(value)}`;
     }
@@ -1452,25 +1460,25 @@ const fetchOrders = async ({ queryKey, pageParam = {} }) => {
 };
 
 export const useOrderListInfinite = (
- restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy, 
+  restaurantId,
+  courierId,
+  userId,
+  orderId,
+  sortBy,
+  orderBy,
   cursor,
   direction
 ) => {
   const queryKey = [
     "orderListInfinite",
-   restaurantId, 
-  courierId, 
-  userId, 
-  orderId, 
-  sortBy, 
-  orderBy, 
-  cursor,
-  direction
+    restaurantId,
+    courierId,
+    userId,
+    orderId,
+    sortBy,
+    orderBy,
+    cursor,
+    direction,
   ];
 
   const getNextPageParam = (lastPage, allPages) => {
@@ -1511,7 +1519,7 @@ export const useGetSingleOrder = (id) => {
     return response?.data;
   };
 
-  const enabled = Boolean(id)
+  const enabled = Boolean(id);
 
   return useQuery({
     queryKey,
@@ -1524,7 +1532,7 @@ export const useGetSingleOrder = (id) => {
     retry: false,
     staleTime: 0,
   });
-}
+};
 export const useGetOrderItemsByOrderID = (id) => {
   const queryKey = ["orderitemsbyorderID", id];
 
@@ -1538,7 +1546,7 @@ export const useGetOrderItemsByOrderID = (id) => {
     return response?.data;
   };
 
-  const enabled = Boolean(id)
+  const enabled = Boolean(id);
 
   return useQuery({
     queryKey,
@@ -1551,10 +1559,9 @@ export const useGetOrderItemsByOrderID = (id) => {
     retry: false,
     staleTime: 0,
   });
-}
+};
 
-
-export const useUpdateOrderStaus = (orderId,status) => {
+export const useUpdateOrderStaus = (orderId, status) => {
   const mutationFn = (data) => {
     return put(`/restaurant/order/${orderId}?status=${status}`, data);
   };
@@ -1564,10 +1571,7 @@ export const useUpdateOrderStaus = (orderId,status) => {
 
 export const useDeleteUser = () => {
   const mutationFn = (data) => {
-    return delete_request(
-      `/user/remove`,
-      data
-    );
+    return delete_request(`/user/remove`, data);
   };
 
   return { mutationFn };
@@ -1577,9 +1581,9 @@ export const useDeleteUser = () => {
 export const useVerifyUser = (id) => {
   const queryKey = ["verifyuser", id];
 
-console.log({id, id2: id.replace('%20', '+')} )
+  console.log({ id, id2: id.replace("%20", "+") });
 
-  let url = `/user/verify?verificationCode=${encodeURIComponent(id)}`
+  let url = `/user/verify?verificationCode=${encodeURIComponent(id)}`;
   const queryFn = () => {
     return get(url);
   };
@@ -1588,7 +1592,7 @@ console.log({id, id2: id.replace('%20', '+')} )
     return response?.data;
   };
 
-  const enabled = Boolean(id)
+  const enabled = Boolean(id);
 
   return useQuery({
     queryKey,
@@ -1601,4 +1605,4 @@ console.log({id, id2: id.replace('%20', '+')} )
     retry: false,
     staleTime: 0,
   });
-}
+};

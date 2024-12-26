@@ -1,33 +1,60 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
-import {
-  useCourierListPaged,
-  useGetCouriers,
-} from "../../components/brokers/apicalls";
+import { useCourierListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import Table from "../../components/Table";
-import { convertDate } from "../../utils/config";
+import {
+  activeFilters,
+  convertDate,
+  handleFilterChange,
+  sortByColumn,
+} from "../../utils/config";
 import TableAlt from "../../components/TableAlt";
+import PaginatedTable from "../../components/PaginatedTable";
+import TableComponent from "../../components/reusableComponents/TableComponent";
+import TableRow from "../../components/reusableComponents/TableRow";
+import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
+import { HiUser } from "react-icons/hi";
+import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
+import FilterType from "../../components/reusableComponents/FilterType";
+import FilterComponent from "../../components/reusableComponents/FilterComponent";
+import ErrorOccured from "../../components/notices/ErrorOccured";
 
 const Couriers = (props) => {
   const [credentialOpen, setCredentialsOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const { pathname } = useLocation();
-    const [filter, setFilters] = useState({
-  firstName:null,
-  lastName:null,
-  email:null,
-  username:null,
-  averageRating:null,
-  status:null,
-  courierId:null,
-  sortBy:null,
-  orderBy:null,
-  })
+  // firstName,
+  // lastName,
+  // email,
+  // username,
+  // averageRating,
+  // status,
+  // courierId,
+  // sortBy,
+  // orderBy,
+  const [filters, setFilters] = useState([
+    { name: "NAME", value: null, enabled: false },
+    { name: "LASTNAME", value: null, enabled: false },
+    { name: "EMAIL", value: null, enabled: false },
+    { name: "USERNAME", value: null, enabled: false },
+    { name: "AVG RATING", value: null, enabled: false },
+    { name: "STATUS", value: null, enabled: false },
+    { name: "COURIER ID", value: null, enabled: false },
+    { name: "sortBy", value: null, enabled: false },
+    { name: "orderBy", value: null, enabled: false },
+  ]);
 
+  const tablehead = [
+    { title: "Name", sortable: true, sortKey: "FIRSTNAME" },
+    { title: "Phone", sortable: false },
+    { title: "Email", sortable: false },
+    { title: "Address", sortable: false },
+    { title: "Action", sortable: false },
+  ];
 
   const handleOpenInvoiceModal = useCallback(() => {
     setCredentialsOpen(true);
@@ -49,29 +76,31 @@ const Couriers = (props) => {
     data: courierList = [],
     isLoading: courierLoading,
     hasNextPage: courierHasNextPage,
-    fetchNextPage: courierFetchNextPage,
     isFetchingNextPage: courierFetchingNextPage,
     isError: isCourierError,
   } = useCourierListPaged(
-  filter.firstName, 
-  filter.lastName, 
-  filter.email,
-  filter.username,
-  filter.averageRating,
-  filter.status,
-  filter.courierId,
-  filter.sortBy,
-  filter.orderBy,
-  currentPage
-);
-
+    //firstname
+    filters[0].enabled ? filters[0].value : null,
+    //lastname
+    filters[1].enabled ? filters[1].value : null,
+    filters[2].enabled ? filters[2].value : null,
+    filters[3].enabled ? filters[3].value : null,
+    filters[4].enabled ? filters[4].value : null,
+    filters[5].enabled ? filters[5].value : null,
+    filters[6].enabled ? filters[6].value : null,
+    filters[7].enabled ? filters[7].value : null,
+    filters[8].enabled ? filters[7].value : null,
+    currentPage
+  );
 
   let courierData = courierList?.pages?.flatMap((page) => page?.data);
-  const numberOfPages = courierData?.[0].totalPages
+  const numberOfPages = courierData?.[0].totalPages;
 
+  const tabledata = courierData?.[0].results;
 
-
-  const fetchedData = props?.fetchedData || courierData;
+  if (isCourierError) {
+    return <ErrorOccured />;
+  }
   return (
     <>
       <AddCredentialModal
@@ -106,290 +135,118 @@ const Couriers = (props) => {
           </div>
         )}
       </div>
-      {pathname == "/dashboard/couriers" &&   <TableAlt
-      isLoading={courierLoading}
-        list={courierData}
-        title={"No Record Found"}
+      <>
+        <FilterComponent
+          filters={filters}
+          setFilters={setFilters}
+          activeFilters={activeFilters(filters)}
+          top={"top-[-120px]"}
+        >
+          <FilterType
+            filterType={"INPUTFIELD"}
+            handleFilterChange={(event) =>
+              handleFilterChange(event, "NAME", filters, setFilters)
+            }
+            placeholder={"Name"}
+          />
+          <FilterType
+            filterType={"INPUTFIELD"}
+            handleFilterChange={(event) =>
+              handleFilterChange(event, "EMAIL", filters, setFilters)
+            }
+            placeholder={"Email"}
+          />
+          <FilterType
+            filterType={"INPUTFIELD"}
+            handleFilterChange={(event) =>
+              handleFilterChange(event, "USERNAME", filters, setFilters)
+            }
+            placeholder={"Username"}
+          />
+        </FilterComponent>
+
+        <RenderActiveFilters filters={filters} setFilters={setFilters} />
+
+        <PaginatedTable
+          title={"No Orders Found"}
+          list={courierData}
+          totalCount={6}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          isLoading={courierLoading}
           numberOfPages={numberOfPages}
-            totalCount={4}
-            setCurrentPage={setCurrentPage}
-            currentPage={currentPage}
-            isFetchingNextPage={courierFetchingNextPage}
-            usersHasNextPage={courierHasNextPage}
-      >
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                {props.title || "Courier Details"}
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                {props?.type == "coupon" ? "Validity:" : "Address:"}
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-100">
-            {fetchedData?.[0].results?.map((item, idx) => {
+          isFetchingNextPage={courierFetchingNextPage}
+          dataHasNextPage={courierHasNextPage}
+        >
+          <TableComponent
+            tablehead={tablehead}
+            tabledata={tabledata}
+            filters={filters}
+            setFilters={setFilters}
+            sortByColumn={sortByColumn}
+          >
+            {tabledata?.map((item, idx) => {
               return (
-                <tr
-                  className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
-                  key={idx}
-                >
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">Name: </p>
-                        {props?.type == "coupon" ? (
-                          <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.couponName}
-                          </span>
-                        ) : (
-                          <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.firstName} {item?.lastName}
-                          </span>
-                        )}
+                <TableRow key={idx} index={idx}>
+                  <TableColumnContent>
+                    <div className="flex gap-2">
+                      <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
+                        <HiUser
+                          className="text-slate-400 cursor-pointer"
+                          size={"20px"}
+                        />
                       </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {props?.type == "coupon"
-                            ? "Coupon Number:"
-                            : "Contact:"}{" "}
+
+                      <div className="flex flex-col justify-center">
+                        <p className="mr-3 font-bold">
+                          {item?.firstName} {item?.lastName}
                         </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {props?.type == "coupon"
-                            ? item?.couponNumber
-                            : item?.contact}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {" "}
-                          {props?.type == "coupon" ? "Percentage" : "Email"}
-                        </p>
-                        <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {props?.type == "coupon"
-                            ? item?.percentage
-                            : item?.credential?.email}{" "}
+                        <p className="mr-3 text-xs font-light">
+                          @{item?.credential.username}
                         </p>
                       </div>
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  </TableColumnContent>
+                  <TableColumnContent>
                     <div className="flex flex-col">
                       <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {props?.type == "coupon" ? "Start Date:" : "Street:"}
-                        </p>
-                        <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {props?.type == "coupon"
-                            ? convertDate(item?.startDate)
-                            : item?.address?.street}{" "}
-                        </span>
+                        <p className="mr-3 ">{item?.contact}</p>
                       </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {" "}
-                          {props?.type == "coupon"
-                            ? "End Date:"
-                            : "House Number:"}
-                        </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {props?.type == "coupon"
-                            ? convertDate(item?.endDate)
-                            : item?.address?.houseNumber}
-                        </p>
-                      </div>
-                      {props?.type !== "coupon" && (
-                        <div className="flex items-center">
-                          <p className="mr-3 italic"> City: </p>
-                          <p className="mr-3 font-extrabold text-xs text-red-600">
-                            {item?.address?.city}
-                          </p>
-                        </div>
-                      )}{" "}
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {props?.type !== "coupon" ? (
-                      <Link
-                        to={
-                          props?.link
-                            ? `/dashboard/${props.link}/${item?.id}`
-                            : item?.id
-                        }
-                      >
-                        <Button
-                          variant="dark"
-                          className="px-2 py-1 text-xs rounded-md"
-                          onClick={() => {
-                            setID(item?.id);
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    ) : (
+                  </TableColumnContent>
+                  <TableColumnContent>
+                    <div className="flex flex-col">
+                      <div className="flex items-center">
+                        <p className="mr-3 ">{item?.credential.email}</p>
+                      </div>
+                    </div>
+                  </TableColumnContent>
+                  <TableColumnContent>
+                    <div className="flex flex-col">
+                      <div className="flex items-center">
+                        <p className="mr-3 ">
+                          {item?.address?.street} {item?.address?.houseNumber},{" "}
+                          {item?.address?.city}
+                        </p>
+                      </div>
+                    </div>
+                  </TableColumnContent>
+                  <TableColumnContent>
+                    <Link to={`${item?.id}`}>
                       <Button
                         variant="dark"
                         className="px-2 py-1 text-xs rounded-md"
-                        onClick={() => {
-                          handleOpenViewModal(item?.id);
-                          setID(item?.id);
-                        }}
                       >
                         View Details
                       </Button>
-                    )}
-                  </td>
-                </tr>
+                    </Link>
+                  </TableColumnContent>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
-      </TableAlt>}
-
-      {
-        pathname == "/dashboard/coupons" && <Table data={fetchedData}>
-            <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                {props.title || "Courier Details"}
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                {props?.type == "coupon" ? "Validity:" : "Address:"}
-              </th>
-              {/* <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Actions
-              </th> */}
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-100">
-            {fetchedData?.map((item, idx) => {
-              return (
-                <tr
-                  className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
-                  key={idx}
-                >
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">Name: </p>
-                        {props?.type == "coupon" ? (
-                          <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.couponName}
-                          </span>
-                        ) : (
-                          <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                            {item?.firstName} {item?.lastName}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {props?.type == "coupon"
-                            ? "Coupon Number:"
-                            : "Contact:"}{" "}
-                        </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {props?.type == "coupon"
-                            ? item?.couponNumber
-                            : item?.contact}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {" "}
-                          {props?.type == "coupon" ? "Percentage" : "Email"}
-                        </p>
-                        <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {props?.type == "coupon"
-                            ? item?.percentage
-                            : item?.credential?.email}{" "}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {props?.type == "coupon" ? "Start Date:" : "Street:"}
-                        </p>
-                        <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {props?.type == "coupon"
-                            ? convertDate(item?.startDate)
-                            : item?.address?.street}{" "}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">
-                          {" "}
-                          {props?.type == "coupon"
-                            ? "End Date:"
-                            : "House Number:"}
-                        </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {props?.type == "coupon"
-                            ? convertDate(item?.endDate)
-                            : item?.address?.houseNumber}
-                        </p>
-                      </div>
-                      {props?.type !== "coupon" && (
-                        <div className="flex items-center">
-                          <p className="mr-3 italic"> City: </p>
-                          <p className="mr-3 font-extrabold text-xs text-red-600">
-                            {item?.address?.city}
-                          </p>
-                        </div>
-                      )}{" "}
-                    </div>
-                  </td>
-                  {/* <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    {props?.type !== "coupon" ? (
-                      <Link
-                        to={
-                          props?.link
-                            ? `/dashboard/${props.link}/${item?.id}`
-                            : item?.id
-                        }
-                      >
-                        <Button
-                          variant="dark"
-                          className="px-2 py-1 text-xs rounded-md"
-                          onClick={() => {
-                            setID(item?.id);
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button
-                        variant="dark"
-                        className="px-2 py-1 text-xs rounded-md"
-                        onClick={() => {
-                          handleOpenViewModal(item?.id);
-                          setID(item?.id);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    )}
-                  </td> */}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        </Table> 
-      }
-    
+          </TableComponent>
+        </PaginatedTable>
+      </>
     </>
   );
 };

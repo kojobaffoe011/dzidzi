@@ -6,25 +6,20 @@ import {
 import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
-import TableAlt from "../../components/TableAlt";
-import { useOutletContext } from "react-router";
+import { useLocation, useOutletContext } from "react-router";
 import PaginatedTable from "../../components/PaginatedTable";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
-import { FaBowlFood } from "react-icons/fa6";
 import { useCategoryList } from "../../hooks/useCategoryList";
-import {
-  activeFilters,
-  handleFilterChange,
-  sortByColumn,
-} from "../../utils/config";
+import { handleFilterChange, sortByColumn } from "../../utils/config";
 import FilterComponent from "../../components/reusableComponents/FilterComponent";
 import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
-const Menus = () => {
+const Menus = ({ id, top }) => {
   const [, activeUser] = useOutletContext();
+  const { pathname } = useLocation();
   const [filters, setFilters] = useState([
     { name: "Minimum Price", value: null, enabled: false },
     { name: "Maximum Price", value: null, enabled: false },
@@ -36,12 +31,13 @@ const Menus = () => {
     { name: "Latitude", value: null, enabled: false },
     { name: "Longitude", value: null, enabled: false },
     {
-      name: "Restaurant ID",
+      name: "RESTAURANT ID",
       value:
-        activeUser?.currentUserRole == "RESTAURANT_ADMIN"
-          ? [activeUser?.currentUserId]
+        activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
+        pathname.includes("restaurant")
+          ? id || activeUser?.currentUserId
           : null,
-      enabled: false,
+      enabled: true,
     },
     { name: "sortBy", value: null, enabled: false },
     { name: "orderBy", value: null, enabled: false },
@@ -145,7 +141,9 @@ const Menus = () => {
       <FilterComponent
         filters={filters}
         setFilters={setFilters}
-        activeFilters={activeFilters(filters)}
+        // activeFilters={activeFilters(filters)}
+        type={"menus"}
+        top={top || "top-[-120px]"}
       >
         <FilterType
           filterType={"INPUTFIELD"}
@@ -170,7 +168,11 @@ const Menus = () => {
         />
       </FilterComponent>
 
-      <RenderActiveFilters filters={filters} setFilters={setFilters} />
+      <RenderActiveFilters
+        filters={filters}
+        setFilters={setFilters}
+        type={"menus"}
+      />
       <PaginatedTable
         title={"No Orders Found"}
         list={menuData}
@@ -190,14 +192,20 @@ const Menus = () => {
           sortByColumn={sortByColumn}
         >
           {tabledata?.map((item, idx) => {
+            const category = categories.find(
+              (category) => category.value == item.category
+            );
+
             return (
               <TableRow key={idx} index={idx}>
                 <TableColumnContent>
                   <div className="flex gap-2">
                     <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
-                      <FaBowlFood
-                        className="text-slate-400 cursor-pointer"
-                        size={"20px"}
+                      <img
+                        src={category.icon}
+                        alt="icon"
+                        width="20px"
+                        className=""
                       />
                     </div>
 
@@ -224,15 +232,11 @@ const Menus = () => {
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-                      <p className="mr-3 uppercase">
-                        {
-                          categories.find(
-                            (category) => category.value == item.category
-                          ).name
-                        }
-                      </p>
+                  <div className="flex">
+                    <div
+                      className={`font-bold rounded-full text-xs px-3 py-1 ${category.color} ${category.text}`}
+                    >
+                      <p className=" uppercase">{category.name}</p>
                     </div>
                   </div>
                 </TableColumnContent>

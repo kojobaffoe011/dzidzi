@@ -4,9 +4,9 @@ import { BiXCircle } from "react-icons/bi";
 import { activeFilters, clearSingleFilter } from "../../utils/config";
 import PropTypes from "prop-types";
 
-const RenderActiveFilters = ({ filters, setFilters }) => {
+const RenderActiveFilters = ({ filters, setFilters, type }) => {
   const renderActiveFilters = () => {
-    if (activeFilters(filters).length > 0) {
+    if (activeFilters(filters, type).length > 0) {
       return (
         <div className="flex">
           {activeFilters(filters).map((item, idx) => {
@@ -15,7 +15,9 @@ const RenderActiveFilters = ({ filters, setFilters }) => {
                 <div className="flex px-3 py-1">
                   <div className="flex">
                     <p className="mr-2 text-xs text-gray-500">
-                      {idx == 0 && "Filtering by"} {item.name}: {item.value}
+                      {idx == 0 && "Filtering by"}{" "}
+                      <span className="lowercase">{item.name}: </span>
+                      {item.value}
                     </p>
                   </div>
                   <div>
@@ -43,4 +45,5 @@ RenderActiveFilters.propTypes = {
   activeFilters: PropTypes.func,
   filters: PropTypes.array,
   setFilters: PropTypes.func,
+  type: PropTypes.string,
 };

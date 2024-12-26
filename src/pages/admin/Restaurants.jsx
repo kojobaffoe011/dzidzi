@@ -1,29 +1,51 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useRestaurantList, useRestaurantListPaged } from "../../components/brokers/apicalls";
+import { useCallback, useState } from "react";
+import { useRestaurantListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
 import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
-import Table from "../../components/Table";
-import TableAlt from "../../components/TableAlt";
+import PaginatedTable from "../../components/PaginatedTable";
+import TableComponent from "../../components/reusableComponents/TableComponent";
+import {
+  activeFilters,
+  handleFilterChange,
+  sortByColumn,
+} from "../../utils/config";
+import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
+import ErrorOccured from "../../components/notices/ErrorOccured";
+import FilterComponent from "../../components/reusableComponents/FilterComponent";
+import FilterType from "../../components/reusableComponents/FilterType";
+import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
+import { HiUser } from "react-icons/hi";
+import TableRow from "../../components/reusableComponents/TableRow";
+import { Link } from "react-router-dom";
+import { LuDot } from "react-icons/lu";
 
 const Restaurants = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({
-  name:null,
-  email:null,
-  username:null,
-  rating:null,
-  visible:null,
-  parentRestaurantId:null,
-  distance:null,
-  latitude:null,
-  longitude:null,
-  restaurantId:null,
-  sortBy:null,
-  orderBy:null,
+  const [currentPage, setCurrentPage] = useState(1);
 
-  });
+  const [filters, setFilters] = useState([
+    { name: "name", value: null, enabled: false },
+    { name: "email", value: null, enabled: false },
+    { name: "username", value: null, enabled: false },
+    { name: "rating", value: null, enabled: false },
+    { name: "visible", value: null, enabled: false },
+    { name: "parentRestaurantId", value: null, enabled: false },
+    { name: "distance", value: null, enabled: false },
+    { name: "latitude", value: null, enabled: false },
+    { name: "longitude", value: null, enabled: false },
+    { name: "restaurantId", value: null, enabled: false },
+    { name: "sortBy", value: null, enabled: false },
+    { name: "orderBy", value: null, enabled: false },
+  ]);
+
+  const tablehead = [
+    { title: "Name", sortable: true, sortKey: "NAME" },
+    { title: "Rating", sortable: true, sortKey: "RATING" },
+    { title: "Phone", sortable: false },
+    { title: "Email", sortable: false },
+    { title: "Address", sortable: false },
+    { title: "Action", sortable: false },
+  ];
 
   const [credentialOpen, setCredentialsOpen] = useState(false);
 
@@ -43,34 +65,65 @@ const Restaurants = () => {
     setViewOpen(false);
   }, []);
 
-
-
   const {
     data: restaurantList = [],
     isLoading: restaurantLoading,
     hasNextPage: restaurantHasNextPage,
-    fetchNextPage: restaurantFetchNextPage,
     isFetchingNextPage: restaurantFetchingNextPage,
     isError: isRestaurantError,
   } = useRestaurantListPaged(
-  filters.name,
-  filters.email,
-  filters.username,
-  filters.rating,
-  filters.visible,
-  filters.parentRestaurantId,
-  filters.distance,
-  filters.latitude,
-  filters.longitude,
-  filters.restaurantId,
-  filters.sortBy,
-  filters.orderBy,
-  currentPage);
+    //name
+    filters[0].enabled ? filters[0].value : null,
+    //email
+    filters[1].enabled ? filters[1].value : null,
+    filters[2].enabled ? filters[2].value : null,
+    filters[3].enabled ? filters[3].value : null,
+    filters[4].enabled ? filters[4].value : null,
+    filters[5].enabled ? filters[5].value : null,
+    filters[6].enabled ? filters[6].value : null,
+    filters[7].enabled ? filters[7].value : null,
+    filters[8].enabled ? filters[8].value : null,
+    filters[9].enabled ? filters[9].value : null,
+    filters[10].enabled ? filters[10].value : null,
+    filters[11].enabled ? filters[11].value : null,
+    currentPage
+  );
 
-    let restaurantData = restaurantList?.pages?.flatMap((page) => page?.data);
-  const numberOfPages = restaurantData?.[0]?.totalPages
+  let restaurantData = restaurantList?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = restaurantData?.[0]?.totalPages;
+  const tabledata = restaurantData?.[0].results;
 
- 
+  if (isRestaurantError) {
+    return <ErrorOccured />;
+  }
+
+  const renderRating = (rating) => {
+    if (rating === null || rating === 0) {
+      return (
+        <div className="flex">
+          <div className="rounded-full text-xs font-bold bg-gray-200 text-gray-500 px-3 py-1">
+            <p>N/A</p>
+          </div>
+        </div>
+      );
+    }
+    return rating;
+  };
+
+  const renderVisiblity = (visibility) => {
+    if (visibility) {
+      return (
+        <>
+          <p className=" text-xs font-light text-green-600">open</p>
+        </>
+      );
+    }
+    return (
+      <>
+        <p className=" text-xs font-light text-red-600">closed</p>
+      </>
+    );
+  };
 
   return (
     <>
@@ -104,118 +157,121 @@ const Restaurants = () => {
           </Button>
         </div>
       </div>
-      <TableAlt
-         isLoading={restaurantLoading}
-        list={restaurantData}
-        title={"No Record Found"}
-          numberOfPages={numberOfPages}
-            totalCount={4}
-            setCurrentPage={setCurrentPage}
-            currentPage={currentPage}
-            isFetchingNextPage={restaurantFetchingNextPage}
-            usersHasNextPage={restaurantHasNextPage}
-      >
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Restaurant Details
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Address
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Rating
-              </th>
-              <th className="p-3 text-sm font-semibold tracking-wide text-left">
-                Actions
-              </th>
-            </tr>
-          </thead>
 
-          <tbody className="divide-y divide-gray-100">
-            {restaurantData?.[0]?.results?.map((item, idx) => {
-              return (
-                <tr
-                  className={`${idx % 2 == 0 ? "bg-white" : "bg-gray-50"} `}
-                  key={idx}
-                >
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
+      <FilterComponent
+        filters={filters}
+        setFilters={setFilters}
+        activeFilters={activeFilters(filters)}
+      >
+        <FilterType
+          filterType={"INPUTFIELD"}
+          handleFilterChange={(event) =>
+            handleFilterChange(event, "name", filters, setFilters)
+          }
+          placeholder={"Name"}
+        />
+        <FilterType
+          filterType={"INPUTFIELD"}
+          handleFilterChange={(event) =>
+            handleFilterChange(event, "email", filters, setFilters)
+          }
+          placeholder={"Email"}
+        />
+        <FilterType
+          filterType={"INPUTFIELD"}
+          handleFilterChange={(event) =>
+            handleFilterChange(event, "username", filters, setFilters)
+          }
+          placeholder={"Username"}
+        />
+      </FilterComponent>
+
+      <RenderActiveFilters filters={filters} setFilters={setFilters} />
+
+      <PaginatedTable
+        title={"No Orders Found"}
+        list={restaurantData}
+        totalCount={6}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        isLoading={restaurantLoading}
+        numberOfPages={numberOfPages}
+        isFetchingNextPage={restaurantFetchingNextPage}
+        dataHasNextPage={restaurantHasNextPage}
+      >
+        <TableComponent
+          tablehead={tablehead}
+          tabledata={tabledata}
+          filters={filters}
+          setFilters={setFilters}
+          sortByColumn={sortByColumn}
+        >
+          {tabledata?.map((item, idx) => {
+            return (
+              <TableRow key={idx} index={idx}>
+                <TableColumnContent>
+                  <div className="flex gap-2">
+                    <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
+                      <HiUser
+                        className="text-slate-400 cursor-pointer"
+                        size={"20px"}
+                      />
+                    </div>
+
+                    <div className="flex flex-col justify-center">
+                      <p className=" font-bold">{item.name}</p>
                       <div className="flex items-center">
-                        <p className="mr-3 italic">Name: </p>
-                        <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic"> Contact: </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {item?.contact}
+                        <p className=" text-xs font-light">
+                          @{item.credential.username}
                         </p>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic"> Email: </p>
-                        <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.credential?.email}
-                        </p>
+                        <LuDot />
+                        {renderVisiblity(item.visible)}
                       </div>
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <p className="mr-3 italic">Street: </p>
-                        <span className="p-1 text-xs uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 font-extrabold">
-                          {item?.address?.street}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic"> House Number: </p>
-                        <p className="mr-3 font-extrabold text-xs">
-                          {item?.address?.houseNumber}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 italic"> City: </p>
-                        <p className="mr-3 font-extrabold text-xs text-red-600">
-                          {item?.address?.city}
-                        </p>
-                      </div>
+                  </div>
+                </TableColumnContent>
+                <TableColumnContent>
+                  {renderRating(item.averageRating)}
+                </TableColumnContent>
+                <TableColumnContent>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <p className=" ">{item?.contact}</p>
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <p className="mr-3 font-extrabold">
-                          {item?.averageRating}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-3 font-extrabold">{item?.amount}</p>
-                      </div>
+                  </div>
+                </TableColumnContent>
+                <TableColumnContent>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <p className=" ">{item?.credential.email}</p>
                     </div>
-                  </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                    <Link to={`${item?.id}`}>
-                      <Button
-                        variant="dark"
-                        className="px-2 py-1 text-xs rounded-md"
-                        // onClick={() => {
-                        //   handleOpenViewModal();
-                        //   setRestaurantID(item?.id);
-                        // }}
-                      >
-                        View Details
-                      </Button>
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </TableAlt>
+                  </div>
+                </TableColumnContent>
+                <TableColumnContent>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <p className=" ">
+                        {item?.address?.street} {item?.address?.houseNumber},{" "}
+                        {item?.address?.city}
+                      </p>
+                    </div>
+                  </div>
+                </TableColumnContent>
+                <TableColumnContent>
+                  <Link to={`${item?.id}`}>
+                    <Button
+                      variant="dark"
+                      className="px-2 py-1 text-xs rounded-md"
+                    >
+                      View Details
+                    </Button>
+                  </Link>
+                </TableColumnContent>
+              </TableRow>
+            );
+          })}
+        </TableComponent>
+      </PaginatedTable>
     </>
   );
 };

@@ -216,8 +216,27 @@ export const clearSingleFilter = (name, filters, setFilters) => {
   setFilters(value);
 };
 
-export const activeFilters = (filters) => {
+export const activeFilters = (filters, type) => {
+  if (type === null || type === undefined) {
+    return filters.filter(
+      (item) =>
+        item.enabled &&
+        item.name !== "sortBy" &&
+        item.name !== "orderBy" &&
+        item.name !== "RESTAURANT ID"
+    );
+  }
+
   return filters.filter(
-    (item) => item.enabled && item.name !== "sortBy" && item.name !== "orderBy"
+    (item) =>
+      item.enabled &&
+      item.name !== "sortBy" &&
+      item.name !== "orderBy" &&
+      item.name !== "RESTAURANT ID"
   );
+};
+
+export const position = {
+  top: "top-[-465px]",
+  right: "right-[-380px]",
 };
