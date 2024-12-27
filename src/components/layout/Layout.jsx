@@ -15,27 +15,8 @@ import { ModalProvider } from "../../context/modalProvider";
  */
 
 const Layout = (props) => {
-  const { auth, setAuth } = useAuth();
+  // const { auth, setAuth } = useAuth();
   const { open, setOpen } = useModal();
-
-  useEffect(() => {
-    if (
-      auth?.modal == true &&
-      typeof window != "undefined" &&
-      window.document
-    ) {
-      document.body.style.overflow = "hidden";
-    } else if (
-      auth?.open == true &&
-      auth?.orders?.length > 0 &&
-      typeof window != "undefined" &&
-      window.document
-    ) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "scroll";
-    }
-  }, [auth?.open, auth?.modal, auth?.orders?.length]);
 
   const renderContent = () => {
     // if (auth?.open && auth?.orders?.length > 0) {
@@ -59,7 +40,7 @@ const Layout = (props) => {
       return (
         <div
           className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
-          onClick={() => setOpen(!open)}
+          // onClick={() => setOpen(false)}
         />
       );
     }

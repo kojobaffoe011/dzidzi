@@ -993,6 +993,34 @@ export const useGetCouponsByRestaurantID = (id) => {
   });
 };
 
+export const useRestaurantBranches = (id) => {
+  const queryKey = ["branches", id];
+
+  const url = `/restaurant/${id}/branches`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
 export const useGetExtras = () => {
   const queryKey = ["coupons"];
 
@@ -1147,6 +1175,16 @@ export const useSignup = () => {
 export const useAddOrderItem = () => {
   const mutationFn = (data) => {
     const response = post(`/item`, data);
+    return response?.data;
+  };
+
+  return { mutationFn };
+};
+
+//Add restaurant branch
+export const useAddRestaurantBranch = () => {
+  const mutationFn = (data) => {
+    const response = post(`/restaurant/add-branch`, data);
     return response?.data;
   };
 
@@ -1580,8 +1618,6 @@ export const useDeleteUser = () => {
 //USE VERIFY USER
 export const useVerifyUser = (id) => {
   const queryKey = ["verifyuser", id];
-
-  console.log({ id, id2: id.replace("%20", "+") });
 
   let url = `/user/verify?verificationCode=${encodeURIComponent(id)}`;
   const queryFn = () => {

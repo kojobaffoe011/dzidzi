@@ -66,7 +66,13 @@ const Dashboard = () => {
         <MdOutlineHome className={className} size="25px" />
       ),
       text: "Home",
-      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
+      userType: [
+        "ADMIN",
+        "RESTAURANT_ADMIN",
+        "COURIER",
+        "SERVICE",
+        "RESTAURANT_BRANCH",
+      ],
     },
     {
       link: "users",
@@ -85,12 +91,20 @@ const Dashboard = () => {
       userType: ["ADMIN", "SERVICE"],
     },
     {
+      link: "branches",
+      icon: (className = "") => (
+        <GrRestaurant className={className} size="25px" />
+      ),
+      text: "Branches",
+      userType: ["RESTAURANT_ADMIN"],
+    },
+    {
       link: "coupons",
       icon: (className = "") => (
         <RiCoupon2Line className={className} size="25px" />
       ),
       text: "Coupons",
-      userType: ["ADMIN", "RESTAURANT_ADMIN"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "RESTAURANT_BRANCH"],
     },
     {
       link: "orders",
@@ -98,7 +112,7 @@ const Dashboard = () => {
         <IoFastFoodOutline className={className} size="25px" />
       ),
       text: "Orders",
-      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "RESTAURANT_BRANCH"],
     },
     // {
     //   link: "services",
@@ -130,7 +144,7 @@ const Dashboard = () => {
         <IoRestaurantOutline className={className} size="25px" />
       ),
       text: "Menus",
-      userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE", "RESTAURANT_BRANCH"],
     },
     // {
     //   link: "profile-details",

@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import {
+  useGetActiveUser,
   useGetSingleMenu,
   useMenuListPaged,
 } from "../../components/brokers/apicalls";
@@ -17,8 +18,15 @@ import FilterComponent from "../../components/reusableComponents/FilterComponent
 import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
-const Menus = ({ id, top }) => {
-  const [, activeUser] = useOutletContext();
+import Spinner from "../../components/loaders/Spinner";
+
+const Menus = ({ id, top, show }) => {
+  const {
+    data: activeUser,
+    isLoading: activeUserLoading,
+    // isError: isActiveUserError,
+    // error: activeUserError,
+  } = useGetActiveUser();
   const { pathname } = useLocation();
   const [filters, setFilters] = useState([
     { name: "Minimum Price", value: null, enabled: false },
@@ -34,6 +42,7 @@ const Menus = ({ id, top }) => {
       name: "RESTAURANT ID",
       value:
         activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
+        activeUser?.currentUserRole == "RESTAURANT_BRANCH" ||
         pathname.includes("restaurant")
           ? id || activeUser?.currentUserId
           : null,
@@ -54,8 +63,9 @@ const Menus = ({ id, top }) => {
   }, []);
 
   const [restaurantID, setRestaurantID] = useState(
-    activeUser?.currentUserRole == "RESTAURANT_ADMIN"
-      ? activeUser?.currentUserId
+    activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
+      activeUser?.currentUserRole == "RESTAURANT_BRANCH"
+      ? [activeUser?.currentUserId]
       : null
   );
   const [viewOpen, setViewOpen] = useState(false);
@@ -111,6 +121,10 @@ const Menus = ({ id, top }) => {
     // error,
   } = useGetSingleMenu(menuID);
 
+  if (activeUserLoading) {
+    return <Spinner />;
+  }
+
   if (isMenuAltError) {
     return <ErrorOccured />;
   }
@@ -134,9 +148,11 @@ const Menus = ({ id, top }) => {
         restaurantLoading={restaurantLoading}
       />
 
-      <div className="mt-2 flex-col gap-2">
-        <p className="font-bold text-2xl">Menus</p>
-      </div>
+      {show && (
+        <div className="mt-2 flex-col gap-2">
+          <p className="font-bold text-2xl">Menus</p>
+        </div>
+      )}
 
       <FilterComponent
         filters={filters}

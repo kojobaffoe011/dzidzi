@@ -193,6 +193,7 @@ import OrderModal from "../../../components/modal/restaurant/OrderModal";
 
 const MyOrders = ({ userID, position }) => {
   const [orderID, setOrderID] = useState(null);
+  const [open, setOpen] = useState(null);
   const { auth, setAuth } = useAuth();
   const [, data] = useOutletContext();
 
@@ -228,8 +229,8 @@ const MyOrders = ({ userID, position }) => {
   // orderData = fetchedData || orderData;
 
   const tablehead = [
-    { title: "Name" },
-    { title: "Price" },
+    { title: "ORDER DETAILS", sortable: true, sortKey: "ORDER_NUMBER" },
+    { title: "ORDER PRICE" },
     { title: "Status" },
     { title: "Address" },
     { title: "Action" },
@@ -239,16 +240,17 @@ const MyOrders = ({ userID, position }) => {
 
   return (
     <div className="relative">
-      {auth?.modal > 0 && (
-        <OrderModal
-          auth={auth}
-          setAuth={setAuth}
-          orderID={orderID}
-          top={position?.top}
-          right={position?.right}
-        />
-      )}
-
+      {/* {auth?.modal > 0 && ( */}
+      <OrderModal
+        auth={auth}
+        setAuth={setAuth}
+        orderID={orderID}
+        top={position?.top}
+        right={position?.right}
+        setOpen={setOpen}
+        open={open}
+      />
+      {/* )} */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col ">
           <p className="font-bold">My Orders</p>
@@ -280,7 +282,7 @@ const MyOrders = ({ userID, position }) => {
                     </TableColumnContent>
                     <TableColumnContent>
                       <div className="flex flex-col">
-                        <p className="text-sm">¢{item.totalAmountToPay}</p>
+                        <p className="text-sm">€ {item.totalAmountToPay}</p>
                       </div>
                     </TableColumnContent>
                     <TableColumnContent>
@@ -303,7 +305,8 @@ const MyOrders = ({ userID, position }) => {
                         onClick={() => {
                           // handleOpenOrderModal();
                           setOrderID(item?.id);
-                          setAuth({ ...auth, modal: true });
+                          setOpen(true);
+                          // setAuth({ ...auth, modal: true });
                         }}
                       >
                         View Details

@@ -1,8 +1,7 @@
 import { RiCloseLine } from "react-icons/ri";
-import useAuth from "../../hooks/useAuth";
 import useModal from "../../hooks/useModal";
 import PropTypes from "prop-types";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 const SideModal = ({
   children,
@@ -15,19 +14,17 @@ const SideModal = ({
   zindex,
   open,
   setOpen,
+  showSupport,
 }) => {
-  const { auth, setAuth } = useAuth();
-  const {
-    open: modalOpen,
-    setOpen: setModalOpen,
-    openModal,
-    closeModal,
-  } = useModal();
-  const modalRef = useRef(null);
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
-    setModalOpen(open);
-  }, [setModalOpen, open]);
+    if (open == true) {
+      return openModal();
+    } else if (open == false) {
+      return closeModal();
+    }
+  }, [open]);
 
   useEffect(() => {
     const handlePageReload = () => {
@@ -39,29 +36,15 @@ const SideModal = ({
     };
   }, [closeModal]);
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (!modalRef.current.contains(event.target)) {
-  //       // Close the modal
-  //       closeModal();
-  //     }
-  //   };
-  //   document.addEventListener("click", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("click", handleClickOutside);
-  //   };
-  // }, [modalRef, closeModal]);
-
   return (
     <>
-      {open && modalOpen && (
+      {open && (
         <div
           className={`p-4 flex flex-col h-[1015px] shadow-md absolute ${
             right ? right : "right-4"
           } ${top ? top : "top-[-0px]"} ${bottom ? bottom : " bottom-5"} ${
             left ? left : " "
-          } w-[450px] ${zindex || "z-[300]"} bg-white shadow-lg  rounded-lg`}
-          // ref={modalRef}
+          } w-[450px] ${zindex || "z-[10]"} bg-white shadow-lg  rounded-lg`}
         >
           <div className="mt-4 flex justify-between items-center border-b">
             <div className="flex flex-col">
@@ -80,17 +63,17 @@ const SideModal = ({
             </div>
             <button
               onClick={() => {
-                setOpen(false);
                 closeModal();
+                setOpen(false);
               }}
-              className="border border-red-400"
+              className=""
             >
-              <RiCloseLine size={"20px"} className="cursor-pointer" />
+              <RiCloseLine size={"35px"} className="cursor-pointer" />
             </button>
           </div>
           {children}
 
-          {open && modalOpen && (
+          {showSupport && (
             <div className="absolute bottom-8 right-0 left-0 ">
               <div className="flex w-full justify-between p-2 items-center">
                 <p className="font-light text-sm">Confused about something?</p>
@@ -119,4 +102,5 @@ SideModal.propTypes = {
   zindex: PropTypes.string,
   open: PropTypes.bool,
   setOpen: PropTypes.func,
+  showSupport: PropTypes.bool,
 };

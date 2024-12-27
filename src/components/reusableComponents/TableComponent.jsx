@@ -32,7 +32,6 @@ const TableComponent = ({
                       onClick={() => {
                         if (!item.sortable) return;
                         sortByColumn(item.sortKey, filters, setFilters);
-                        console.log(item);
                         setSortKey(item.sortKey);
                         setUp(!up);
                       }}

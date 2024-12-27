@@ -13,34 +13,28 @@ import { axiosInstance } from "../../../components/brokers/apicalls";
 import CustomInput from "../../../components/reusableComponents/CustomInput";
 import Button from "../../../components/reusableComponents/Button";
 
-
 const LoginDetails = () => {
-  const {navigateTo} = useNavigateTo()
+  const { navigateTo } = useNavigateTo();
   const [isFocused, setIsFocused] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [dataLoading, setDataLoading]  = useState(false)
-  const userDetails = localStorage.getItem('signup')
-  const parsedUserDetails = JSON.parse(userDetails)
+  const [dataLoading, setDataLoading] = useState(false);
+  const userDetails = localStorage.getItem("signup");
+  const parsedUserDetails = JSON.parse(userDetails);
 
   const handleFocus = () => {
     setIsFocused(true);
   };
 
-
   const handleBlur = () => {
     setIsFocused(false);
   };
 
-
-
-    const userSchema = yup.object().shape({
+  const userSchema = yup.object().shape({
     email: yup
       .string()
       .email("Enter a valid email")
       .required("Email is required"),
-    username: yup
-      .string()
-      .required("Username is required"),
+    username: yup.string().required("Username is required"),
     password: yup
       .string()
       .required("Password is required")
@@ -56,15 +50,14 @@ const LoginDetails = () => {
     // agreeBox: yup.boolean().oneOf([true], "Please tick checkbox"),
   });
 
-    const {
+  const {
     register,
     handleSubmit,
     watch,
-    formState: {errors}
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(userSchema),
   });
-
 
   const password = watch("password");
 
@@ -87,189 +80,187 @@ const LoginDetails = () => {
     },
   ];
 
-   const { mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["checkEmail", userData?.email],
     mutationFn: async (data) => {
-      const response = await axiosInstance.post(`/user/exist?email=${encodeURIComponent(userData?.email)}`, data);
+      const response = await axiosInstance.post(
+        `/user/exist?email=${encodeURIComponent(userData?.email)}`,
+        data
+      );
       return response?.data;
     },
     onSuccess: async (data) => {
-      setDataLoading(false)
-     if(data == false){
-       await mutateAsync({
-              firstName: parsedUserDetails.firstname,
-              lastName: parsedUserDetails.lastname,
-              contact: parsedUserDetails.contact,
-              address: {
-               street: parsedUserDetails.address.street,
-               houseNumber: parsedUserDetails.address.houseNumber,
-               apartmentNr:'',
-               zip: parsedUserDetails.address.zip,
-               city: parsedUserDetails.address.city,
-               floor: 0
-             },
-              email: userData.email,
-              password: userData.password,
-              username: userData.username,
-              provider: "LOCAL"
-    });
-    return
-     }else throw Error ('User already exists')
-
+      setDataLoading(false);
+      if (data == false) {
+        await mutateAsync({
+          firstName: parsedUserDetails.firstname,
+          lastName: parsedUserDetails.lastname,
+          contact: parsedUserDetails.contact,
+          address: {
+            street: parsedUserDetails.address.street,
+            houseNumber: parsedUserDetails.address.houseNumber,
+            apartmentNr: "",
+            zip: parsedUserDetails.address.zip,
+            city: parsedUserDetails.address.city,
+            floor: 0,
+          },
+          email: userData.email,
+          password: userData.password,
+          username: userData.username,
+          provider: "LOCAL",
+        });
+        return;
+      } else throw Error("User already exists");
     },
     onError: (error) => {
-      setDataLoading(false)
-      if(error.message.includes('timeout')){
-        return timeOutError(error)
-      } 
-     return showErrorToast(error.message)
+      setDataLoading(false);
+      if (error.message.includes("timeout")) {
+        return timeOutError(error);
+      }
+      return showErrorToast(error.message);
     },
   });
 
-    const {mutateAsync, isPending: creatingUserPending} = useMutation({
-    mutationKey: ['createUser'],
-    mutationFn:   async (data) => {
-      const response = await axiosInstance.post('user/sign-up', data);
+  const { mutateAsync, isPending: creatingUserPending } = useMutation({
+    mutationKey: ["createUser"],
+    mutationFn: async (data) => {
+      const response = await axiosInstance.post("user/sign-up", data);
       return response.data;
     },
     onSuccess: () => {
-        // Handle success, navigate to success page
-        setDataLoading(false)
-        localStorage.removeItem('signup')
-        navigateTo('/auth/register/success')
-      },
+      // Handle success, navigate to success page
+      setDataLoading(false);
+      localStorage.removeItem("signup");
+      navigateTo("/auth/register/success");
+    },
     onError: (error) => {
-        setDataLoading(false)
-        if(error.message.includes('timeout')){
-          return timeOutError(error)
-        }
-        if(error?.response?.data.error == "usernameExists"){
-          return showErrorToast('Username already taken')
-        }
-        showErrorToast(error.message)
-        
-      },
+      setDataLoading(false);
+      if (error.message.includes("timeout")) {
+        return timeOutError(error);
+      }
+      if (error?.response?.data.error == "usernameExists") {
+        return showErrorToast("Username already taken");
+      }
+      showErrorToast(error.message);
+    },
+  });
 
-  })
+  const formSubmitHandler = async (data) => {
+    if (Object.keys(errors).length === 0) setDataLoading(true);
+    await setUserData(data);
+    setTimeout(mutate({}), 1000);
+  };
 
-  const formSubmitHandler = async (data)=> {
-
-    if(Object.keys(errors).length === 0)
-      setDataLoading(true)
-      await setUserData(data)
-      setTimeout( 
-        mutate({}),
-        1000)
-     
+  if (
+    !userDetails ||
+    !parsedUserDetails?.basicCompleted ||
+    !parsedUserDetails?.addressCompleted
+  ) {
+    return <Unauthorized link="/auth/register/address" />;
   }
 
-
-     if(!userDetails || !parsedUserDetails?.basicCompleted || !parsedUserDetails?.addressCompleted){
-         return  <Unauthorized link="/auth/register/address"/>
-        }
-
-
   return (
-    <div className='flex flex-col'>
-        <div className='flex flex-col items-center gap-2'>
-            <p className='font-bold text-4xl '>Almost Done!</p>
-            <p className='font-light text-sm'>Enter the following details to finish your sign up</p>
+    <div className="flex flex-col">
+      <div className="flex flex-col items-center gap-2">
+        <p className="font-bold text-4xl ">Almost Done!</p>
+        <p className="font-light text-sm">
+          Enter the following details to finish your sign up
+        </p>
 
-            <form action="" className='flex flex-col w-full gap-6' onSubmit={handleSubmit(formSubmitHandler)}>
-              <div className="flex flex-col gap-6 col-span-2 mt-4">
-              <div className="grid grid-cols-3 gap-1">
-                <div className="w-full col-span-2 ">
-                  <CustomInput 
-                  register={register} 
-                  name={"email"} 
-                  label={'EMAIL'} 
-                  type={'text'} 
-                 required={true} 
-                  placeholder={'Enter email here'}
-                  />
-                </div>
-                  <CustomInput 
-                  register={register} 
-                  name={"username"} 
-                  label={'USERNAME'} 
-                  type={'text'} 
+        <form
+          action=""
+          className="flex flex-col w-full gap-6"
+          onSubmit={handleSubmit(formSubmitHandler)}
+        >
+          <div className="flex flex-col gap-6 col-span-2 mt-4">
+            <div className="grid grid-cols-3 gap-1">
+              <div className="w-full col-span-2 ">
+                <CustomInput
+                  register={register}
+                  name={"email"}
+                  label={"EMAIL"}
+                  type={"text"}
                   required={true}
-                  placeholder={'Enter username'}
-                  />
+                  placeholder={"Enter email here"}
+                />
               </div>
+              <CustomInput
+                register={register}
+                name={"username"}
+                label={"USERNAME"}
+                type={"text"}
+                required={true}
+                placeholder={"Enter username"}
+              />
+            </div>
 
-              <div className="w-full grid grid-cols-2 gap-1">
-                <div className="flex flex-col gap-1 relative">
-                  <CustomInput 
-                  register={register} 
-                  name={"password"} 
-                  label={'PASSWORD'} 
-                  type={'password'} 
-                  required={true} 
-                  placeholder={'Enter password'} 
-                  onFocus={handleFocus} 
+            <div className="w-full grid grid-cols-2 gap-1">
+              <div className="flex flex-col gap-1 relative">
+                <CustomInput
+                  register={register}
+                  name={"password"}
+                  label={"PASSWORD"}
+                  type={"password"}
+                  required={true}
+                  placeholder={"Enter password"}
+                  onFocus={handleFocus}
                   onBlur={handleBlur}
-                  />
+                />
                 {isFocused && (
-                <div className="flex flex-col mt-1">
-                  {passReq.map((item, idx) => {
-                    return (
-                      <div className="flex" key={idx}>
-                        {item?.isSatisfied ? (
-                          <IoCheckmarkCircle className="text-green-600" />
-                        ) : (
-                          <IoCloseCircle className="text-red-600" />
-                        )}
-                        <p
-                          className={`text-xs ${
-                            item?.isSatisfied
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {item.text}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-                </div>
-                  <CustomInput
-                  register={register} 
-                  name={"repeatpassword"} 
-                  label={'REPEAT PASSWORD'} 
-                  type={'password'} 
-                  required={true} 
-                  placeholder={'Retype Password'}
-                  />
+                  <div className="flex flex-col mt-1">
+                    {passReq.map((item, idx) => {
+                      return (
+                        <div className="flex" key={idx}>
+                          {item?.isSatisfied ? (
+                            <IoCheckmarkCircle className="text-green-600" />
+                          ) : (
+                            <IoCloseCircle className="text-red-600" />
+                          )}
+                          <p
+                            className={`text-xs ${
+                              item?.isSatisfied
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {item.text}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
+              <CustomInput
+                register={register}
+                name={"repeatpassword"}
+                label={"REPEAT PASSWORD"}
+                type={"password"}
+                required={true}
+                placeholder={"Retype Password"}
+              />
             </div>
+          </div>
 
-
-               <div className=" mb-8 w-full flex">
-              {" "}
-                <Button
-                  className="mt-5 px-16 py-4 w-full"
-                  variant="primary"
-                  rounded
-                  disabled={isPending || creatingUserPending || dataLoading}
-                >
-                  {(isPending || creatingUserPending || dataLoading ) ? (
-                    <Spinner color="white" size="20px" />
-                  ) : (
-                     <p className='font-bold text-white'>Finish</p>
-                  )}
-                 
-                </Button>
-            </div>
-            </form>
-        </div>
-    
-
+          <div className=" mb-8 w-full flex">
+            {" "}
+            <Button
+              className="mt-5 px-16 py-4 w-full"
+              variant="primary"
+              rounded
+              disabled={isPending || creatingUserPending || dataLoading}
+            >
+              {isPending || creatingUserPending || dataLoading ? (
+                <Spinner color="white" size="20px" />
+              ) : (
+                <p className="font-bold text-white">Finish</p>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-
-export default LoginDetails
+export default LoginDetails;

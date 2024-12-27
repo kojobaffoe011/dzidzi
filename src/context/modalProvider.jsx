@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 /**
- * The `Layout` component serves as a basic layout structure for a web page.
+ * The `Modal Context Provi` component serves as a basic layout structure for a web page.
  * It wraps its child components in a flex container with a minimum height to fill
  * the screen vertically and horizontally center the content.
  *
@@ -18,13 +18,15 @@ export const ModalProvider = ({ children }) => {
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
   const toggleModal = () => setOpen((prev) => !prev);
-  console.log(open, "modal context");
 
-  // useEffect(() => {
-  //   setOpen(open);
-  // }, [open]);
+  useEffect(() => {
+    if (open && typeof window != "undefined" && window.document) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "scroll";
+    }
+  }, [open]);
 
-  console.log(open, "modalhere");
   return (
     <ModalContext.Provider
       value={{ open, setOpen, openModal, closeModal, toggleModal }}
@@ -33,7 +35,7 @@ export const ModalProvider = ({ children }) => {
         {open && (
           <div
             className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
-            onClick={() => closeModal()}
+            // onClick={() => closeModal()}
           />
         )}
         {children}

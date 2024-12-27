@@ -1,11 +1,10 @@
-import  { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import Button from "../../../components/reusableComponents/Button";
 import { useParams } from "react-router";
 import {
   useExtrasList,
   useGetSingleMenu,
 } from "../../../components/brokers/apicalls";
-import Loader from "../../../components/loaders/Loader";
 import Spinner from "../../../components/loaders/Spinner";
 import useAuth from "../../../hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
@@ -13,10 +12,20 @@ import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import axios from "axios";
 import Imageloader from "../../../components/loaders/Imageloader";
 import OrderContext from "../../../context/orderProvider";
-import  PropTypes  from "prop-types";
+import PropTypes from "prop-types";
 import DzidziLoader from "../../../components/loaders/DzidziLoader";
+import UserSelectedOrders from "../../../components/modal/restaurant/UserSelectedOrders";
 
-const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderItems, menuData }) => {
+const NumberOfExtras = ({
+  id,
+  setAuth,
+  auth,
+  resID,
+  setReplaceOrder,
+  setOrderItems,
+  menuData,
+  setOpen,
+}) => {
   const [extraCount, setExtraCount] = useState(1);
 
   const { mutate, isPending } = useMutation({
@@ -28,13 +37,14 @@ const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderIte
     onSuccess: (data) => {
       setAuth((prevAuth) => ({
         ...prevAuth,
-        open: true,
+        // open: true,
         restaurant: { id: resID, name: menuData?.restaurant?.name },
         orders: Array.isArray(prevAuth?.orders)
           ? [...prevAuth.orders, data] // Append to the existing array if it's valid
           : [data], // Initialize with the new data if orders is not an array
       }));
       showSuccessToast("Extra Added Successfully");
+      setOpen(true);
     },
     onError: (error) => {
       showErrorToast(error.message);
@@ -50,15 +60,15 @@ const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderIte
         });
       } else throw Error("DIFFERNTRESTAURANT_ADMINS");
     } catch (error) {
-      if(error.message == "DIFFERNTRESTAURANT_ADMINS"){
-         setAuth({ ...auth, restaurantClash: true });
+      if (error.message == "DIFFERNTRESTAURANT_ADMINS") {
+        setAuth({ ...auth, restaurantClash: true });
         setReplaceOrder(true);
         setOrderItems({
           orderType: "extra",
           extra: id,
           quantity: extraCount,
-          restaurant: menuData?.restaurant?.name
-        })
+          restaurant: menuData?.restaurant?.name,
+        });
 
         return;
       }
@@ -109,10 +119,11 @@ const NumberOfExtras = ({ id, setAuth, auth, resID, setReplaceOrder, setOrderIte
 };
 
 const ReviewOrder = () => {
-    const { setReplaceOrder, setOrderItems } = useContext(OrderContext); // Access setReplaceOrder from the context
+  const { setReplaceOrder, setOrderItems } = useContext(OrderContext); // Access setReplaceOrder from the context
 
   const [selectedNumber, setSelectedNumber] = useState(1);
   const { auth, setAuth } = useAuth();
+  const [open, setOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     name: null,
@@ -160,13 +171,14 @@ const ReviewOrder = () => {
     onSuccess: (data) => {
       setAuth((prevAuth) => ({
         ...prevAuth,
-        open: true,
+        // open: true,
         restaurant: { id: resID, name: menuData?.restaurant?.name },
         orders: Array.isArray(prevAuth?.orders)
           ? [...prevAuth.orders, data] // Append to the existing array if it's valid
           : [data], // Initialize with the new data if orders is not an array
       }));
       showSuccessToast("Order Item Added Successfully");
+      setOpen(true);
     },
     onError: (data) => {
       showErrorToast(data?.response?.error);
@@ -180,17 +192,17 @@ const ReviewOrder = () => {
           menu: id,
           quantity: selectedNumber,
         });
-     } else throw Error("DIFFERNTRESTAURANT_ADMINS");
+      } else throw Error("DIFFERNTRESTAURANT_ADMINS");
     } catch (error) {
-      if(error.message == "DIFFERNTRESTAURANT_ADMINS"){
+      if (error.message == "DIFFERNTRESTAURANT_ADMINS") {
         setAuth({ ...auth, restaurantClash: true });
         setReplaceOrder(true);
         setOrderItems({
           orderType: "menu",
           menu: id,
           quantity: selectedNumber,
-          restaurant: menuData?.restaurant?.name
-        })
+          restaurant: menuData?.restaurant?.name,
+        });
 
         return;
       }
@@ -204,13 +216,17 @@ const ReviewOrder = () => {
 
   return (
     <div className="">
+      <UserSelectedOrders setOpen={setOpen} open={open} top={"top-[15px]"} />
       <div className=" mx-auto w-full flex-col flex h-full relative">
         <div>
           <p>Back to {menuData?.restaurant?.name}</p>
         </div>
         <div className="grid grid-cols-2 p-2 gap-2">
           <div className="flex items-center justify-center h-full">
-          <Imageloader imageID={menuData?.image?.id} classNames={'object-center w-[400px] h-[400px]'}/>
+            <Imageloader
+              imageID={menuData?.image?.id}
+              classNames={"object-center w-[400px] h-[400px]"}
+            />
           </div>
           <div className="flex-col flex">
             <div className="flex flex-col gap-1">
@@ -268,7 +284,10 @@ const ReviewOrder = () => {
                 <div className="flex flex-col" key={idx}>
                   <div className="flex rounded overflow-hidden cursor-pointer mb-2 items-center justify-between gap-3 p-1 border border-gray-500">
                     <div className="overflow-hidden basis-1/3 h-full">
-                     <Imageloader imageID={item?.image?.id}  classNames={'object-center w-[100px] h-[100px]'}/>
+                      <Imageloader
+                        imageID={item?.image?.id}
+                        classNames={"object-center w-[100px] h-[100px]"}
+                      />
                     </div>
                     <div className="p-1 flex justify-between items-center basis-2/3 w-full h-full group">
                       <div className="flex flex-col w-full gap-1">
@@ -301,6 +320,7 @@ const ReviewOrder = () => {
                             setReplaceOrder={setReplaceOrder}
                             setOrderItems={setOrderItems}
                             menuData={menuData}
+                            setOpen={setOpen}
                           />
                         </div>
                       </div>
@@ -333,13 +353,14 @@ const ReviewOrder = () => {
 };
 
 NumberOfExtras.propTypes = {
-  id: PropTypes.string, 
-  setAuth: PropTypes.func, 
-  auth: PropTypes.object, 
+  id: PropTypes.string,
+  setAuth: PropTypes.func,
+  auth: PropTypes.object,
   resID: PropTypes.string,
-  setReplaceOrder: PropTypes.func, 
-  setOrderItems: PropTypes.func, 
-  menuData: PropTypes.object
-} 
+  setReplaceOrder: PropTypes.func,
+  setOrderItems: PropTypes.func,
+  menuData: PropTypes.object,
+  setOpen: PropTypes.func,
+};
 
 export default ReviewOrder;

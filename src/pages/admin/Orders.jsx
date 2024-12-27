@@ -19,9 +19,11 @@ import { HiUser } from "react-icons/hi";
 import { LuDot } from "react-icons/lu";
 import OrderModal from "../../components/modal/restaurant/OrderModal";
 import useAuth from "../../hooks/useAuth";
+import useModal from "../../hooks/useModal";
 
 const Orders = () => {
   const [open, setOpen] = useState(false);
+  const { open: modalOpen, openModal } = useModal();
   const { auth, setAuth } = useAuth();
   const [, activeUser] = useOutletContext();
   const [orderID, setOrderID] = useState(null);
@@ -29,7 +31,8 @@ const Orders = () => {
     {
       name: "RESTAURANT ID",
       value:
-        activeUser?.currentUserRole == "RESTAURANT_ADMIN"
+        activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
+        activeUser?.currentUserRole == "RESTAURANT_BRANCH"
           ? [activeUser?.currentUserId]
           : null,
       enabled: true,
@@ -41,7 +44,6 @@ const Orders = () => {
     { name: "sortBy", value: "DATE", enabled: true },
     { name: "orderBy", value: "DESC", enabled: true },
   ]);
-  const [zindex, setZindex] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const {
@@ -78,9 +80,9 @@ const Orders = () => {
     { title: "Action", sortable: false },
   ];
 
-  const handleOpenModal = useCallback(() => {
-    setOpen(true);
-  }, []);
+  // const handleOpenModal = useCallback(() => {
+
+  // }, []);
 
   const handleCloseModal = useCallback(() => {
     setOpen(false);
@@ -93,27 +95,21 @@ const Orders = () => {
 
   return (
     <div>
-      {auth?.modal > 0 && (
-        <OrderModal
-          // auth={auth}
-          // setAuth={setAuth}
-          orderID={orderID}
-          top={"top-[17px]"}
-          right={"right-[17px]"}
-          zindex={"z-[300]"}
-          setOpen={setOpen}
-          open={open}
-          // top={position?.top}
-          // right={position?.right}
-        />
-      )}
+      {/* {auth?.modal > 0 && ( */}
+      <OrderModal
+        orderID={orderID}
+        top={"top-[17px]"}
+        right={"right-[17px]"}
+        setOpen={setOpen}
+        open={open}
+      />
+      {/* )} */}
 
       <FilterComponent
         filters={filters}
         setFilters={setFilters}
         type={"menus"}
         top={"top-[-80px]"}
-        zindex={zindex}
       >
         <FilterType
           filterType={"INPUTFIELD"}
@@ -267,8 +263,8 @@ const Orders = () => {
                     variant="dark"
                     className="px-2 py-1 text-xs rounded-md"
                     onClick={() => {
-                      handleOpenModal();
-                      console.log({ open });
+                      setOpen(true);
+                      openModal();
                       setOrderID(item?.id);
                     }}
                   >

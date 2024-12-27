@@ -20,6 +20,34 @@ import TableRow from "../../components/reusableComponents/TableRow";
 import { Link } from "react-router-dom";
 import { LuDot } from "react-icons/lu";
 
+export const renderRating = (rating) => {
+  if (rating === null || rating === 0) {
+    return (
+      <div className="flex">
+        <div className="rounded-full text-xs font-bold bg-gray-200 text-gray-500 px-3 py-1">
+          <p>N/A</p>
+        </div>
+      </div>
+    );
+  }
+  return rating;
+};
+
+export const renderVisiblity = (visibility) => {
+  if (visibility) {
+    return (
+      <>
+        <p className=" text-xs font-light text-green-600">open</p>
+      </>
+    );
+  }
+  return (
+    <>
+      <p className=" text-xs font-light text-red-600">closed</p>
+    </>
+  );
+};
+
 const Restaurants = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -97,34 +125,6 @@ const Restaurants = () => {
     return <ErrorOccured />;
   }
 
-  const renderRating = (rating) => {
-    if (rating === null || rating === 0) {
-      return (
-        <div className="flex">
-          <div className="rounded-full text-xs font-bold bg-gray-200 text-gray-500 px-3 py-1">
-            <p>N/A</p>
-          </div>
-        </div>
-      );
-    }
-    return rating;
-  };
-
-  const renderVisiblity = (visibility) => {
-    if (visibility) {
-      return (
-        <>
-          <p className=" text-xs font-light text-green-600">open</p>
-        </>
-      );
-    }
-    return (
-      <>
-        <p className=" text-xs font-light text-red-600">closed</p>
-      </>
-    );
-  };
-
   return (
     <>
       <AddCredentialModal
@@ -132,14 +132,6 @@ const Restaurants = () => {
         handleCancel={handleCloseInvoiceModal}
         userRole={"RESTAURANT_ADMIN"}
         width="400px"
-      />
-
-      <ViewRestaurant
-        isOpen={viewOpen}
-        handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="950px"
-        restaurantID={restaurantID}
       />
 
       <div className="mt-2 flex-col gap-2">
