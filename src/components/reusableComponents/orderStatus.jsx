@@ -35,6 +35,26 @@ const OrderStatus = ({ orderStatus }) => {
       text = "READY FOR DELIVERY";
     }
 
+    if (orderStatus == "COMPLETED") {
+      className = "bg-green-100 text-green-500";
+      text = "COMPLETED";
+    }
+
+    if (orderStatus == "OPEN") {
+      className = "bg-blue-100 text-blue-500";
+      text = "OPEN";
+    }
+
+    if (orderStatus == "IN_PROGRESS") {
+      className = "bg-zinc-100 text-zinc-500";
+      text = "IN PROGRESS";
+    }
+
+    if (orderStatus == "CLOSED") {
+      className = "bg-red-100 text-red-500";
+      text = "CLOSED";
+    }
+
     return (
       <div className="flex">
         <div

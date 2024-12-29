@@ -1,26 +1,35 @@
 import { useCallback, useState } from "react";
-import { useGetCoupons } from "../../components/brokers/apicalls";
+import {
+  useDeleteCoupon,
+  useGetActiveUser,
+  useGetCoupons,
+} from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import AddCoupon from "../../components/modal/restaurant/AddCoupon";
-import { useOutletContext } from "react-router";
-import {
-  activeFilters,
-  convertDate,
-  handleFilterChange,
-  sortByColumn,
-} from "../../utils/config";
+import { convertDate, sortByColumn } from "../../utils/config";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
 import { HiUser } from "react-icons/hi";
-import { Link } from "react-router-dom";
-import FilterComponent from "../../components/reusableComponents/FilterComponent";
-import FilterType from "../../components/reusableComponents/FilterType";
-import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
+import { useLocation } from "react-router-dom";
+import Spinner from "../../components/loaders/Spinner";
+import ErrorOccured from "../../components/notices/ErrorOccured";
+import PropTypes from "prop-types";
+import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 
-const Coupons = () => {
-  const [credentialOpen, setCredentialsOpen] = useState(false);
-  const [, activeUser] = useOutletContext();
+const Coupons = ({ id }) => {
+  const { pathname } = useLocation();
+  const [openAddCoupon, setOpenAddCoupon] = useState(false);
+  const [openDeleteCoupon, setOpenDeleteCoupon] = useState(false);
+  const [couponId, setCouponID] = useState(null);
+
+  const { mutationFn } = useDeleteCoupon(couponId && couponId);
+  const {
+    data: activeUser,
+    isLoading: activeUserLoading,
+    // isError: isActiveUserError,
+    // error: activeUserError,
+  } = useGetActiveUser();
   const [filters, setFilters] = useState([
     { name: "NAME", value: null, enabled: false },
     { name: "LASTNAME", value: null, enabled: false },
@@ -41,19 +50,33 @@ const Coupons = () => {
     { title: "Action", sortable: false },
   ];
 
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
+  const handleOpenAddCouponModal = useCallback(() => {
+    setOpenAddCoupon(true);
   }, []);
-  const handleCloseInvoiceModal = useCallback(() => {
-    setCredentialsOpen(false);
+  const handleCloseAddCouponModal = useCallback(() => {
+    setOpenAddCoupon(false);
   }, []);
+
+  const handleOpenDeleteCouponModal = useCallback(() => {
+    setOpenDeleteCoupon(true);
+  }, []);
+  const handleCloseDeleteCouponModal = useCallback(() => {
+    setOpenDeleteCoupon(false);
+  }, []);
+
+  let user_id = null;
+
+  if (activeUser.currentUserRole == "RESTAURANT_ADMIN") {
+    user_id = activeUser.currentUserId;
+  }
 
   const {
     data: coupons,
     isLoading: couponsLoading,
-    isError: couponsError,
-    error: isCouponsError,
-  } = useGetCoupons(activeUser);
+    isError: isCouponsError,
+    refetch,
+    // error: couponsError,
+  } = useGetCoupons(id || user_id);
 
   const percentage = (percentage) => {
     if (percentage < 30) {
@@ -65,25 +88,43 @@ const Coupons = () => {
     }
   };
 
+  if (couponsLoading || activeUserLoading) {
+    return <Spinner />;
+  }
+
+  if (isCouponsError) {
+    return <ErrorOccured />;
+  }
   return (
     <>
       <AddCoupon
-        isOpen={credentialOpen}
-        handleCancel={handleCloseInvoiceModal}
+        isOpen={openAddCoupon}
+        handleCancel={handleCloseAddCouponModal}
+        refetch={refetch}
         userRole={"RESTAURANT_ADMIN"}
         width="400px"
       />
+      <DeleteModal
+        isOpen={openDeleteCoupon}
+        action={"coupon"}
+        handleCancel={handleCloseDeleteCouponModal}
+        mutationFn={mutationFn}
+        refetch={refetch}
+        width="400px"
+      />
       <div className="flex flex-col mt-4">
-        <div className="justify-end flex">
-          <Button
-            variant="primary"
-            rounded
-            className=" text-xs px-4 py-2"
-            onClick={() => handleOpenInvoiceModal()}
-          >
-            Add Coupon
-          </Button>
-        </div>
+        {pathname == "/dashboard/coupons" && (
+          <div className="justify-end flex">
+            <Button
+              variant="primary"
+              rounded
+              className=" text-xs px-4 py-2"
+              onClick={() => handleOpenAddCouponModal()}
+            >
+              Add Coupon
+            </Button>
+          </div>
+        )}
 
         {/* <FilterComponent
           filters={filters}
@@ -166,14 +207,18 @@ const Coupons = () => {
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
-                  <Link to={`${item.id}`}>
-                    <Button
-                      variant="dark"
-                      className="px-2 py-1 text-xs rounded-md"
-                    >
-                      View Details
-                    </Button>
-                  </Link>
+                  {/* <Link to={`${item.id}`}> */}
+                  <Button
+                    variant="danger"
+                    className="px-2 py-1 text-xs rounded-md"
+                    onClick={async () => {
+                      await setCouponID(item?.id);
+                      handleOpenDeleteCouponModal();
+                    }}
+                  >
+                    Delete Coupon
+                  </Button>
+                  {/* </Link> */}
                 </TableColumnContent>
               </TableRow>
             );
@@ -185,3 +230,8 @@ const Coupons = () => {
 };
 
 export default Coupons;
+
+Coupons.propTypes = {
+  id: PropTypes.string,
+  show: PropTypes.bool,
+};

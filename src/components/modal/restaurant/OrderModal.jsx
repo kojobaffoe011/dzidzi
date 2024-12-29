@@ -54,20 +54,28 @@ const colorStyles = {
   singleValue: (styles, { data }) => ({ ...styles, ...dot(data.color) }),
 };
 
-const ChangeOrderStatus = ({ orderStatus, orderID, setOpen, activeUser }) => {
+const ChangeOrderStatus = ({
+  orderStatus,
+  orderID,
+  setOpen,
+  activeUser,
+  refetch,
+}) => {
   const [selectedOption, setSelectedOption] = useState(null || orderStatus);
-
-  const { mutationFn } = useUpdateOrderStaus(orderID, selectedOption);
 
   const userRole = activeUser?.currentUserRole;
 
+  const { mutationFn } = useUpdateOrderStaus(orderID, selectedOption, userRole);
+
   const { mutate, isPending } = useMutation({
-    mutationKey: ["updateOrder", orderID, selectedOption],
+    mutationKey: ["updateOrder", orderID, selectedOption, userRole],
     mutationFn,
     onSuccess: () => {
       showSuccessToast("Order updated successfully");
-      // props.handleCancel();
       setOpen(false);
+      if (refetch && typeof refetch == "function") {
+        return refetch();
+      }
     },
     onError: (error) => {
       showErrorToast(error.message);
@@ -109,7 +117,7 @@ const ChangeOrderStatus = ({ orderStatus, orderID, setOpen, activeUser }) => {
   );
 };
 
-const OrderModal = ({ orderID, top, right, open, setOpen }) => {
+const OrderModal = ({ orderID, top, right, open, setOpen, refetch }) => {
   const [, activeUser] = useOutletContext();
 
   const { data, isLoading } = useGetSingleOrder(orderID);
@@ -292,6 +300,7 @@ const OrderModal = ({ orderID, top, right, open, setOpen }) => {
                 orderID={orderID}
                 setOpen={setOpen}
                 activeUser={activeUser}
+                refetch={refetch}
               />
             </div>
           )}
@@ -308,6 +317,7 @@ OrderModal.propTypes = {
   right: PropTypes.string,
   open: PropTypes.bool,
   setOpen: PropTypes.func,
+  refetch: PropTypes.func,
 };
 
 ChangeOrderStatus.propTypes = {
@@ -315,4 +325,5 @@ ChangeOrderStatus.propTypes = {
   orderID: PropTypes.string,
   setOpen: PropTypes.func,
   activeUser: PropTypes.object,
+  refetch: PropTypes.func,
 };

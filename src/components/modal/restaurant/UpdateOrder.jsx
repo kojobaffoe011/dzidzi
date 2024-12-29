@@ -1,11 +1,11 @@
-import  {  useState } from "react";
+import { useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
 import useAuth from "../../../hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 // import Button from "../../Button";
-import {useGetOrderItemByID, useGetSingleMenu } from "../../brokers/apicalls";
+import { useGetOrderItemByID, useGetSingleMenu } from "../../brokers/apicalls";
 import axios from "axios";
 import Imageloader from "../../loaders/Imageloader";
 import PropTypes from "prop-types";
@@ -17,7 +17,6 @@ const UpdateOrderModal = (props) => {
   const { order } = props;
   const { setAuth } = useAuth();
 
- 
   const {
     data: orderItem,
     isLoading: orderItemLoading,
@@ -28,7 +27,7 @@ const UpdateOrderModal = (props) => {
   const {
     data: menuData,
     isLoading: menuDataLoading,
-    isError:isMenuDataError,
+    isError: isMenuDataError,
     error: menuDataError,
   } = useGetSingleMenu(order?.menu?.id || order?.extra?.id);
 
@@ -76,7 +75,7 @@ const UpdateOrderModal = (props) => {
         ...prevAuth,
         restaurantClash: prevAuth?.orders?.length <= 1 ? false : 0,
         restaurant: prevAuth?.orders?.length <= 1 ? null : prevAuth?.restaurant,
-        orders: prevAuth?.orders?.filter((item) => item.id !== order.id)
+        orders: prevAuth?.orders?.filter((item) => item.id !== order.id),
       }));
 
       showSuccessToast("Order Item Deleted Successfully");
@@ -125,95 +124,93 @@ const UpdateOrderModal = (props) => {
     }
   };
 
-
   return (
-      <Modal {...props}>
-        <>
-          {orderItemLoading ? (
-            <div className="p-5">
-              <Spinner color="black" size="90px" />
+    <Modal {...props}>
+      <>
+        {orderItemLoading ? (
+          <div className="p-5">
+            <Spinner color="black" size="90px" />
+          </div>
+        ) : (
+          <div className="p-2 grid grid-cols-2 mt-8 gap-2">
+            <div
+              className="
+              "
+            >
+              <Imageloader
+                imageID={menuData?.image?.id}
+                classNames="h-[300px] w-full object-contain"
+              />
             </div>
-          ) : (
-            <div className="p-2 grid grid-cols-2 mt-8 gap-2">
-              <div className="
-              ">
-                <Imageloader imageID={menuData?.image?.id} classNames="h-[300px] w-full object-contain"/>
-              </div>
-              <div className="flex-col">
-                <div className="flex-col flex">
-                  <div className="flex flex-col gap-1">
-                    <h1 className="font-extrabold text-3xl">
-                      {orderItem?.menu
-                        ? orderItem?.menu?.name
-                        : orderItem?.extra?.name}
-                    </h1>
-                    <p className="font-bold text-gray-500 text-xl">
-                      €
-                      {orderItem?.menu
-                        ? orderItem?.menu?.price
-                        : orderItem?.extra?.price}
-                    </p>
+            <div className="flex-col">
+              <div className="flex-col flex">
+                <div className="flex flex-col gap-1">
+                  <h1 className="font-extrabold text-3xl">
+                    {orderItem?.menu
+                      ? orderItem?.menu?.name
+                      : orderItem?.extra?.name}
+                  </h1>
+                  <p className="font-bold text-gray-500 text-xl">
+                    €
+                    {orderItem?.menu
+                      ? orderItem?.menu?.price
+                      : orderItem?.extra?.price}
+                  </p>
+                </div>
+                <div className="flex flex-col mt-8">
+                  <div>
+                    <select
+                      name="quantity"
+                      id="plan"
+                      onChange={(e) => setSelectedNumber(e.currentTarget.value)}
+                    >
+                      {Array(99)
+                        .fill("")
+                        .map((item, idx) => {
+                          return (
+                            <option defaultValue={1} key={idx} value={idx + 1}>
+                              {idx + 1}
+                            </option>
+                          );
+                        })}
+                    </select>
                   </div>
-                  <div className="flex flex-col mt-8">
-                    <div>
-                      <select
-                        name="quantity"
-                        id="plan"
-                        onChange={(e) =>
-                          setSelectedNumber(e.currentTarget.value)
-                        }
-                      >
-                        {Array(99)
-                          .fill("")
-                          .map((item, idx) => {
-                            return (
-                              <option
-                                defaultValue={1}
-                                key={idx}
-                                value={idx + 1}
-                              >
-                                {idx + 1}
-                              </option>
-                            );
-                          })}
-                      </select>
-                    </div>
+                  <Button
+                    className="bg-black py-3 mt-3 hover:bg-gray-600"
+                    rounded
+                    onClick={handleUpdateOrder}
+                    disabled={deleteLoading || isPending}
+                  >
+                    {isPending ? (
+                      <Spinner color="WHITE" size="20px" />
+                    ) : (
+                      <p className="text-white font-bold">
+                        Update Order • €
+                        {(
+                          selectedNumber *
+                          (orderItem?.menu
+                            ? orderItem?.menu?.price
+                            : orderItem?.extra?.price)
+                        ).toFixed(2)}
+                      </p>
+                    )}
+                  </Button>
+                  <div className="flex justify-center mt-2">
                     <Button
-                      className="bg-black py-3 mt-3 hover:bg-gray-600"
-                      rounded
-                      onClick={handleUpdateOrder}
+                      className="font-bold text-md text-red-700 w-full disabled:bg-white disabled:text-red-700"
+                      onClick={handleDeleteOrder}
                       disabled={deleteLoading || isPending}
                     >
-                      {isPending ? (
-                        <Spinner color="WHITE" size="20px" />
-                      ) : (
-                        <p className="text-white font-bold">
-                          Update Order • €
-                          {(
-                            selectedNumber *
-                            (orderItem?.menu
-                              ? orderItem?.menu?.price
-                              : orderItem?.extra?.price)
-                          ).toFixed(2)}
-                        </p>
-                      )}
+                      Remove from cart
                     </Button>
-                    <div className="flex justify-center mt-2">
-                      <Button
-                        className="font-bold text-md text-red-700 w-full disabled:bg-white disabled:text-red-700"
-                        onClick={handleDeleteOrder}
-                        disabled={deleteLoading || isPending}
-                      >
-                        Remove from cart
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-        </>
-      </Modal>
+          </div>
+        )}
+      </>
+    </Modal>
   );
 };
 
@@ -222,5 +219,5 @@ export default UpdateOrderModal;
 UpdateOrderModal.propTypes = {
   order: PropTypes.object,
   handleCancel: PropTypes.func,
-  isOpen: PropTypes.bool
-}
+  isOpen: PropTypes.bool,
+};

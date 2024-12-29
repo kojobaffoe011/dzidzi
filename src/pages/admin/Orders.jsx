@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useOrderListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import {
@@ -18,13 +18,11 @@ import TableColumnContent from "../../components/reusableComponents/TableColumnC
 import { HiUser } from "react-icons/hi";
 import { LuDot } from "react-icons/lu";
 import OrderModal from "../../components/modal/restaurant/OrderModal";
-import useAuth from "../../hooks/useAuth";
 import useModal from "../../hooks/useModal";
 
 const Orders = () => {
   const [open, setOpen] = useState(false);
-  const { open: modalOpen, openModal } = useModal();
-  const { auth, setAuth } = useAuth();
+  const { openModal } = useModal();
   const [, activeUser] = useOutletContext();
   const [orderID, setOrderID] = useState(null);
   const [filters, setFilters] = useState([
@@ -80,14 +78,6 @@ const Orders = () => {
     { title: "Action", sortable: false },
   ];
 
-  // const handleOpenModal = useCallback(() => {
-
-  // }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setOpen(false);
-  }, []);
-
   let orderData = data?.pages?.flatMap((page) => page?.data);
   const numberOfPages = orderData?.[0].totalPages;
 
@@ -95,7 +85,6 @@ const Orders = () => {
 
   return (
     <div>
-      {/* {auth?.modal > 0 && ( */}
       <OrderModal
         orderID={orderID}
         top={"top-[17px]"}
@@ -103,7 +92,6 @@ const Orders = () => {
         setOpen={setOpen}
         open={open}
       />
-      {/* )} */}
 
       <FilterComponent
         filters={filters}

@@ -20,7 +20,7 @@ import { RiTimerLine } from "react-icons/ri";
 import { useMutation } from "@tanstack/react-query";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import { useState } from "react";
-import { useLocation, useOutletContext } from "react-router";
+import { useOutletContext } from "react-router";
 import NoRecord from "../../notices/NoRecord";
 import Button from "../../reusableComponents/Button";
 
@@ -51,7 +51,7 @@ const dot = (color = "transparent") => ({
 const colorStyles = {
   singleValue: (styles, { data }) => ({ ...styles, ...dot(data.color) }),
 };
-const ChangeOrderStatus = ({ orderStatus, orderID, props }) => {
+const ChangeOrderStatus = ({ orderStatus, orderID }) => {
   const [selectedOption, setSelectedOption] = useState(null || orderStatus);
 
   const { mutationFn } = useUpdateOrderStaus(orderID, selectedOption);
@@ -61,7 +61,7 @@ const ChangeOrderStatus = ({ orderStatus, orderID, props }) => {
     mutationFn,
     onSuccess: () => {
       showSuccessToast("Order updated successfully");
-      props.handleCancel();
+      // props.handleCancel();
     },
     onError: (error) => {
       showErrorToast(error.message);
@@ -177,7 +177,6 @@ const OrderDetails = (props) => {
   const [, activeUser] = useOutletContext();
 
   const { orderID } = props;
-  const { pathname } = useLocation();
 
   const { data, isLoading } = useGetSingleOrder(orderID);
   const {

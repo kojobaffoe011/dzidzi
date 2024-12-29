@@ -3,6 +3,7 @@ import { AiFillStar, AiOutlineHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { FaMedal } from "react-icons/fa";
 import Button from "./Button";
+import { renderRating } from "../../pages/admin/Restaurants";
 // import Button from "../Button";
 
 function RestaurantImage({ props }) {
@@ -60,12 +61,12 @@ function RestaurantIntro({ props }) {
           <div className="flex items-center">
             {" "}
             <AiFillStar className="mr-1" />
-            <p>
-              {props.rating === 0 ? 0 : props.rating || 4.9} •{" "}
-              <span className="text-sm text-gray-400">{props.address}</span>
-            </p>
+            <div className="flex items-center gap-1">
+              {renderRating(props.rating)} <p> •</p>
+              <p className="text-sm text-gray-400">{props.address}</p>
+            </div>
           </div>
-          <div>
+          <div className="mt-1">
             {" "}
             <p className="text-xs text-slate-500">Open till 9:00 PM</p>{" "}
           </div>

@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import {
+  useExtraListPaged,
   useGetActiveUser,
+  useGetSingleExtra,
   useGetSingleMenu,
   useMenuListPaged,
 } from "../../components/brokers/apicalls";
@@ -19,8 +21,10 @@ import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import Spinner from "../../components/loaders/Spinner";
+import { HiUser } from "react-icons/hi";
+import { GiKetchup } from "react-icons/gi";
 
-const Menus = ({ id, top, show }) => {
+const Extras = ({ id, top, show }) => {
   const {
     data: activeUser,
     isLoading: activeUserLoading,
@@ -83,7 +87,7 @@ const Menus = ({ id, top, show }) => {
     hasNextPage: menuHasNextPage,
     isFetchingNextPage: menuFetchingNextPage,
     isError: isMenuAltError,
-  } = useMenuListPaged(
+  } = useExtraListPaged(
     //min price
     filters[0].enabled ? filters[0].value : null,
     //max price
@@ -108,7 +112,7 @@ const Menus = ({ id, top, show }) => {
     { title: "Name", sortable: true, sortKey: "NAME" },
     { title: "Price", sortable: true, sortKey: "PRICE" },
     { title: "Restaurant Name", sortable: false },
-    { title: "Category", sortable: true, sortKey: "CATEGORY" },
+    // { title: "Category", sortable: true, sortKey: "CATEGORY" },
     { title: "Action", sortable: false },
   ];
 
@@ -119,7 +123,7 @@ const Menus = ({ id, top, show }) => {
     data: restaurantData,
     // isError,
     // error,
-  } = useGetSingleMenu(menuID);
+  } = useGetSingleExtra(menuID);
 
   if (activeUserLoading) {
     return <Spinner />;
@@ -148,8 +152,8 @@ const Menus = ({ id, top, show }) => {
         restaurantLoading={restaurantLoading}
       />
 
-      {pathname == "/dashboard/menus" && (
-        <div className="mt-2 flex flex-col gap-2">
+      {show && (
+        <div className="mt-2 flex-col gap-2">
           <p className="font-bold text-2xl">Menus</p>
         </div>
       )}
@@ -208,27 +212,21 @@ const Menus = ({ id, top, show }) => {
           sortByColumn={sortByColumn}
         >
           {tabledata?.map((item, idx) => {
-            const category = categories.find(
-              (category) => category.value == item.category
-            );
-
             return (
               <TableRow key={idx} index={idx}>
                 <TableColumnContent>
                   <div className="flex gap-2">
                     <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
-                      <img
-                        src={category?.icon}
-                        alt="icon"
-                        width="20px"
-                        className=""
+                      <GiKetchup
+                        className="text-slate-400 cursor-pointer"
+                        size={"20px"}
                       />
                     </div>
 
                     <div className="flex flex-col justify-center">
                       <p className="mr-3 font-bold">{item.name}</p>
                       <p className="mr-3 text-xs font-light uppercase text-xs text-gray-500">
-                        Menu
+                        EXTRA
                       </p>
                     </div>
                   </div>
@@ -247,7 +245,7 @@ const Menus = ({ id, top, show }) => {
                     </div>
                   </div>
                 </TableColumnContent>
-                <TableColumnContent>
+                {/* <TableColumnContent>
                   <div className="flex">
                     <div
                       className={`font-bold rounded-full text-xs px-3 py-1 ${category?.color} ${category?.text}`}
@@ -255,7 +253,7 @@ const Menus = ({ id, top, show }) => {
                       <p className=" uppercase">{category?.name}</p>
                     </div>
                   </div>
-                </TableColumnContent>
+                </TableColumnContent> */}
                 <TableColumnContent>
                   <Button
                     variant="dark"
@@ -277,4 +275,4 @@ const Menus = ({ id, top, show }) => {
   );
 };
 
-export default Menus;
+export default Extras;

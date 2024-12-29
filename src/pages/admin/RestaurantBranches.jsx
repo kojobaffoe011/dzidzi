@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import {
+  useDeleteBranches,
   useGetActiveUser,
   useRestaurantBranches,
 } from "../../components/brokers/apicalls";
@@ -9,7 +10,7 @@ import ErrorOccured from "../../components/notices/ErrorOccured";
 
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
 import TableRow from "../../components/reusableComponents/TableRow";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Spinner from "../../components/loaders/Spinner";
 import AddBranchModal from "../../components/modal/restaurant/AddBranchModal";
 import { sortByColumn } from "../../utils/config";
@@ -17,8 +18,13 @@ import { HiUser } from "react-icons/hi";
 import { LuDot } from "react-icons/lu";
 import { renderRating, renderVisiblity } from "./Restaurants";
 import PropTypes from "prop-types";
+import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 
-const RestaurantBranches = ({ id, show }) => {
+const RestaurantBranches = ({ id }) => {
+  const { pathname } = useLocation();
+  const { mutationFn } = useDeleteBranches();
+  const [openDelete, setOpenDelete] = useState(false);
+
   const {
     data: activeUser,
     isLoading: activeUserLoading,
@@ -56,16 +62,25 @@ const RestaurantBranches = ({ id, show }) => {
     setOpen(true);
   }, []);
 
+  const handleOpenDeleteModal = useCallback(() => {
+    setOpenDelete(true);
+  }, []);
+  const handleCloseDeleteModal = useCallback(() => {
+    setOpenDelete(false);
+  }, []);
+
   const {
     data: branches,
     isLoading: branchesLoading,
     isError: isBranchesError,
+    refetch,
     // error: branchesError,
   } = useRestaurantBranches(id || activeUser?.currentUserId);
 
   if (branchesLoading || activeUserLoading) {
     return <Spinner />;
   }
+
   if (isBranchesError) {
     return <ErrorOccured />;
   }
@@ -73,17 +88,22 @@ const RestaurantBranches = ({ id, show }) => {
   return (
     <>
       <AddBranchModal
-        // isOpen={credentialOpen}
-        // handleCancel={handleCloseInvoiceModal}
-        // userRole={"RESTAURANT_ADMIN"}
-        // width="400px"
         setOpen={setOpen}
         open={open}
         right={"right-[20px]"}
         top={"top-[20px]"}
+        refetch={refetch}
+      />
+      <DeleteModal
+        isOpen={openDelete}
+        action={"coupon"}
+        handleCancel={handleCloseDeleteModal}
+        mutationFn={mutationFn}
+        refetch={refetch}
+        width="400px"
       />
 
-      {show && (
+      {pathname == "/dashboard/branches" && (
         <div className="mt-2 flex-col gap-2 mb-2">
           <p>Branches</p>
           <div className="flex justify-end">
@@ -100,8 +120,7 @@ const RestaurantBranches = ({ id, show }) => {
           </div>
         </div>
       )}
-
-      <div className={`${!show && "mt-4"}`}>
+      <div className={`${pathname !== "/dashboard/branches" && "mt-4"}`}>
         <TableComponent
           tablehead={tablehead}
           tabledata={branches}
@@ -161,14 +180,15 @@ const RestaurantBranches = ({ id, show }) => {
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
-                  <Link to={`${item.id}`}>
-                    <Button
-                      variant="dark"
-                      className="px-2 py-1 text-xs rounded-md"
-                    >
-                      View Details
-                    </Button>
-                  </Link>
+                  {/* <Link to={`${item.id}`}> */}
+                  <Button
+                    variant="dark"
+                    className="px-2 py-1 text-xs rounded-md"
+                    onClick={() => handleOpenDeleteModal()}
+                  >
+                    View Details
+                  </Button>
+                  {/* </Link> */}
                 </TableColumnContent>
               </TableRow>
             );

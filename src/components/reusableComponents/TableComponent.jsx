@@ -15,7 +15,7 @@ const TableComponent = ({
   const [sortKey, setSortKey] = useState(null);
 
   return (
-    <div>
+    <div className="overflow-scroll">
       {tabledata?.length > 0 ? (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">

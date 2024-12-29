@@ -11,7 +11,7 @@ import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import { timeOutError } from "../../../utils/config";
 import Spinner from "../../loaders/Spinner";
 
-const AddBranchModal = ({ top, right, open, setOpen }) => {
+const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
   const userSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     email: yup
@@ -56,6 +56,9 @@ const AddBranchModal = ({ top, right, open, setOpen }) => {
     onSuccess: () => {
       showSuccessToast("Restaurant Branch Added successfully");
       setOpen(false);
+      if (refetch && typeof refetch == "function") {
+        return refetch();
+      }
     },
     onError: (error) => {
       if (error.message.includes("timeout")) {
@@ -227,19 +230,6 @@ const AddBranchModal = ({ top, right, open, setOpen }) => {
               )}
             </Button>
           </div>
-
-          {/* {(activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
-          activeUser?.currentUserRole == "COURIER") && (
-          <div className="flex-col flex gap-4 mt-4">
-            <p className="text-sm text-gray-600 font-bold">Update Order</p>
-            <ChangeOrderStatus
-              orderStatus={data?.status}
-              orderID={orderID}
-              setOpen={setOpen}
-              activeUser={activeUser}
-            />
-          </div>
-        )} */}
         </div>
       </form>
       {/* )} */}
@@ -254,4 +244,5 @@ AddBranchModal.propTypes = {
   right: PropTypes.string,
   open: PropTypes.bool,
   setOpen: PropTypes.func,
+  refetch: PropTypes.func,
 };

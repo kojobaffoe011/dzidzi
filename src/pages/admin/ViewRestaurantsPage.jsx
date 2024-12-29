@@ -170,6 +170,10 @@ const ViewRestaurantsPage = () => {
       name: "Extras",
       url: "extras",
     },
+    {
+      name: "Coupons",
+      url: "coupons",
+    },
   ];
 
   const [filters, setFilters] = useState({
@@ -284,8 +288,8 @@ const ViewRestaurantsPage = () => {
             />
           ) : (
             <>
+              {/* <div>a</div>cc */}
               <TabComponent tabs={tabs} />
-
               <Outlet />
             </>
           )}

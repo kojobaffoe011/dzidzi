@@ -15,8 +15,12 @@ import Loader from "../../components/loaders/Loader";
 import { GrRestaurant } from "react-icons/gr";
 import { useGetActiveUser } from "../../components/brokers/apicalls";
 import { useLogoutUser } from "../../hooks/useLogoutUser";
-import { MdOutlineDeliveryDining, MdOutlineHome } from "react-icons/md";
-import useAuth from "../../hooks/useAuth";
+import {
+  MdOutlineDeliveryDining,
+  MdOutlineExposurePlus2,
+  MdOutlineHome,
+} from "react-icons/md";
+import { TiTicket } from "react-icons/ti";
 
 const Dashboard = () => {
   const pageRef = useRef(null);
@@ -24,7 +28,6 @@ const Dashboard = () => {
   const [show, setShow] = useState(true);
   const [mobileShow, setMobileShow] = useState(false);
   const { mutate, isPending } = useLogoutUser();
-  const { auth, setAuth } = useAuth();
 
   const {
     data: activeUser,
@@ -104,7 +107,7 @@ const Dashboard = () => {
         <RiCoupon2Line className={className} size="25px" />
       ),
       text: "Coupons",
-      userType: ["ADMIN", "RESTAURANT_ADMIN", "RESTAURANT_BRANCH"],
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE"],
     },
     {
       link: "orders",
@@ -112,7 +115,13 @@ const Dashboard = () => {
         <IoFastFoodOutline className={className} size="25px" />
       ),
       text: "Orders",
-      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "RESTAURANT_BRANCH"],
+      userType: [
+        "ADMIN",
+        "RESTAURANT_ADMIN",
+        "COURIER",
+        "RESTAURANT_BRANCH",
+        "SERVICE",
+      ],
     },
     // {
     //   link: "services",
@@ -130,20 +139,33 @@ const Dashboard = () => {
       text: "Couriers",
       userType: ["ADMIN"],
     },
-    // {
-    //   link: "tickets",
-    //   icon: (className = "") => (
-    //     <AiOutlineFieldTime className={className} size="25px" />
-    //   ),
-    //   text: "Tickets",
-    //   userType: ["RESTAURANT_ADMIN", "SERVICE"],
-    // },
+    {
+      link: "tickets",
+      icon: (className = "") => <TiTicket className={className} size="25px" />,
+      text: "Tickets",
+      userType: [
+        "ADMIN",
+        "RESTAURANT_ADMIN",
+        "SERVICE",
+        "RESTAURANT_ADMIN",
+        "RESTAURANT_BRANCH",
+        "COURIER",
+      ],
+    },
     {
       link: "menus",
       icon: (className = "") => (
         <IoRestaurantOutline className={className} size="25px" />
       ),
       text: "Menus",
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE", "RESTAURANT_BRANCH"],
+    },
+    {
+      link: "extras",
+      icon: (className = "") => (
+        <MdOutlineExposurePlus2 className={className} size="25px" />
+      ),
+      text: "Extras",
       userType: ["ADMIN", "RESTAURANT_ADMIN", "SERVICE", "RESTAURANT_BRANCH"],
     },
     // {
@@ -209,8 +231,12 @@ const Dashboard = () => {
       <CheckOnlineStatus>
         <div className="grid grid-cols-6 h-screen">
           {show && (
-            <div className="relative flex">
-              <div className="col-span-1 lg:flex-col lg:flex md:hidden sm:hidden xs:hidden ss:hidden xss:hidden fixed w-[16.7%] h-full">
+            <div>
+              <div
+                className={`${
+                  show ? "col-span-1" : ""
+                }  lg:flex-col lg:flex md:hidden sm:hidden xs:hidden ss:hidden xss:hidden fixed w-[16.7%]`}
+              >
                 <div className="flex flex-col">
                   <div className="p-5 flex items-center justify-center">
                     <p className="font-logo font-extrabold text-4xl text-blue-600">
@@ -346,7 +372,7 @@ const Dashboard = () => {
               show
                 ? "lg:col-span-5 md:col-span-6 sm:col-span-6 xs:col-span-6 ss:col-span-6 xss:col-span-6"
                 : "lg:col-span-6 md:col-span-6 sm:col-span-6 xs:col-span-6 ss:col-span-6 xss:col-span-6"
-            } flex flex-col `}
+            } flex flex-col`}
           >
             <div
               className={`${
@@ -390,7 +416,7 @@ const Dashboard = () => {
                   {!activeUserLoading && (
                     <div className="rounded-full border py-2 px-5 bg-slate-100 mr-2">
                       <p className="text-xs font-bold text-blue-600">
-                        {activeUser?.currentUserRole}
+                        {activeUser?.currentUserRole.replaceAll("_", " ")}
                       </p>
                     </div>
                   )}

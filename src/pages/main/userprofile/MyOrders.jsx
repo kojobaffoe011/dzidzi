@@ -1,16 +1,10 @@
 import PaginatedTable from "../../../components/PaginatedTable";
-import {
-  useGetOrderItemsByOrderID,
-  useGetSingleOrder,
-  useOrderListPaged,
-} from "../../../components/brokers/apicalls";
+import { useOrderListPaged } from "../../../components/brokers/apicalls";
 import Button from "../../../components/reusableComponents/Button";
 import { humanDatetime } from "../../../utils/config";
 import OrderStatus from "../../../components/reusableComponents/orderStatus";
 import useAuth from "../../../hooks/useAuth";
-import SideModal from "../../../components/reusableComponents/SideModal";
-import ErrorOccured from "../../../components/notices/ErrorOccured";
-import Spinner from "../../../components/loaders/Spinner";
+
 import { useOutletContext } from "react-router";
 import OrdersSummary from "./OrdersSummary";
 import { useState } from "react";
@@ -211,7 +205,7 @@ const MyOrders = ({ userID, position }) => {
     data: orderList = [],
     isLoading,
     hasNextPage,
-    // fetchNextPage,
+    refetch,
     isFetchingNextPage,
     isError,
   } = useOrderListPaged(
@@ -242,13 +236,12 @@ const MyOrders = ({ userID, position }) => {
     <div className="relative">
       {/* {auth?.modal > 0 && ( */}
       <OrderModal
-        auth={auth}
-        setAuth={setAuth}
         orderID={orderID}
         top={position?.top}
         right={position?.right}
         setOpen={setOpen}
         open={open}
+        refetch={refetch}
       />
       {/* )} */}
       <div className="flex flex-col gap-4">

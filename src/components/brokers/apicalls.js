@@ -443,6 +443,34 @@ export const useGetSingleMenu = (id) => {
   });
 };
 
+export const useGetSingleExtra = (id) => {
+  const queryKey = ["singleextra", id];
+
+  const url = `/restaurant/extra/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
 export const useGetSingleUser = (id) => {
   const queryKey = ["singleuser", id];
 
@@ -861,6 +889,92 @@ export const useExtrasList = (
   return useInfiniteQuery({ queryKey, queryFn: fetchExtras, ...options });
 };
 
+export const useExtraListPaged = (
+  minimumPrice,
+  maximumPrice,
+  name,
+  category,
+  rating,
+  visible,
+  distance,
+  latitude,
+  longitude,
+  restaurantId,
+  sortBy,
+  orderBy,
+  page
+) => {
+  //queryKey based on the provided parameters.
+  const queryKey = [
+    "extraListPaged",
+    minimumPrice,
+    maximumPrice,
+    name,
+    category,
+    rating,
+    visible,
+    distance,
+    latitude,
+    longitude,
+    restaurantId,
+    sortBy,
+    orderBy,
+    page,
+  ];
+
+  const fetchExtras = ({ pageParam = page }) => {
+    let url = `/paged-extras?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+    const queryParams = {
+      minimumPrice,
+      maximumPrice,
+      name,
+      category,
+      rating,
+      visible,
+      distance,
+      latitude,
+      longitude,
+      restaurantId,
+      sortBy,
+      orderBy,
+    };
+
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({ queryKey, queryFn: fetchExtras, ...options });
+};
+
 //edit Restaurant
 export const useEditRestaurant = () => {
   const mutationFn = (data) => {
@@ -935,15 +1049,21 @@ export const useGetServices = () => {
 };
 
 //useGet Coupons
-export const useGetCoupons = (activeUser) => {
-  const queryKey = ["coupons", activeUser];
+export const useGetCoupons = (id) => {
+  const queryKey = ["coupons", id];
 
-  const url =
-    activeUser.currentUserRole == "ADMIN"
-      ? "/coupons"
-      : `/coupons/${activeUser.currentUserId}`;
+  console.log({ id });
+  let url = "/coupons";
+
+  if (id) {
+    url = `/coupons/${id}`;
+  }
+
+  // const url =
+  //   activeUser.currentUserRole == "ADMIN" ? "/coupons" : `/coupons/${id}`;
 
   const queryFn = () => {
+    console.log(url);
     return get(url);
   };
 
@@ -951,13 +1071,13 @@ export const useGetCoupons = (activeUser) => {
     return response?.data;
   };
 
-  const enabled = Boolean(activeUser);
+  // const enabled = Boolean(activeUser);
 
   return useQuery({
     queryKey,
     queryFn,
     select,
-    enabled,
+    // enabled,
     refetch0nWindowFocus: false,
     refetchOnmount: false,
     refetch0nReconnect: false,
@@ -965,6 +1085,34 @@ export const useGetCoupons = (activeUser) => {
     staleTime: 0,
   });
 };
+
+//delete coupon
+export const useDeleteCoupon = (id) => {
+  const mutationFn = (data) => {
+    return delete_request(`/coupon/${id}`, data);
+  };
+
+  return { mutationFn };
+};
+
+//delete restaurant branchees
+export const useDeleteBranches = () => {
+  const mutationFn = (data) => {
+    return post(`/restaurant/job/remove-restaurants`, data);
+  };
+
+  return { mutationFn };
+};
+
+//delete restaurant branchees
+export const useAcceptTicket = (id) => {
+  const mutationFn = (data) => {
+    return post(`/ticket/${id}/accept`, data);
+  };
+
+  return { mutationFn };
+};
+
 export const useGetCouponsByRestaurantID = (id) => {
   const queryKey = ["coupons"];
 
@@ -1196,6 +1344,35 @@ export const useGetOrderItemByID = (id) => {
   const queryKey = ["orderitem", id];
 
   let url = `/item/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//get order item
+export const useGetTicketByID = (id) => {
+  const queryKey = ["ticket", id];
+
+  let url = `/ticket/${id}`;
 
   const queryFn = () => {
     return get(url);
@@ -1463,6 +1640,77 @@ export const useCourierListPaged = (
   return useInfiniteQuery({ queryKey, queryFn: fetchCouriers, ...options });
 };
 
+export const useTicketListPaged = (
+  userId,
+  restaurantId,
+  courierId,
+  serviceId,
+  from,
+  to,
+  status,
+  page
+) => {
+  //queryKey based on the provided parameters.
+  const queryKey = [
+    "ticketlist",
+    userId,
+    restaurantId,
+    courierId,
+    serviceId,
+    from,
+    to,
+    status,
+    page,
+  ];
+
+  const fetchTickets = ({ pageParam = page }) => {
+    let url = `/paged-ticket?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}`;
+
+    const queryParams = {
+      userId,
+      restaurantId,
+      courierId,
+      serviceId,
+      from,
+      to,
+      status,
+    };
+
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url += `&${key}=${encodeURIComponent(value)}`;
+      }
+    });
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({ queryKey, queryFn: fetchTickets, ...options });
+};
+
 const fetchOrders = async ({ queryKey, pageParam = {} }) => {
   const [, restaurantId, courierId, userId, orderId, sortBy, orderBy] =
     queryKey;
@@ -1571,6 +1819,7 @@ export const useGetSingleOrder = (id) => {
     staleTime: 0,
   });
 };
+
 export const useGetOrderItemsByOrderID = (id) => {
   const queryKey = ["orderitemsbyorderID", id];
 
@@ -1599,9 +1848,26 @@ export const useGetOrderItemsByOrderID = (id) => {
   });
 };
 
-export const useUpdateOrderStaus = (orderId, status) => {
+export const useUpdateOrderStaus = (orderId, status, usertype) => {
+  let url = "";
+  if (usertype == "RESTAURANT_ADMIN") {
+    url = `/restaurant/order/${orderId}?status=${status}`;
+  } else {
+    url = `/courier/order/${orderId}?status=${status}`;
+  }
+
   const mutationFn = (data) => {
-    return put(`/restaurant/order/${orderId}?status=${status}`, data);
+    return put(url, data);
+  };
+
+  return { mutationFn };
+};
+
+export const useUpdateTicketStaus = (ticketID, status) => {
+  let url = `/service-ticket/${ticketID}?status=${status}`;
+
+  const mutationFn = (data) => {
+    return post(url, data);
   };
 
   return { mutationFn };

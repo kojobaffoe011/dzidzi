@@ -46,6 +46,10 @@ import { ModalProvider } from "./context/modalProvider";
 import ViewRestaurantMenus from "./pages/admin/ViewRestaurantMenus";
 import RestaurantBranches from "./pages/admin/RestaurantBranches";
 import ViewRestaurantBranches from "./pages/admin/ViewRestaurantBranches";
+import Extras from "./pages/admin/Extras";
+import ViewRestaurantExtras from "./pages/admin/ViewRestaurantExtras";
+import ViewRestaurantCoupons from "./pages/admin/ViewRestaurantCoupons";
+import Tickets from "./pages/admin/Tickets";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -121,6 +125,16 @@ const App = () => {
                       exact
                       element={<ViewRestaurantMenus />}
                     />
+                    <Route
+                      path="extras"
+                      exact
+                      element={<ViewRestaurantExtras />}
+                    />
+                    <Route
+                      path="coupons"
+                      exact
+                      element={<ViewRestaurantCoupons />}
+                    />
                   </Route>
                   <Route path="users/:id" exact element={<ViewUsers />}>
                     <Route path="" exact element={<UserOrders />} />
@@ -135,6 +149,8 @@ const App = () => {
                   <Route path="services" exact element={<Services />} />
                   <Route path="coupons" exact element={<Coupons />} />
                   <Route path="menus" exact element={<Menus />} />
+                  <Route path="extras" exact element={<Extras />} />
+                  <Route path="tickets" exact element={<Tickets />} />
                   <Route
                     path="branches"
                     exact
