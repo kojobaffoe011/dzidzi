@@ -52,13 +52,11 @@ const SideModal = ({
                 {/* {auth.open ? auth?.restaurant?.name : title} */}
                 {title}
               </p>
-              <p>
-                <p className="text-sm font-light mb-2">
-                  {/* {auth.open
+              <p className="text-sm font-light mb-2">
+                {/* {auth.open
                 ? `${auth?.orders && auth.orders.length} item(s)`
                 : subtext}{" "} */}
-                  {subtext}
-                </p>
+                {subtext}
               </p>
             </div>
             <button

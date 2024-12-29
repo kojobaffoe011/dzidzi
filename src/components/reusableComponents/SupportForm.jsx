@@ -50,7 +50,6 @@ const SupportForm = ({ setOpen, refetch }) => {
 
   const handleAddTicket = (data) => {
     const description = data.description.toString();
-    console.log(data);
     if (Object.keys(errors).length == 0) {
       return mutate({ description });
     }

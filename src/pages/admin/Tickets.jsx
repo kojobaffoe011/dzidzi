@@ -268,12 +268,12 @@ const Tickets = ({ top }) => {
                   ) : (
                     <div className="flex flex-col justify-center">
                       <p className="mr-3 font-bold">
-                        {item.user.firstName || item.courier.firstName}{" "}
-                        {item.user.lastName || item.courier.lastName}
+                        {item?.user?.firstName || item?.courier?.firstName}{" "}
+                        {item?.user?.lastName || item?.courier?.lastName}
                       </p>
                       <div className="flex items-center gap-1">
                         <p className="text-xs font-light uppercase text-xs text-gray-500">
-                          {item.user.contact || item.courier.contact}
+                          {item?.user?.contact || item?.courier?.contact}
                         </p>
                         {/* <p>•</p>
                         {renderRating(item.restaurant.averageRating)} */}
@@ -348,7 +348,6 @@ const Tickets = ({ top }) => {
                       className="px-2 py-1 text-xs rounded-md"
                       onClick={() => {
                         setOpen(true);
-                        // openModal();
                         setTicketID(item.id);
                       }}
                     >

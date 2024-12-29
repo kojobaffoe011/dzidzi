@@ -1052,7 +1052,6 @@ export const useGetServices = () => {
 export const useGetCoupons = (id) => {
   const queryKey = ["coupons", id];
 
-  console.log({ id });
   let url = "/coupons";
 
   if (id) {
@@ -1063,7 +1062,6 @@ export const useGetCoupons = (id) => {
   //   activeUser.currentUserRole == "ADMIN" ? "/coupons" : `/coupons/${id}`;
 
   const queryFn = () => {
-    console.log(url);
     return get(url);
   };
 
@@ -1113,10 +1111,19 @@ export const useDeleteBranches = () => {
   return { mutationFn };
 };
 
-//delete restaurant branchees
+//accept ticket
 export const useAcceptTicket = (id) => {
   const mutationFn = (data) => {
     return post(`/ticket/${id}/accept`, data);
+  };
+
+  return { mutationFn };
+};
+
+//accept ticket
+export const useAddServiceResponse = (id, response) => {
+  const mutationFn = (data) => {
+    return post(`/response/ticket/${id}?response=${response}`, data);
   };
 
   return { mutationFn };
@@ -1377,7 +1384,7 @@ export const useGetOrderItemByID = (id) => {
   });
 };
 
-//get order item
+//get ticket
 export const useGetTicketByID = (id) => {
   const queryKey = ["ticket", id];
 
@@ -1403,6 +1410,51 @@ export const useGetTicketByID = (id) => {
     refetch0nReconnect: false,
     retry: false,
     staleTime: 0,
+  });
+};
+
+//get response by ticket id
+export const useGetResponsesByTicketID = (ticketID, page) => {
+  //queryKey based on the provided parameters.
+  const queryKey = ["ticketresponse", ticketID, page];
+
+  const fetchTicketResponses = ({ pageParam = page }) => {
+    let url = `/paged-response?page=${encodeURIComponent(
+      parseInt(pageParam)
+    )}&limit=${encodeURIComponent(parseInt(10))}&ticketId=${encodeURIComponent(
+      ticketID
+    )}`;
+
+    return get(`${url}`);
+  };
+
+  // flag to keep previous data when paginating.
+  const keepPreviousData = true;
+
+  // function getNextPageParam to determine the next page to fetch.
+  const getNextPageParam = (_lastPage, pages) => {
+    // Calculate the number of pages required to fetch all data.
+    const numberOfPages = pages?.[0]?.data?.totalPages;
+
+    // If there are more pages to fetch, return the next page number; otherwise, return undefined.
+    if (pages.length < numberOfPages) return pages.length + 1;
+
+    return undefined;
+  };
+
+  // flag to prevent refetching on window focus.
+  const refetchOnWindowFocus = false;
+
+  // Configure options for the useInfiniteQuery hook.
+  const options = { getNextPageParam, keepPreviousData, refetchOnWindowFocus };
+  const enabled = Boolean(ticketID);
+
+  // Use the useInfiniteQuery hook to manage the paginated query.
+  return useInfiniteQuery({
+    queryKey,
+    queryFn: fetchTicketResponses,
+    enabled,
+    ...options,
   });
 };
 

@@ -42,7 +42,7 @@ const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
   const {
     register,
     handleSubmit,
-    watch,
+    // watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(userSchema),
