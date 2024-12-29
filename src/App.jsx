@@ -50,6 +50,8 @@ import Extras from "./pages/admin/Extras";
 import ViewRestaurantExtras from "./pages/admin/ViewRestaurantExtras";
 import ViewRestaurantCoupons from "./pages/admin/ViewRestaurantCoupons";
 import Tickets from "./pages/admin/Tickets";
+import UserSupportPage from "./pages/main/userprofile/UserSupportPage";
+import ViewUserTickets from "./pages/main/userprofile/ViewUserTickets";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,7 +102,10 @@ const App = () => {
                 <Route path="user-profile" exact element={<Profile />}>
                   <Route path="" exact element={<General />} />
                   <Route path="orders" exact element={<MyOrders />} />
-                  <Route path="support" exact element={<Support />} />
+                  <Route path="support" exact element={<UserSupportPage />}>
+                    <Route path="" exact element={<Support />} />
+                    <Route path="tickets" exact element={<ViewUserTickets />} />
+                  </Route>
                 </Route>
               </Route>
 

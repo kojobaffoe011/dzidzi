@@ -19,6 +19,48 @@ const CustomInput = ({
     setShowPass(!showPass);
   };
 
+  const renderInput = () => {
+    if (type == "textarea") {
+      return (
+        <>
+          <textarea
+            {...register(name)}
+            className="border outline-none px-4 py-3 text-sm border border-black w-full rounded placeholder:text-xs h-[300px]"
+            // type={type == "password" ? (showPass ? "text" : "password") : type}
+            placeholder={placeholder}
+            name={name}
+            required={required}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+        </>
+      );
+    } else {
+      return (
+        <>
+          <input
+            {...register(name)}
+            className="border outline-none px-4 py-3 text-sm border border-black w-full rounded placeholder:text-xs"
+            type={type == "password" ? (showPass ? "text" : "password") : type}
+            placeholder={placeholder}
+            name={name}
+            required={required}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
+          {type == "password" && (
+            <div
+              className="cursor-pointer absolute right-4 bottom-5"
+              onClick={handleTogglePass}
+            >
+              {showPass ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+            </div>
+          )}
+        </>
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col gap-1">
       <div className="relative">
@@ -26,24 +68,7 @@ const CustomInput = ({
           {label}
           <span className="text-red-600 text-lg ">*</span>
         </label>
-        <input
-          {...register(name)}
-          className="border outline-none px-4 py-3 text-sm border border-black w-full rounded placeholder:text-xs"
-          type={type == "password" ? (showPass ? "text" : "password") : type}
-          placeholder={placeholder}
-          name={name}
-          required={required}
-          onBlur={onBlur}
-          onFocus={onFocus}
-        />
-        {type == "password" && (
-          <div
-            className="cursor-pointer absolute right-4 bottom-5"
-            onClick={handleTogglePass}
-          >
-            {showPass ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
-          </div>
-        )}
+        {renderInput()}
       </div>
       {errors && errors[name] ? (
         <span className="text-red-600 text-sm mt-3">

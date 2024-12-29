@@ -1095,6 +1095,15 @@ export const useDeleteCoupon = (id) => {
   return { mutationFn };
 };
 
+//delete ticket
+export const useDeleteTicket = (id) => {
+  const mutationFn = (data) => {
+    return delete_request(`/ticket/${id}`, data);
+  };
+
+  return { mutationFn };
+};
+
 //delete restaurant branchees
 export const useDeleteBranches = () => {
   const mutationFn = (data) => {
@@ -1864,7 +1873,17 @@ export const useUpdateOrderStaus = (orderId, status, usertype) => {
 };
 
 export const useUpdateTicketStaus = (ticketID, status) => {
-  let url = `/service-ticket/${ticketID}?status=${status}`;
+  const url = `/service-ticket/${ticketID}?status=${status}`;
+
+  const mutationFn = (data) => {
+    return post(url, data);
+  };
+
+  return { mutationFn };
+};
+
+export const useAddTicket = () => {
+  let url = `/ticket`;
 
   const mutationFn = (data) => {
     return post(url, data);

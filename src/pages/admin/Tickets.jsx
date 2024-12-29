@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
+  useDeleteTicket,
   useGetActiveUser,
   useTicketListPaged,
 } from "../../components/brokers/apicalls";
@@ -22,10 +23,25 @@ import Spinner from "../../components/loaders/Spinner";
 import { renderRating } from "./Restaurants";
 import OrderStatus from "../../components/reusableComponents/orderStatus";
 import TicketModal from "../../components/modal/restaurant/TicketModal";
+import AddTicketModal from "../../components/modal/restaurant/AddTicketModal";
+import { IoEyeSharp } from "react-icons/io5";
+import { FaTrash } from "react-icons/fa6";
+import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 
 const Tickets = ({ top }) => {
   const [ticketID, setTicketID] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openAddTicket, setOpeAddTicket] = useState(false);
+  const [openDeleteTicket, setOpenDeleteTicket] = useState(false);
+
+  const { mutationFn } = useDeleteTicket(ticketID && ticketID);
+
+  const handleOpenDeleteTicketModal = useCallback(() => {
+    setOpenDeleteTicket(true);
+  }, []);
+  const handleCloseDeleteTicketModal = useCallback(() => {
+    setOpenDeleteTicket(false);
+  }, []);
 
   const {
     data: activeUser,
@@ -33,7 +49,6 @@ const Tickets = ({ top }) => {
     // isError: isActiveUserError,
     // error: activeUserError,
   } = useGetActiveUser();
-  const { pathname } = useLocation();
   const [filters, setFilters] = useState([
     {
       name: "USER ID",
@@ -130,12 +145,44 @@ const Tickets = ({ top }) => {
         right={"right-[15px]"}
         setOpen={setOpen}
         open={open}
+        activeUser={activeUser}
         refetch={refetch}
       />
-
-      {pathname == "/dashboard/menus" && (
+      <AddTicketModal
+        // ticketID={ticketID}
+        top={"top-[15px]"}
+        right={"right-[15px]"}
+        setOpen={setOpeAddTicket}
+        open={openAddTicket}
+        // activeUser={activeUser}
+        refetch={refetch}
+      />
+      <DeleteModal
+        isOpen={openDeleteTicket}
+        action={"ticket"}
+        handleCancel={handleCloseDeleteTicketModal}
+        mutationFn={mutationFn}
+        refetch={refetch}
+        width="400px"
+      />
+      {activeUser?.currentUserRole == "ADMIN" ||
+      activeUser?.currentUserRole == "SERVICE" ? (
+        ""
+      ) : (
         <div className="mt-2 flex flex-col gap-2">
-          <p className="font-bold text-2xl">Menus</p>
+          {/* <p className="font-bold text-2xl">Menus</p> */}
+          <div className="flex justify-end">
+            <Button
+              variant="primary"
+              className="px-2 py-2 text-sm"
+              rounded
+              onClick={() => {
+                setOpeAddTicket(true);
+              }}
+            >
+              Add Ticket
+            </Button>
+          </div>
         </div>
       )}
 
@@ -219,7 +266,19 @@ const Tickets = ({ top }) => {
                       </div>
                     </div>
                   ) : (
-                    ""
+                    <div className="flex flex-col justify-center">
+                      <p className="mr-3 font-bold">
+                        {item.user.firstName || item.courier.firstName}{" "}
+                        {item.user.lastName || item.courier.lastName}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-xs font-light uppercase text-xs text-gray-500">
+                          {item.user.contact || item.courier.contact}
+                        </p>
+                        {/* <p>•</p>
+                        {renderRating(item.restaurant.averageRating)} */}
+                      </div>
+                    </div>
                   )}
                   {/* <div className="flex gap-2">
                     <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
@@ -273,17 +332,29 @@ const Tickets = ({ top }) => {
                   )}
                 </TableColumnContent>
                 <TableColumnContent>
-                  <Button
-                    variant="dark"
-                    className="px-2 py-1 text-xs rounded-md"
-                    onClick={() => {
-                      setOpen(true);
-                      // openModal();
-                      setTicketID(item.id);
-                    }}
-                  >
-                    View Details
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="danger"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        setTicketID(item.id);
+                        handleOpenDeleteTicketModal();
+                      }}
+                    >
+                      <FaTrash />
+                    </Button>
+                    <Button
+                      variant="dark"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        setOpen(true);
+                        // openModal();
+                        setTicketID(item.id);
+                      }}
+                    >
+                      <IoEyeSharp />
+                    </Button>
+                  </div>
                 </TableColumnContent>
               </TableRow>
             );

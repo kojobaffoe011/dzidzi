@@ -223,7 +223,7 @@ export const activeFilters = (filters, type) => {
         item.enabled &&
         item.name !== "sortBy" &&
         item.name !== "orderBy" &&
-        item.name !== "RESTAURANT ID"
+        !item.name.toLowerCase().includes("id")
     );
   }
 
@@ -232,7 +232,7 @@ export const activeFilters = (filters, type) => {
       item.enabled &&
       item.name !== "sortBy" &&
       item.name !== "orderBy" &&
-      item.name !== "RESTAURANT ID"
+      !item.name.toLowerCase().includes("id")
   );
 };
 

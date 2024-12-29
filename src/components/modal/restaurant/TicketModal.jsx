@@ -13,7 +13,6 @@ import { useState } from "react";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Select from "react-select";
 import Button from "../../reusableComponents/Button";
-import { useOutletContext } from "react-router";
 import { humanDatetime } from "../../../utils/config";
 import { RiCheckboxCircleFill } from "react-icons/ri";
 
@@ -111,8 +110,16 @@ const ChangeOrderStatus = ({
   );
 };
 
-const TicketModal = ({ ticketID, top, right, open, setOpen, refetch }) => {
-  const [, activeUser] = useOutletContext();
+const TicketModal = ({
+  ticketID,
+  top,
+  right,
+  open,
+  setOpen,
+  refetch,
+  activeUser,
+}) => {
+  // const [, activeUser] = useOutletContext();
 
   // const { data, isLoading } = useGetSingleOrder(ticketID);
   const {
@@ -264,18 +271,20 @@ const TicketModal = ({ ticketID, top, right, open, setOpen, refetch }) => {
             </div>
           </div>
 
-          {ticket?.assignedTo !== null && ticket?.status !== "COMPLETED" && (
-            <div className="flex-col flex gap-4 mt-4">
-              <p className="text-sm text-gray-600 font-bold">Update Ticket</p>
-              <ChangeOrderStatus
-                ticketStatus={ticketStatus}
-                ticketID={ticketID}
-                setOpen={setOpen}
-                activeUser={activeUser}
-                refetch={refetch}
-              />
-            </div>
-          )}
+          {ticket?.assignedTo !== null &&
+            ticket?.status !== "COMPLETED" &&
+            activeUser?.currentUserRole == "SERVICE" && (
+              <div className="flex-col flex gap-4 mt-4">
+                <p className="text-sm text-gray-600 font-bold">Update Ticket</p>
+                <ChangeOrderStatus
+                  ticketStatus={ticketStatus}
+                  ticketID={ticketID}
+                  setOpen={setOpen}
+                  activeUser={activeUser}
+                  refetch={refetch}
+                />
+              </div>
+            )}
         </div>
       )}
     </SideModal>
@@ -290,6 +299,7 @@ TicketModal.propTypes = {
   open: PropTypes.bool,
   setOpen: PropTypes.func,
   refetch: PropTypes.func,
+  activeUser: PropTypes.object,
 };
 
 ChangeOrderStatus.propTypes = {

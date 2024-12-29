@@ -30,6 +30,8 @@ const FilterComponent = ({ filters, setFilters, children, type, top }) => {
 
       if (type === "menus" && item.name === "RESTAURANT ID") {
         return { ...item };
+      } else if (item.name.toLowerCase().includes("id")) {
+        return { ...item };
       } else {
         return { ...item, value: null, enabled: false };
       }
