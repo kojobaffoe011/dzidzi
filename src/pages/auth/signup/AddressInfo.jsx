@@ -5,12 +5,30 @@ import * as yup from "yup";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
 import CustomInput from "../../../components/reusableComponents/CustomInput";
 import Button from "../../../components/reusableComponents/Button";
+import { useLocation } from "react-router";
 
 const AddressInfo = () => {
+  const { pathname, search } = useLocation();
+
   const signupInfo = localStorage.getItem("signup");
   const basicDetails = JSON.parse(signupInfo);
 
   const { navigateTo } = useNavigateTo();
+
+  const queryParams = new URLSearchParams(search);
+  const verifyParam = queryParams.get("verificationcode"); // Get the value of "verificationcode"
+  const verificationCode = verifyParam ? verifyParam.replace(/ /g, "+") : "";
+
+  const navigateLink = () => {
+    let link = "/auth/register/login-info";
+    if (pathname.includes("restaurant")) {
+      link = `/auth/register/restaurant/login-info?verificationcode=${verificationCode}`;
+    } else if (pathname.includes("courier")) {
+      link = `/auth/register/courier/login-info?verificationcode=${verificationCode}`;
+    } else link = "/auth/register/login-info";
+
+    return link;
+  };
 
   const userSchema = yup.object().shape({
     street: yup.string().required("Street is required"),
@@ -39,7 +57,7 @@ const AddressInfo = () => {
         addressCompleted: true,
       })
     );
-    navigateTo("/auth/register/login-info");
+    navigateTo(navigateLink());
   };
 
   if (!basicDetails || !basicDetails?.basicCompleted) {

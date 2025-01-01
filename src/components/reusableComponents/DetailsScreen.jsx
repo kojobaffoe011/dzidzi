@@ -3,7 +3,6 @@ import RestaurantCard from "./restaurantCard";
 import MenuDetails from "./menuDetails";
 import { useRestaurantList } from "../brokers/apicalls";
 import DzidziLoader from "../loaders/DzidziLoader";
-import { useAllowLocation } from "../../hooks/useAllowLocation";
 import { useCategoryList } from "../../hooks/useCategoryList";
 import Promo from "./Promo";
 import ErrorOccured from "../notices/ErrorOccured";
@@ -61,7 +60,7 @@ function Categories() {
                 {" "}
                 <img src={item.icon} alt="icon" width="40px" className="" />
               </div>
-              <p className="font-bold text-xs"> {item.name}</p>
+              <p className="font-bold text-xs"> {item.label}</p>
             </div>
           );
         })}

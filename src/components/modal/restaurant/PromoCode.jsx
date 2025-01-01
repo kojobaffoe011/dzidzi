@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../loaders/Spinner";
-import useAuth from "../../../hooks/useAuth";
-import { useNavigate } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
-import { RiErrorWarningFill } from "react-icons/ri";
-// import Button from "../../Button";
-import { useAddCoupon, useAddCredentials } from "../../brokers/apicalls";
 import Button from "../../reusableComponents/Button";
+import axios from "axios";
 
 const PromoCode = (props) => {
   const types = ["RESTAURANT_ADMIN", "COURIER", "SERVICE", "ADMIN"];
@@ -91,7 +86,10 @@ const PromoCode = (props) => {
 
             <div className="flex justify-center">
               <div className="flex items-center mr-2">
-                <Button className="px-8 py-2 w-full bg-black rounded-md" onClick={()=> props.handleCancel()}>
+                <Button
+                  className="px-8 py-2 w-full bg-black rounded-md"
+                  onClick={() => props.handleCancel()}
+                >
                   {isLoading ? (
                     <Spinner color="white" size="15px" />
                   ) : (

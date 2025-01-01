@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
 import { useRestaurantListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
-import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
-import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import PaginatedTable from "../../components/PaginatedTable";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import {
@@ -19,6 +17,7 @@ import { HiUser } from "react-icons/hi";
 import TableRow from "../../components/reusableComponents/TableRow";
 import { Link } from "react-router-dom";
 import { LuDot } from "react-icons/lu";
+import AddUserRoleModal from "../../components/modal/restaurant/AddUserRoleModal";
 
 export const renderRating = (rating) => {
   if (rating === null || rating === 0) {
@@ -50,6 +49,7 @@ export const renderVisiblity = (visibility) => {
 
 const Restaurants = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [open, setOpen] = useState(false);
 
   const [filters, setFilters] = useState([
     { name: "name", value: null, enabled: false },
@@ -75,22 +75,8 @@ const Restaurants = () => {
     { title: "Action", sortable: false },
   ];
 
-  const [credentialOpen, setCredentialsOpen] = useState(false);
-
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
-  }, []);
-  const handleCloseInvoiceModal = useCallback(() => {
-    setCredentialsOpen(false);
-  }, []);
-
-  const [restaurantID, setRestaurantID] = useState(null);
-  const [viewOpen, setViewOpen] = useState(false);
-  const handleOpenViewModal = useCallback(() => {
-    setViewOpen(true);
-  }, []);
-  const handleCloseViewModal = useCallback(() => {
-    setViewOpen(false);
+  const handleOpenModal = useCallback(() => {
+    setOpen(true);
   }, []);
 
   const {
@@ -99,6 +85,7 @@ const Restaurants = () => {
     hasNextPage: restaurantHasNextPage,
     isFetchingNextPage: restaurantFetchingNextPage,
     isError: isRestaurantError,
+    refetch,
   } = useRestaurantListPaged(
     //name
     filters[0].enabled ? filters[0].value : null,
@@ -127,11 +114,13 @@ const Restaurants = () => {
 
   return (
     <>
-      <AddCredentialModal
-        isOpen={credentialOpen}
-        handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="400px"
+      <AddUserRoleModal
+        setOpen={setOpen}
+        open={open}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
+        userRole="RESTAURANT_ADMIN"
       />
 
       <div className="mt-2 flex-col gap-2">
@@ -142,7 +131,7 @@ const Restaurants = () => {
             className="px-2 py-2 text-sm"
             rounded
             onClick={() => {
-              handleOpenInvoiceModal();
+              handleOpenModal();
             }}
           >
             Add Restaurant

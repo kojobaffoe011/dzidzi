@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import NoRecord from "../notices/NoRecord";
 import { RiArrowUpSFill } from "react-icons/ri";
 import { useState } from "react";
+import NoDataFound from "../notices/NoDataFound";
 
 const TableComponent = ({
   tablehead,
@@ -54,7 +55,7 @@ const TableComponent = ({
           </tbody>
         </table>
       ) : (
-        <NoRecord />
+        <NoDataFound title={"Oops no data to show at the moment"} />
       )}
     </div>
   );

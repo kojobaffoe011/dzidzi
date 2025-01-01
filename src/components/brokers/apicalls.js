@@ -996,6 +996,24 @@ export const useDeleteRestaurant = (restaurantId) => {
   return { mutationFn };
 };
 
+//delte MENU
+export const useDeleteMenu = (id) => {
+  const mutationFn = (data) => {
+    return delete_request(`/menu/${id}`, data);
+  };
+
+  return { mutationFn };
+};
+
+//delte extra
+export const useDeleteExtra = (id) => {
+  const mutationFn = (data) => {
+    return delete_request(`/extra/${id}`, data);
+  };
+
+  return { mutationFn };
+};
+
 //get couriers
 export const useGetCouriers = () => {
   const queryKey = ["couriers"];
@@ -1120,10 +1138,146 @@ export const useAcceptTicket = (id) => {
   return { mutationFn };
 };
 
-//accept ticket
+//add ticket response
 export const useAddServiceResponse = (id, response) => {
   const mutationFn = (data) => {
     return post(`/response/ticket/${id}?response=${response}`, data);
+  };
+
+  return { mutationFn };
+};
+
+//add menu
+export const useAddMenu = () => {
+  const mutationFn = (data) => {
+    const { name, description, price, category, image } = data;
+
+    // Create a FormData object
+    const formData = new FormData();
+    // formData.append("name", name);
+    // formData.append("description", description);
+    // formData.append("price", price);
+    // formData.append("category", category);
+
+    if (image) {
+      formData.append("image", image); // Append the image file
+    }
+
+    // Send the FormData as the request body
+    return post(
+      `/menu?name=${encodeURIComponent(name)}&description=${encodeURIComponent(
+        description
+      )}&price=${encodeURIComponent(price)}&category=${encodeURIComponent(
+        category
+      )}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  };
+
+  return { mutationFn };
+};
+export const useAddExtra = () => {
+  const mutationFn = (data) => {
+    const { name, price, image } = data;
+
+    // Create a FormData object
+    const formData = new FormData();
+    // formData.append("name", name);
+    // formData.append("category", category);
+
+    if (image) {
+      formData.append("image", image); // Append the image file
+    }
+
+    // Send the FormData as the request body
+    return post(
+      `/extra?name=${encodeURIComponent(name)}&price=${encodeURIComponent(
+        price
+      )}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  };
+
+  return { mutationFn };
+};
+
+//restaurant complete account
+export const useRestaurantCompleteAccount = () => {
+  const mutationFn = (data) => {
+    const {
+      verificationcode,
+      name,
+      bio,
+      password,
+      contact,
+      username,
+      address,
+    } = data;
+
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("contact", contact);
+    formData.append("contact1", contact);
+    formData.append("bio", bio);
+    formData.append("newPassword", password);
+    formData.append("repeatPass", password);
+    formData.append("username", username);
+    formData.append("address", address);
+
+    // Send the FormData as the request body
+    return axiosInstance.post(
+      `${NO_AUTH_URL}/restaurant/complete-account?verificationCode=${encodeURIComponent(
+        verificationcode
+      )}`,
+      formData
+    );
+  };
+
+  return { mutationFn };
+};
+
+//restaurant complete courier
+export const useCourierCompleteAccount = () => {
+  const mutationFn = (data) => {
+    const {
+      verificationcode,
+      firstName,
+      lastName,
+      password,
+      contact,
+      username,
+      address,
+    } = data;
+
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append("lastName", lastName);
+    formData.append("contact", contact);
+    formData.append("contact1", contact);
+    formData.append("firstName", firstName);
+    formData.append("newPassword", password);
+    formData.append("repeatPass", password);
+    formData.append("username", username);
+    formData.append("address", address);
+
+    // Send the FormData as the request body
+    return axiosInstance.put(
+      `${NO_AUTH_URL}/courier/complete-account?verificationCode=${encodeURIComponent(
+        verificationcode
+      )}`,
+      formData
+    );
   };
 
   return { mutationFn };
@@ -1209,8 +1363,6 @@ export const useGetExtras = () => {
     staleTime: 0,
   });
 };
-
-//post
 
 export const useAddCredentials = () => {
   const mutationFn = (data) => {
@@ -1978,4 +2130,35 @@ export const useVerifyUser = (id) => {
     retry: false,
     staleTime: 0,
   });
+};
+
+//update menu visibility
+export const useUpdateMenuVisibility = (id) => {
+  const mutationFn = (data) => {
+    const { visible } = data;
+    console.log(visible);
+
+    let url = "";
+    if (visible) {
+      url = `/menu/${id}/disable-visibility`;
+    } else url = `/menu/${id}/enable-visibility`;
+    return post(url, data);
+  };
+
+  return { mutationFn };
+};
+
+//update menu visibility
+export const useUpdateExtraVisibility = (id) => {
+  const mutationFn = (data) => {
+    const { visible } = data;
+
+    let url = "";
+    if (visible) {
+      url = `/extra/${id}/disable-visibility`;
+    } else url = `/extra/${id}/enable-visibility`;
+    return post(url, data);
+  };
+
+  return { mutationFn };
 };

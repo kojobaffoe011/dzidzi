@@ -1,37 +1,45 @@
 import { useCallback, useState } from "react";
 import {
+  useDeleteExtra,
   useExtraListPaged,
   useGetActiveUser,
-  useGetSingleExtra,
-  useGetSingleMenu,
-  useMenuListPaged,
 } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
-import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
-import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import { useLocation } from "react-router";
 import PaginatedTable from "../../components/PaginatedTable";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
-import { useCategoryList } from "../../hooks/useCategoryList";
 import { handleFilterChange, sortByColumn } from "../../utils/config";
 import FilterComponent from "../../components/reusableComponents/FilterComponent";
 import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import Spinner from "../../components/loaders/Spinner";
-import { HiUser } from "react-icons/hi";
 import { GiKetchup } from "react-icons/gi";
+import AddMenuModal from "../../components/modal/restaurant/AddMenuModal";
+import { LuDot } from "react-icons/lu";
+import ViewMenuExtraModal from "../../components/modal/restaurant/ViewMenuExtraModal";
+import PropTypes from "prop-types";
+import DeleteModal from "../../components/modal/restaurant/DeleteModal";
+import { FaTrash } from "react-icons/fa6";
 
-const Extras = ({ id, top, show }) => {
+const Extras = ({ id, top }) => {
+  const { pathname } = useLocation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [extraID, setExtraID] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const { mutationFn } = useDeleteExtra(extraID && extraID);
+
   const {
     data: activeUser,
     isLoading: activeUserLoading,
     // isError: isActiveUserError,
     // error: activeUserError,
   } = useGetActiveUser();
-  const { pathname } = useLocation();
+
   const [filters, setFilters] = useState([
     { name: "Minimum Price", value: null, enabled: false },
     { name: "Maximum Price", value: null, enabled: false },
@@ -55,38 +63,29 @@ const Extras = ({ id, top, show }) => {
     { name: "sortBy", value: null, enabled: false },
     { name: "orderBy", value: null, enabled: false },
   ]);
-  const [menuID, setMenuID] = useState(null);
-  const { categories } = useCategoryList();
 
-  const [credentialOpen, setCredentialsOpen] = useState(false);
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
-  }, []);
-  const handleCloseInvoiceModal = useCallback(() => {
-    setCredentialsOpen(false);
+  const handleOpenModal = useCallback(() => {
+    setOpen(true);
   }, []);
 
-  const [restaurantID, setRestaurantID] = useState(
-    activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
-      activeUser?.currentUserRole == "RESTAURANT_BRANCH"
-      ? [activeUser?.currentUserId]
-      : null
-  );
-  const [viewOpen, setViewOpen] = useState(false);
   const handleOpenViewModal = useCallback(() => {
     setViewOpen(true);
   }, []);
-  const handleCloseViewModal = useCallback(() => {
-    setViewOpen(false);
+
+  const handleOpenDeleteModal = useCallback(() => {
+    setOpenDelete(true);
+  }, []);
+  const handleCloseDeleteModal = useCallback(() => {
+    setOpenDelete(false);
   }, []);
 
-  const [currentPage, setCurrentPage] = useState(1);
   const {
     data: menuListAlt = [],
     isLoading: isMenuLoading,
     hasNextPage: menuHasNextPage,
     isFetchingNextPage: menuFetchingNextPage,
     isError: isMenuAltError,
+    refetch,
   } = useExtraListPaged(
     //min price
     filters[0].enabled ? filters[0].value : null,
@@ -105,25 +104,17 @@ const Extras = ({ id, top, show }) => {
     currentPage
   );
 
-  let menuData = menuListAlt?.pages?.flatMap((page) => page?.data);
-  const numberOfPages = menuData?.[0].totalPages;
+  let extraData = menuListAlt?.pages?.flatMap((page) => page?.data);
+  const numberOfPages = extraData?.[0].totalPages;
 
   const tablehead = [
     { title: "Name", sortable: true, sortKey: "NAME" },
     { title: "Price", sortable: true, sortKey: "PRICE" },
     { title: "Restaurant Name", sortable: false },
-    // { title: "Category", sortable: true, sortKey: "CATEGORY" },
     { title: "Action", sortable: false },
   ];
 
-  const tabledata = menuData?.[0].results;
-
-  const {
-    isLoading: restaurantLoading,
-    data: restaurantData,
-    // isError,
-    // error,
-  } = useGetSingleExtra(menuID);
+  const tabledata = extraData?.[0].results;
 
   if (activeUserLoading) {
     return <Spinner />;
@@ -135,26 +126,47 @@ const Extras = ({ id, top, show }) => {
 
   return (
     <>
-      <AddCredentialModal
-        isOpen={credentialOpen}
-        handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT_ADMIN"}
+      <AddMenuModal
+        setOpen={setOpen}
+        open={open}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
+        type={"extra"}
+      />
+
+      <ViewMenuExtraModal
+        setOpen={setViewOpen}
+        open={viewOpen}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
+        extraID={extraID}
+      />
+
+      <DeleteModal
+        isOpen={openDelete}
+        action={"EXTRA"}
+        handleCancel={handleCloseDeleteModal}
+        mutationFn={mutationFn}
+        refetch={refetch}
         width="400px"
       />
-
-      <ViewRestaurant
-        isOpen={viewOpen}
-        handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="950px"
-        restaurantID={restaurantID}
-        restaurantData={restaurantData}
-        restaurantLoading={restaurantLoading}
-      />
-
-      {show && (
-        <div className="mt-2 flex-col gap-2">
-          <p className="font-bold text-2xl">Menus</p>
+      {pathname == "/dashboard/extras" && (
+        <div className="mt-2 flex flex-col gap-2">
+          <p className="font-bold text-2xl">Extras</p>
+          <div className="flex justify-end">
+            <Button
+              variant="primary"
+              className="px-2 py-2 text-sm"
+              rounded
+              onClick={() => {
+                handleOpenModal();
+              }}
+            >
+              Add Extras
+            </Button>
+          </div>
         </div>
       )}
 
@@ -195,7 +207,7 @@ const Extras = ({ id, top, show }) => {
       />
       <PaginatedTable
         title={"No Orders Found"}
-        list={menuData}
+        list={extraData}
         totalCount={6}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
@@ -225,9 +237,21 @@ const Extras = ({ id, top, show }) => {
 
                     <div className="flex flex-col justify-center">
                       <p className="mr-3 font-bold">{item.name}</p>
-                      <p className="mr-3 text-xs font-light uppercase text-xs text-gray-500">
-                        EXTRA
-                      </p>
+                      <div className="flex items-center">
+                        <p className="text-xs font-light uppercase text-xs text-gray-500">
+                          EXTRA
+                        </p>
+                        <LuDot />
+                        {item.visible ? (
+                          <p className=" text-xs font-light text-green-600">
+                            visible
+                          </p>
+                        ) : (
+                          <p className=" text-xs font-light text-red-600">
+                            not visible
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TableColumnContent>
@@ -245,26 +269,30 @@ const Extras = ({ id, top, show }) => {
                     </div>
                   </div>
                 </TableColumnContent>
-                {/* <TableColumnContent>
-                  <div className="flex">
-                    <div
-                      className={`font-bold rounded-full text-xs px-3 py-1 ${category?.color} ${category?.text}`}
-                    >
-                      <p className=" uppercase">{category?.name}</p>
-                    </div>
-                  </div>
-                </TableColumnContent> */}
+
                 <TableColumnContent>
-                  <Button
-                    variant="dark"
-                    className="px-2 py-1 text-xs rounded-md"
-                    onClick={() => {
-                      handleOpenViewModal();
-                      setMenuID(item.id);
-                    }}
-                  >
-                    View Details
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="danger"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        setExtraID(item.id);
+                        handleOpenDeleteModal();
+                      }}
+                    >
+                      <FaTrash />
+                    </Button>
+                    <Button
+                      variant="dark"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        handleOpenViewModal();
+                        setExtraID(item.id);
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </div>
                 </TableColumnContent>
               </TableRow>
             );
@@ -276,3 +304,8 @@ const Extras = ({ id, top, show }) => {
 };
 
 export default Extras;
+
+Extras.propTypes = {
+  id: PropTypes.string,
+  top: PropTypes.string,
+};

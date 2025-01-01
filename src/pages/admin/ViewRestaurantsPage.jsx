@@ -100,50 +100,6 @@ const UserView = ({
   );
 };
 
-// const TabComponent = () => {
-//   const tabs = [
-//     {
-//       name: "Branches",
-//       url: "",
-//     },
-//     {
-//       name: "Menus",
-//       url: "",
-//     },
-//     {
-//       name: "Extras",
-//       url: "",
-//     },
-//   ];
-
-//   return (
-//     <div className="flex ">
-//       <div className="p-1 flex rounded-md gap-1 bg-slate-50">
-//         {tabs?.map((tab, idx) => {
-//           return (
-//             <div
-//               key={idx}
-//               className={`px-6 py-2 border hover:cursor-pointer rounded-sm hover:border hover:border-blue-200 hover:border-2 hover:bg-blue-50 hover:shadow-md ${
-//                 idx == 0
-//                   ? "border border-blue-200 border-2 bg-blue-50 shadow-md"
-//                   : "border border-gray-200 border-2 bg-white"
-//               }`}
-//             >
-//               <p
-//                 className={`text-xs font-bold hover:text-blue-600 ${
-//                   idx == 0 ? "text-blue-600 " : ""
-//                 }`}
-//               >
-//                 {tab.name}
-//               </p>
-//             </div>
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// };
-
 const ViewRestaurantsPage = () => {
   const { id } = useParams();
   const { pathname } = useLocation();

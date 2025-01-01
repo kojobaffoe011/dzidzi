@@ -212,7 +212,6 @@ const ShowTicketDetails = ({
   refetchResponses,
 }) => {
   const [addResponse, setAddResponse] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // const { data, isLoading } = useGetSingleOrder(ticketID);
 
@@ -629,6 +628,7 @@ ShowTicketDetails.propTypes = {
   setOpen: PropTypes.func,
   activeUser: PropTypes.object,
   refetch: PropTypes.func,
+  refetchResponses: PropTypes.func,
 };
 
 ShowResponses.propTypes = {

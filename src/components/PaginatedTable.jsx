@@ -3,6 +3,7 @@ import NoRecord from "./notices/NoRecord";
 import ForwardSVG from "./ForwardSVG";
 import SVG from "./SVG";
 import PropTypes from "prop-types";
+import NoDataFound from "./notices/NoDataFound";
 
 const PaginatedTable = (props) => {
   const {
@@ -122,7 +123,7 @@ const PaginatedTable = (props) => {
                 </div>
               </div>
             ) : (
-              <NoRecord title={title} />
+              <NoDataFound title={"Oops no data to show at the moment"} />
             )}
           </div>
         )}

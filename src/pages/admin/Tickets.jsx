@@ -245,15 +245,6 @@ const Tickets = ({ top }) => {
                 <TableColumnContent>
                   {item?.restaurant ? (
                     <div className="flex gap-2">
-                      {/* <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl"> */}
-                      {/* <img
-                          src={category?.icon}
-                          alt="icon"
-                          width="20px"
-                          className=""
-                        /> */}
-                      {/* </div> */}
-
                       <div className="flex flex-col justify-center">
                         <p className="mr-3 font-bold">{item.restaurant.name}</p>
                         <div className="flex items-center gap-1">
@@ -275,29 +266,9 @@ const Tickets = ({ top }) => {
                         <p className="text-xs font-light uppercase text-xs text-gray-500">
                           {item?.user?.contact || item?.courier?.contact}
                         </p>
-                        {/* <p>•</p>
-                        {renderRating(item.restaurant.averageRating)} */}
                       </div>
                     </div>
                   )}
-                  {/* <div className="flex gap-2">
-                    <div className="rounded-full px-2 py-2 border bg-gray-100 uppercase font-extrabold text-xl">
-                      <img
-                        src={category?.icon}
-                        alt="icon"
-                        width="20px"
-                        className=""
-                      />
-                    </div>
-
-                    <div className="flex flex-col justify-center">
-                      <p className="mr-3 font-bold">{item.name}</p>
-                      <p className="mr-3 text-xs font-light uppercase text-xs text-gray-500">
-                        Menu
-                      </p>
-                    </div>
-                  </div> 
-                  */}
                 </TableColumnContent>
                 <TableColumnContent>
                   <div className="flex flex-col">

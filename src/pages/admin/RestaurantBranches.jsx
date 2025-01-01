@@ -24,6 +24,7 @@ const RestaurantBranches = ({ id }) => {
   const { pathname } = useLocation();
   const { mutationFn } = useDeleteBranches();
   const [openDelete, setOpenDelete] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const {
     data: activeUser,
@@ -55,8 +56,6 @@ const RestaurantBranches = ({ id }) => {
     { title: "Address", sortable: false },
     { title: "Action", sortable: false },
   ];
-
-  const [open, setOpen] = useState(false);
 
   const handleOpenModal = useCallback(() => {
     setOpen(true);

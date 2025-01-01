@@ -9,17 +9,29 @@ import Spinner from "../../../components/loaders/Spinner";
 import { useNavigateTo } from "../../../hooks/useNavigateTo";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
 import { timeOutError } from "../../../utils/config";
-import { axiosInstance } from "../../../components/brokers/apicalls";
+import {
+  axiosInstance,
+  useCourierCompleteAccount,
+  useRestaurantCompleteAccount,
+} from "../../../components/brokers/apicalls";
 import CustomInput from "../../../components/reusableComponents/CustomInput";
 import Button from "../../../components/reusableComponents/Button";
+import { useLocation } from "react-router";
 
 const LoginDetails = () => {
+  const { pathname, search } = useLocation();
   const { navigateTo } = useNavigateTo();
+  const { mutationFn } = useRestaurantCompleteAccount();
+  const { mutationFn: courierMutFn } = useCourierCompleteAccount();
   const [isFocused, setIsFocused] = useState(false);
   const [userData, setUserData] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
   const userDetails = localStorage.getItem("signup");
   const parsedUserDetails = JSON.parse(userDetails);
+
+  const queryParams = new URLSearchParams(search);
+  const verifyParam = queryParams.get("verificationcode"); // Get the value of "verificationcode"
+  const verificationcode = verifyParam ? verifyParam.replace(/ /g, "+") : "";
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -47,7 +59,22 @@ const LoginDetails = () => {
       .string()
       .oneOf([yup.ref("password"), null], "Passwords must match")
       .required("Confirm Password is required"),
-    // agreeBox: yup.boolean().oneOf([true], "Please tick checkbox"),
+  });
+
+  const otherSchema = yup.object().shape({
+    username: yup.string().required("Username is required"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters long")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%.%^()_#+=*?&-])[A-Za-z\d@$!%.%^()_#+=*?&-]+$/,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol"
+      ),
+    repeatpassword: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .required("Confirm Password is required"),
   });
 
   const {
@@ -56,7 +83,11 @@ const LoginDetails = () => {
     watch,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(userSchema),
+    resolver: yupResolver(
+      pathname.includes("restaurant") || pathname.includes("courier")
+        ? otherSchema
+        : userSchema
+    ),
   });
 
   const password = watch("password");
@@ -121,6 +152,21 @@ const LoginDetails = () => {
     },
   });
 
+  const { mutate: userRoleMutate, isPending: isUserRolePending } = useMutation({
+    mutationKey: ["complete-restaurant"],
+    mutationFn: pathname.includes("restaurant") ? mutationFn : courierMutFn,
+    onSuccess: async () => {
+      showErrorToast("Registration successfully completed");
+      navigateTo("/auth/register/success");
+    },
+    onError: (error) => {
+      if (error.message.includes("timeout")) {
+        return timeOutError(error);
+      }
+      return showErrorToast(error.message);
+    },
+  });
+
   const { mutateAsync, isPending: creatingUserPending } = useMutation({
     mutationKey: ["createUser"],
     mutationFn: async (data) => {
@@ -145,10 +191,51 @@ const LoginDetails = () => {
     },
   });
 
+  console.log(errors);
+
   const formSubmitHandler = async (data) => {
-    if (Object.keys(errors).length === 0) setDataLoading(true);
-    await setUserData(data);
-    setTimeout(mutate({}), 1000);
+    if (pathname.includes("restaurant") && Object.keys(errors).length === 0) {
+      return userRoleMutate({
+        verificationcode: verificationcode,
+        name: parsedUserDetails.name,
+        bio: parsedUserDetails.bio,
+        password: data.password,
+        contact: parsedUserDetails.contact,
+        username: data.username,
+        address: {
+          street: parsedUserDetails.address.street,
+          houseNumber: parsedUserDetails.address.houseNumber,
+          apartmentNr: "",
+          zip: parsedUserDetails.address.zip,
+          city: parsedUserDetails.address.city,
+          floor: 0,
+        },
+      });
+    } else if (
+      pathname.includes("courier") &&
+      Object.keys(errors).length === 0
+    ) {
+      return userRoleMutate({
+        verificationcode: verificationcode,
+        firstName: parsedUserDetails.name,
+        lastName: parsedUserDetails.lastName,
+        password: data.password,
+        contact: parsedUserDetails.contact,
+        username: data.username,
+        address: {
+          street: parsedUserDetails.address.street,
+          houseNumber: parsedUserDetails.address.houseNumber,
+          apartmentNr: "",
+          zip: parsedUserDetails.address.zip,
+          city: parsedUserDetails.address.city,
+          floor: 0,
+        },
+      });
+    } else if (Object.keys(errors).length === 0) {
+      setDataLoading(true);
+      await setUserData(data);
+      return setTimeout(mutate({}), 1000);
+    }
   };
 
   if (
@@ -174,24 +261,32 @@ const LoginDetails = () => {
         >
           <div className="flex flex-col gap-6 col-span-2 mt-4">
             <div className="grid grid-cols-3 gap-1">
-              <div className="w-full col-span-2 ">
+              {pathname == "/auth/register/login-info" && (
+                <div className="w-full col-span-2 ">
+                  <CustomInput
+                    register={register}
+                    name={"email"}
+                    label={"EMAIL"}
+                    type={"text"}
+                    required={true}
+                    placeholder={"Enter email here"}
+                  />
+                </div>
+              )}
+              <div
+                className={
+                  pathname !== "/auth/register/login-info" && "col-span-3"
+                }
+              >
                 <CustomInput
                   register={register}
-                  name={"email"}
-                  label={"EMAIL"}
+                  name={"username"}
+                  label={"USERNAME"}
                   type={"text"}
                   required={true}
-                  placeholder={"Enter email here"}
+                  placeholder={"Enter username"}
                 />
               </div>
-              <CustomInput
-                register={register}
-                name={"username"}
-                label={"USERNAME"}
-                type={"text"}
-                required={true}
-                placeholder={"Enter username"}
-              />
             </div>
 
             <div className="w-full grid grid-cols-2 gap-1">
@@ -248,9 +343,17 @@ const LoginDetails = () => {
               className="mt-5 px-16 py-4 w-full"
               variant="primary"
               rounded
-              disabled={isPending || creatingUserPending || dataLoading}
+              disabled={
+                isPending ||
+                creatingUserPending ||
+                dataLoading ||
+                isUserRolePending
+              }
             >
-              {isPending || creatingUserPending || dataLoading ? (
+              {isPending ||
+              creatingUserPending ||
+              dataLoading ||
+              isUserRolePending ? (
                 <Spinner color="white" size="20px" />
               ) : (
                 <p className="font-bold text-white">Finish</p>

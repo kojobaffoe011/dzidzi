@@ -1,12 +1,10 @@
 import { useCallback, useState } from "react";
 import {
+  useDeleteMenu,
   useGetActiveUser,
-  useGetSingleMenu,
   useMenuListPaged,
 } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
-import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
-import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
 import { useLocation } from "react-router";
 import PaginatedTable from "../../components/PaginatedTable";
 import TableComponent from "../../components/reusableComponents/TableComponent";
@@ -19,15 +17,29 @@ import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import Spinner from "../../components/loaders/Spinner";
+import AddMenuModal from "../../components/modal/restaurant/AddMenuModal";
+import ViewMenuExtraModal from "../../components/modal/restaurant/ViewMenuExtraModal";
+import { LuDot } from "react-icons/lu";
+import { FaTrash } from "react-icons/fa6";
+import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 
 const Menus = ({ id, top, show }) => {
+  const { pathname } = useLocation();
+  const { categories } = useCategoryList();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [open, setOpen] = useState(false);
+  const [menuID, setMenuID] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const { mutationFn } = useDeleteMenu(menuID && menuID);
+
   const {
     data: activeUser,
     isLoading: activeUserLoading,
     // isError: isActiveUserError,
     // error: activeUserError,
   } = useGetActiveUser();
-  const { pathname } = useLocation();
+
   const [filters, setFilters] = useState([
     { name: "Minimum Price", value: null, enabled: false },
     { name: "Maximum Price", value: null, enabled: false },
@@ -51,38 +63,14 @@ const Menus = ({ id, top, show }) => {
     { name: "sortBy", value: null, enabled: false },
     { name: "orderBy", value: null, enabled: false },
   ]);
-  const [menuID, setMenuID] = useState(null);
-  const { categories } = useCategoryList();
 
-  const [credentialOpen, setCredentialsOpen] = useState(false);
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
-  }, []);
-  const handleCloseInvoiceModal = useCallback(() => {
-    setCredentialsOpen(false);
-  }, []);
-
-  const [restaurantID, setRestaurantID] = useState(
-    activeUser?.currentUserRole == "RESTAURANT_ADMIN" ||
-      activeUser?.currentUserRole == "RESTAURANT_BRANCH"
-      ? [activeUser?.currentUserId]
-      : null
-  );
-  const [viewOpen, setViewOpen] = useState(false);
-  const handleOpenViewModal = useCallback(() => {
-    setViewOpen(true);
-  }, []);
-  const handleCloseViewModal = useCallback(() => {
-    setViewOpen(false);
-  }, []);
-
-  const [currentPage, setCurrentPage] = useState(1);
   const {
     data: menuListAlt = [],
     isLoading: isMenuLoading,
     hasNextPage: menuHasNextPage,
     isFetchingNextPage: menuFetchingNextPage,
     isError: isMenuAltError,
+    refetch,
   } = useMenuListPaged(
     //min price
     filters[0].enabled ? filters[0].value : null,
@@ -114,12 +102,18 @@ const Menus = ({ id, top, show }) => {
 
   const tabledata = menuData?.[0].results;
 
-  const {
-    isLoading: restaurantLoading,
-    data: restaurantData,
-    // isError,
-    // error,
-  } = useGetSingleMenu(menuID);
+  const handleOpenModal = useCallback(() => {
+    setOpen(true);
+  }, []);
+  const handleOpenViewModal = useCallback(() => {
+    setViewOpen(true);
+  }, []);
+  const handleOpenDeleteModal = useCallback(() => {
+    setOpenDelete(true);
+  }, []);
+  const handleCloseDeleteModal = useCallback(() => {
+    setOpenDelete(false);
+  }, []);
 
   if (activeUserLoading) {
     return <Spinner />;
@@ -131,35 +125,54 @@ const Menus = ({ id, top, show }) => {
 
   return (
     <>
-      <AddCredentialModal
-        isOpen={credentialOpen}
-        handleCancel={handleCloseInvoiceModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="400px"
+      <AddMenuModal
+        setOpen={setOpen}
+        open={open}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
       />
-
-      <ViewRestaurant
-        isOpen={viewOpen}
-        handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="950px"
-        restaurantID={restaurantID}
-        restaurantData={restaurantData}
-        restaurantLoading={restaurantLoading}
+      <ViewMenuExtraModal
+        setOpen={setViewOpen}
+        open={viewOpen}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
+        menuID={menuID}
+      />
+      <DeleteModal
+        isOpen={openDelete}
+        action={"MENU"}
+        handleCancel={handleCloseDeleteModal}
+        mutationFn={mutationFn}
+        refetch={refetch}
+        width="400px"
       />
 
       {pathname == "/dashboard/menus" && (
         <div className="mt-2 flex flex-col gap-2">
           <p className="font-bold text-2xl">Menus</p>
+          <div className="flex justify-end">
+            <Button
+              variant="primary"
+              className="px-2 py-2 text-sm"
+              rounded
+              onClick={() => {
+                handleOpenModal();
+              }}
+            >
+              Add Menus
+            </Button>
+          </div>
         </div>
       )}
 
       <FilterComponent
         filters={filters}
         setFilters={setFilters}
-        // activeFilters={activeFilters(filters)}
         type={"menus"}
-        top={top || "top-[-120px]"}
+        right={"right-[20px]"}
+        top={top || "top-[-160px]"}
       >
         <FilterType
           filterType={"INPUTFIELD"}
@@ -227,9 +240,22 @@ const Menus = ({ id, top, show }) => {
 
                     <div className="flex flex-col justify-center">
                       <p className="mr-3 font-bold">{item.name}</p>
-                      <p className="mr-3 text-xs font-light uppercase text-xs text-gray-500">
-                        Menu
-                      </p>
+
+                      <div className="flex items-center">
+                        <p className="text-xs font-light uppercase text-xs text-gray-500">
+                          MENU
+                        </p>
+                        <LuDot />
+                        {item.visible ? (
+                          <p className=" text-xs font-light text-green-600">
+                            visible
+                          </p>
+                        ) : (
+                          <p className=" text-xs font-light text-red-600">
+                            not visible
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TableColumnContent>
@@ -252,21 +278,33 @@ const Menus = ({ id, top, show }) => {
                     <div
                       className={`font-bold rounded-full text-xs px-3 py-1 ${category?.color} ${category?.text}`}
                     >
-                      <p className=" uppercase">{category?.name}</p>
+                      <p className=" uppercase">{category?.label}</p>
                     </div>
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
-                  <Button
-                    variant="dark"
-                    className="px-2 py-1 text-xs rounded-md"
-                    onClick={() => {
-                      handleOpenViewModal();
-                      setMenuID(item.id);
-                    }}
-                  >
-                    View Details
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="danger"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        setMenuID(item.id);
+                        handleOpenDeleteModal();
+                      }}
+                    >
+                      <FaTrash />
+                    </Button>
+                    <Button
+                      variant="dark"
+                      className="px-2 py-1 text-xs rounded-md"
+                      onClick={() => {
+                        handleOpenViewModal();
+                        setMenuID(item.id);
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </div>
                 </TableColumnContent>
               </TableRow>
             );

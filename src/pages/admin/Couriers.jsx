@@ -3,16 +3,11 @@ import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { useCourierListPaged } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
-import AddCredentialModal from "../../components/modal/restaurant/AddCredentialModal";
-import ViewRestaurant from "../../components/modal/restaurant/ViewRestaurant";
-import Table from "../../components/Table";
 import {
   activeFilters,
-  convertDate,
   handleFilterChange,
   sortByColumn,
 } from "../../utils/config";
-import TableAlt from "../../components/TableAlt";
 import PaginatedTable from "../../components/PaginatedTable";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
@@ -22,20 +17,12 @@ import RenderActiveFilters from "../../components/reusableComponents/RenderActiv
 import FilterType from "../../components/reusableComponents/FilterType";
 import FilterComponent from "../../components/reusableComponents/FilterComponent";
 import ErrorOccured from "../../components/notices/ErrorOccured";
+import AddUserRoleModal from "../../components/modal/restaurant/AddUserRoleModal";
 
-const Couriers = (props) => {
-  const [credentialOpen, setCredentialsOpen] = useState(false);
+const Couriers = () => {
+  const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { pathname } = useLocation();
-  // firstName,
-  // lastName,
-  // email,
-  // username,
-  // averageRating,
-  // status,
-  // courierId,
-  // sortBy,
-  // orderBy,
   const [filters, setFilters] = useState([
     { name: "NAME", value: null, enabled: false },
     { name: "LASTNAME", value: null, enabled: false },
@@ -56,20 +43,8 @@ const Couriers = (props) => {
     { title: "Action", sortable: false },
   ];
 
-  const handleOpenInvoiceModal = useCallback(() => {
-    setCredentialsOpen(true);
-  }, []);
-  const handleCloseInvoiceModal = useCallback(() => {
-    setCredentialsOpen(false);
-  }, []);
-
-  const [ID, setID] = useState(null);
-  const [viewOpen, setViewOpen] = useState(false);
-  const handleOpenViewModal = useCallback(() => {
-    setViewOpen(true);
-  }, []);
-  const handleCloseViewModal = useCallback(() => {
-    setViewOpen(false);
+  const handleOpenModal = useCallback(() => {
+    setOpen(true);
   }, []);
 
   const {
@@ -78,6 +53,7 @@ const Couriers = (props) => {
     hasNextPage: courierHasNextPage,
     isFetchingNextPage: courierFetchingNextPage,
     isError: isCourierError,
+    refetch,
   } = useCourierListPaged(
     //firstname
     filters[0].enabled ? filters[0].value : null,
@@ -103,23 +79,19 @@ const Couriers = (props) => {
   }
   return (
     <>
-      <AddCredentialModal
-        isOpen={credentialOpen}
-        handleCancel={handleCloseInvoiceModal}
-        userRole={"COURIER"}
-        width="400px"
-      />
-
-      <ViewRestaurant
-        isOpen={viewOpen}
-        handleCancel={handleCloseViewModal}
-        userRole={"RESTAURANT_ADMIN"}
-        width="950px"
-        restaurantID={ID}
+      <AddUserRoleModal
+        setOpen={setOpen}
+        open={open}
+        right={"right-[20px]"}
+        top={"top-[20px]"}
+        refetch={refetch}
+        userRole="COURIER"
+        title={"Add new courier"}
+        subtext={"Fill form to add a new courier"}
       />
 
       <div className="mt-2 flex-col gap-2">
-        <p className="font-bold text-2xl">{props.pagetitle}</p>
+        <p className="font-bold text-2xl">Couriers</p>
         {pathname == "/dashboard/couriers" && (
           <div className="flex justify-end">
             <Button
@@ -127,7 +99,7 @@ const Couriers = (props) => {
               className="px-2 py-2 text-sm"
               rounded
               onClick={() => {
-                handleOpenInvoiceModal();
+                handleOpenModal();
               }}
             >
               Add Courier
