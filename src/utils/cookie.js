@@ -20,9 +20,9 @@ class Auth {
    */
   setCipher(token) {
     // Set the project cipher (token) in a cookie with a 1-hour expiry (expires: 0.041 days)
-    Cookies.set(projectCipher, token, { expires: 0.041 * 24 });
+    Cookies.set(projectCipher, token);
   }
-
+  // , { expires: 0.041 * 24 }
   /**
    * Clear (remove) the project cipher (authentication token) stored in the cookie.
    */

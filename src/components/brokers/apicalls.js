@@ -2162,3 +2162,13 @@ export const useUpdateExtraVisibility = (id) => {
 
   return { mutationFn };
 };
+
+export const useUpdateCourierAvailability = () => {
+  const mutationFn = (data) => {
+    const { availability } = data;
+
+    return put(`/courier/update?availability=${availability}`, data);
+  };
+
+  return { mutationFn };
+};

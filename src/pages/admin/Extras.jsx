@@ -15,7 +15,6 @@ import FilterComponent from "../../components/reusableComponents/FilterComponent
 import FilterType from "../../components/reusableComponents/FilterType";
 import RenderActiveFilters from "../../components/reusableComponents/RenderActiveFilters";
 import ErrorOccured from "../../components/notices/ErrorOccured";
-import Spinner from "../../components/loaders/Spinner";
 import { GiKetchup } from "react-icons/gi";
 import AddMenuModal from "../../components/modal/restaurant/AddMenuModal";
 import { LuDot } from "react-icons/lu";
@@ -23,6 +22,7 @@ import ViewMenuExtraModal from "../../components/modal/restaurant/ViewMenuExtraM
 import PropTypes from "prop-types";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 import { FaTrash } from "react-icons/fa6";
+import TableLoader from "../../components/loaders/TableLoader";
 
 const Extras = ({ id, top }) => {
   const { pathname } = useLocation();
@@ -117,7 +117,7 @@ const Extras = ({ id, top }) => {
   const tabledata = extraData?.[0].results;
 
   if (activeUserLoading) {
-    return <Spinner />;
+    return <TableLoader />;
   }
 
   if (isMenuAltError) {
@@ -142,6 +142,7 @@ const Extras = ({ id, top }) => {
         top={"top-[20px]"}
         refetch={refetch}
         extraID={extraID}
+        activeUser={activeUser}
       />
 
       <DeleteModal

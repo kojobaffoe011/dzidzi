@@ -1,9 +1,9 @@
 import Spinner from "./loaders/Spinner";
-import NoRecord from "./notices/NoRecord";
 import ForwardSVG from "./ForwardSVG";
 import SVG from "./SVG";
 import PropTypes from "prop-types";
 import NoDataFound from "./notices/NoDataFound";
+import TableLoader from "./loaders/TableLoader";
 
 const PaginatedTable = (props) => {
   const {
@@ -12,7 +12,7 @@ const PaginatedTable = (props) => {
     totalCount,
     dataHasNextPage,
     children,
-    title,
+    // title,
     numberOfPages,
     currentPage,
     setCurrentPage,
@@ -48,7 +48,7 @@ const PaginatedTable = (props) => {
     <>
       <div>
         {isLoading ? (
-          <Spinner />
+          <TableLoader />
         ) : (
           // ''
           <div>

@@ -19,6 +19,7 @@ import { LuDot } from "react-icons/lu";
 import { renderRating, renderVisiblity } from "./Restaurants";
 import PropTypes from "prop-types";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
+import TableLoader from "../../components/loaders/TableLoader";
 
 const RestaurantBranches = ({ id }) => {
   const { pathname } = useLocation();
@@ -77,7 +78,7 @@ const RestaurantBranches = ({ id }) => {
   } = useRestaurantBranches(id || activeUser?.currentUserId);
 
   if (branchesLoading || activeUserLoading) {
-    return <Spinner />;
+    return <TableLoader />;
   }
 
   if (isBranchesError) {
@@ -125,6 +126,7 @@ const RestaurantBranches = ({ id }) => {
           tabledata={branches}
           filters={filters}
           setFilters={setFilters}
+          isLoading={branchesLoading}
           sortByColumn={sortByColumn}
         >
           {branches?.map((item, idx) => {

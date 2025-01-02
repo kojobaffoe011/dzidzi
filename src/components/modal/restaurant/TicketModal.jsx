@@ -24,7 +24,6 @@ import * as yup from "yup";
 import { IoIosAddCircle } from "react-icons/io";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
-import nodata from "../../../assets/images/no-data.png";
 import NoDataFound from "../../notices/NoDataFound";
 
 const options = [
@@ -424,13 +423,13 @@ const ShowResponses = ({ responses }) => {
                       <p className="font-light text-xs">
                         {!item.restaurant
                           ? `${
-                              item.customerService.firstName ||
-                              item.user.firstName ||
-                              item.courier.firstName
+                              item.customerService?.firstName ||
+                              item.user?.firstName ||
+                              item.courier?.firstName
                             } ${
-                              item.customerService.lastName ||
-                              item.user.lastName ||
-                              item.courier.lastName
+                              item.customerService?.lastName ||
+                              item.user?.lastName ||
+                              item.courier?.lastName
                             }`
                           : item.restaurant.name}
                       </p>
@@ -451,7 +450,7 @@ const ShowResponses = ({ responses }) => {
                         name=""
                         id=""
                         disabled
-                        value={item.details}
+                        value={item?.details}
                         className="text-sm text-gray-500 p-3 border rounded-md"
                       />
                     </div>

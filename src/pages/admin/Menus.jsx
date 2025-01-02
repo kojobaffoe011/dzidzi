@@ -22,8 +22,9 @@ import ViewMenuExtraModal from "../../components/modal/restaurant/ViewMenuExtraM
 import { LuDot } from "react-icons/lu";
 import { FaTrash } from "react-icons/fa6";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
+import PropTypes from "prop-types";
 
-const Menus = ({ id, top, show }) => {
+const Menus = ({ id, top }) => {
   const { pathname } = useLocation();
   const { categories } = useCategoryList();
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,6 +140,7 @@ const Menus = ({ id, top, show }) => {
         top={"top-[20px]"}
         refetch={refetch}
         menuID={menuID}
+        activeUser={activeUser}
       />
       <DeleteModal
         isOpen={openDelete}
@@ -316,3 +318,8 @@ const Menus = ({ id, top, show }) => {
 };
 
 export default Menus;
+
+Menus.propTypes = {
+  id: PropTypes.string,
+  top: PropTypes.string,
+};

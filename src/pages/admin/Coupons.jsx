@@ -16,6 +16,7 @@ import Spinner from "../../components/loaders/Spinner";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import PropTypes from "prop-types";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
+import TableLoader from "../../components/loaders/TableLoader";
 
 const Coupons = ({ id }) => {
   const { pathname } = useLocation();
@@ -89,7 +90,7 @@ const Coupons = ({ id }) => {
   };
 
   if (couponsLoading || activeUserLoading) {
-    return <Spinner />;
+    return <TableLoader />;
   }
 
   if (isCouponsError) {
@@ -162,6 +163,7 @@ const Coupons = ({ id }) => {
           filters={filters}
           setFilters={setFilters}
           sortByColumn={sortByColumn}
+          isLoading={couponsLoading}
         >
           {coupons?.map((item, idx) => {
             return (

@@ -27,6 +27,7 @@ import AddTicketModal from "../../components/modal/restaurant/AddTicketModal";
 import { IoEyeSharp } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa6";
 import DeleteModal from "../../components/modal/restaurant/DeleteModal";
+import TableLoader from "../../components/loaders/TableLoader";
 
 const Tickets = ({ top }) => {
   const [ticketID, setTicketID] = useState(null);
@@ -130,7 +131,7 @@ const Tickets = ({ top }) => {
   const tabledata = menuData?.[0].results;
 
   if (activeUserLoading) {
-    return <Spinner />;
+    return <TableLoader />;
   }
 
   if (isTicketAltError) {

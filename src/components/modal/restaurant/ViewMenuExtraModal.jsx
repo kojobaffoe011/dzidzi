@@ -20,6 +20,7 @@ const ViewMenuExtraModal = ({
   refetch,
   menuID,
   extraID,
+  activeUser,
 }) => {
   const { mutationFn } = useUpdateMenuVisibility(menuID);
   const { mutationFn: extraMutFn } = useUpdateExtraVisibility(extraID);
@@ -132,39 +133,6 @@ const ViewMenuExtraModal = ({
         </div>
       ) : (
         <div className="flex flex-col mt-2 relative">
-          {/* <div className="flex-col flex border-b gap-4">
-            <p className="text-sm text-gray-600 font-bold">Items (€)</p>
-            <div className="flex flex-col gap-2">
-              {orderItems &&
-                orderItems.map((item, idx) => {
-                  return (
-                    <div key={idx} className="grid-cols-3 grid mb-2">
-                      <div className="flex flex-col ">
-                        <p className="font-bold text-sm">
-                          {item.extra ? item.extra.name : item.menu.name}
-                        </p>
-                        <p className="font-light text-xs">
-                          {item.extra ? "extra" : "menu"}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-center justify-center">
-                        <p className="font-light text-sm text-gray-500">
-                          {item.quantity}pcs
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-center justify-center">
-                        <p className="font-normal text-sm">
-                          {(item.extra
-                            ? item.extra.price * item.quantity
-                            : item.menu.price * item.quantity
-                          ).toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </div> */}
           <div className="flex-col flex border-b gap-4 mt-4">
             <div className="flex flex-col gap-2 mb-2">
               {arraytoMap()?.map((item, idx) => {
@@ -183,49 +151,55 @@ const ViewMenuExtraModal = ({
               })}
             </div>
           </div>
-          <div className="flex-col flex border-b gap-2 mt-4">
-            <p className="text-sm text-gray-600 font-bold">Visibility</p>
-            <div className="flex flex-col gap-1 mb-6">
-              <div className="flex items-center gap-1">
-                <p className="text-sm font-light">This item is currently </p>
-                {(extraID ? extraData?.visible : menuData?.visible) ? (
-                  <p className=" text-sm font-bold text-green-600">visible</p>
-                ) : (
-                  <p className=" text-sm font-bold text-red-600">not visible</p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center justify-between gap-1">
-                  <p className="text-sm font-light">Do you want to make it</p>
+          {activeUser?.currentUserRole.includes("RESTAURANT") && (
+            <div className="flex-col flex border-b gap-2 mt-4">
+              <p className="text-sm text-gray-600 font-bold">Visibility</p>
+              <div className="flex flex-col gap-1 mb-6">
+                <div className="flex items-center gap-1">
+                  <p className="text-sm font-light">This item is currently </p>
                   {(extraID ? extraData?.visible : menuData?.visible) ? (
-                    <p className=" text-sm font-bold text-red-600">
-                      not visible{" "}
-                      <span className="text-black font-light">?</span>
-                    </p>
+                    <p className=" text-sm font-bold text-green-600">visible</p>
                   ) : (
-                    <p className=" text-sm font-bold text-green-600">
-                      visible <span className="text-black font-light">?</span>
+                    <p className=" text-sm font-bold text-red-600">
+                      not visible
                     </p>
                   )}
                 </div>
 
-                <Button
-                  className="px-4 py-1 text-xs"
-                  rounded
-                  variant="success"
-                  disabled={isPending}
-                  onClick={() =>
-                    mutate({
-                      visible: extraID ? extraData?.visible : menuData?.visible,
-                    })
-                  }
-                >
-                  {isPending ? <Spinner size={"10px"} /> : "Change"}
-                </Button>
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <p className="text-sm font-light">Do you want to make it</p>
+                    {(extraID ? extraData?.visible : menuData?.visible) ? (
+                      <p className=" text-sm font-bold text-red-600">
+                        not visible{" "}
+                        <span className="text-black font-light">?</span>
+                      </p>
+                    ) : (
+                      <p className=" text-sm font-bold text-green-600">
+                        visible <span className="text-black font-light">?</span>
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    className="px-4 py-1 text-xs"
+                    rounded
+                    variant="success"
+                    disabled={isPending}
+                    onClick={() =>
+                      mutate({
+                        visible: extraID
+                          ? extraData?.visible
+                          : menuData?.visible,
+                      })
+                    }
+                  >
+                    {isPending ? <Spinner size={"10px"} /> : "Change"}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </SideModal>
@@ -241,4 +215,5 @@ ViewMenuExtraModal.propTypes = {
   open: PropTypes.bool,
   setOpen: PropTypes.func,
   refetch: PropTypes.func,
+  activeUser: PropTypes.object,
 };
