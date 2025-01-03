@@ -114,6 +114,7 @@ const UserSelectedOrders = ({ open, setOpen, top }) => {
               onClick={() => {
                 if (loggedIn) {
                   navigateTo(`/details/checkout/${auth?.restaurant?.id}`);
+                  closeModal();
                   return setOpen(false);
                 } else {
                   setOpen(false);

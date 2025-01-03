@@ -1076,9 +1076,6 @@ export const useGetCoupons = (id) => {
     url = `/coupons/${id}`;
   }
 
-  // const url =
-  //   activeUser.currentUserRole == "ADMIN" ? "/coupons" : `/coupons/${id}`;
-
   const queryFn = () => {
     return get(url);
   };
@@ -1087,7 +1084,32 @@ export const useGetCoupons = (id) => {
     return response?.data;
   };
 
-  // const enabled = Boolean(activeUser);
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    // enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+//useGet Coupons
+export const useGetCouriersOnline = () => {
+  const queryKey = ["online-couriers"];
+
+  let url = "/couriers/availability";
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
 
   return useQuery({
     queryKey,
@@ -1296,6 +1318,34 @@ export const useGetCouponsByRestaurantID = (id) => {
   const queryKey = ["coupons"];
 
   let url = `/coupons`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useGetCouponsByCouponNumber = (id) => {
+  const queryKey = ["coupons", id];
+
+  let url = `/coupon?coupon-number=${id}`;
 
   const queryFn = () => {
     return get(url);

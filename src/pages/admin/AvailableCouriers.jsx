@@ -1,29 +1,26 @@
 import { useCallback, useState } from "react";
 import {
-  useDeleteCoupon,
   useGetActiveUser,
-  useGetCoupons,
+  useGetCouriersOnline,
 } from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import AddCoupon from "../../components/modal/restaurant/AddCoupon";
-import { convertDate, sortByColumn } from "../../utils/config";
+import { sortByColumn } from "../../utils/config";
 import TableComponent from "../../components/reusableComponents/TableComponent";
 import TableRow from "../../components/reusableComponents/TableRow";
 import TableColumnContent from "../../components/reusableComponents/TableColumnContent";
 import { HiUser } from "react-icons/hi";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import PropTypes from "prop-types";
-import DeleteModal from "../../components/modal/restaurant/DeleteModal";
 import TableLoader from "../../components/loaders/TableLoader";
+import { LuDot } from "react-icons/lu";
+import { renderRating } from "./Restaurants";
 
-const Coupons = ({ id }) => {
+const AvailableCouriers = () => {
   const { pathname } = useLocation();
   const [openAddCoupon, setOpenAddCoupon] = useState(false);
-  const [openDeleteCoupon, setOpenDeleteCoupon] = useState(false);
-  const [couponId, setCouponID] = useState(null);
 
-  const { mutationFn } = useDeleteCoupon(couponId && couponId);
   const {
     data: activeUser,
     isLoading: activeUserLoading,
@@ -43,11 +40,11 @@ const Coupons = ({ id }) => {
   ]);
 
   const tablehead = [
-    { title: "COUPON DETAILS", sortable: true, sortKey: "COUPON_NAME" },
-    { title: "PERCENTAGE", sortable: false },
-    { title: "START DATE", sortable: false },
-    { title: "END DATE", sortable: false },
-    { title: "Action", sortable: false },
+    { title: "Name", sortable: true, sortKey: "FIRSTNAME" },
+    { title: "Phone", sortable: false },
+    { title: "Rating", sortable: false },
+    { title: "Email", sortable: false },
+    { title: "Address", sortable: false },
   ];
 
   const handleOpenAddCouponModal = useCallback(() => {
@@ -57,26 +54,13 @@ const Coupons = ({ id }) => {
     setOpenAddCoupon(false);
   }, []);
 
-  const handleOpenDeleteCouponModal = useCallback(() => {
-    setOpenDeleteCoupon(true);
-  }, []);
-  const handleCloseDeleteCouponModal = useCallback(() => {
-    setOpenDeleteCoupon(false);
-  }, []);
-
-  let user_id = null;
-
-  if (activeUser.currentUserRole == "RESTAURANT_ADMIN") {
-    user_id = activeUser.currentUserId;
-  }
-
   const {
-    data: coupons,
-    isLoading: couponsLoading,
-    isError: isCouponsError,
+    data: couriers,
+    isLoading: couriersLoading,
+    isError: isCourierError,
     refetch,
     // error: couponsError,
-  } = useGetCoupons(id || user_id);
+  } = useGetCouriersOnline();
 
   const percentage = (percentage) => {
     if (percentage < 30) {
@@ -88,11 +72,11 @@ const Coupons = ({ id }) => {
     }
   };
 
-  if (couponsLoading || activeUserLoading) {
+  if (couriersLoading || activeUserLoading) {
     return <TableLoader />;
   }
 
-  if (isCouponsError) {
+  if (isCourierError) {
     return <ErrorOccured />;
   }
   return (
@@ -104,14 +88,7 @@ const Coupons = ({ id }) => {
         userRole={"RESTAURANT_ADMIN"}
         width="400px"
       />
-      <DeleteModal
-        isOpen={openDeleteCoupon}
-        action={"coupon"}
-        handleCancel={handleCloseDeleteCouponModal}
-        mutationFn={mutationFn}
-        refetch={refetch}
-        width="400px"
-      />
+
       <div className="flex flex-col mt-4">
         {pathname == "/dashboard/coupons" && (
           <div className="justify-end flex">
@@ -126,45 +103,15 @@ const Coupons = ({ id }) => {
           </div>
         )}
 
-        {/* <FilterComponent
-          filters={filters}
-          setFilters={setFilters}
-          activeFilters={activeFilters(filters)}
-        >
-          <FilterType
-            filterType={"INPUTFIELD"}
-            handleFilterChange={(event) =>
-              handleFilterChange(event, "NAME", filters, setFilters)
-            }
-            placeholder={"Name"}
-          />
-          <FilterType
-            filterType={"INPUTFIELD"}
-            handleFilterChange={(event) =>
-              handleFilterChange(event, "EMAIL", filters, setFilters)
-            }
-            placeholder={"Email"}
-          />
-          <FilterType
-            filterType={"INPUTFIELD"}
-            handleFilterChange={(event) =>
-              handleFilterChange(event, "USERNAME", filters, setFilters)
-            }
-            placeholder={"Username"}
-          />
-        </FilterComponent>
-
-        <RenderActi veFilters filters={filters} setFilters={setFilters} /> */}
         <div className="my-1"> </div>
         <TableComponent
           tablehead={tablehead}
-          tabledata={coupons}
+          tabledata={couriers}
           filters={filters}
           setFilters={setFilters}
           sortByColumn={sortByColumn}
-          isLoading={couponsLoading}
         >
-          {coupons?.map((item, idx) => {
+          {couriers?.map((item, idx) => {
             return (
               <TableRow key={idx} index={idx}>
                 <TableColumnContent>
@@ -177,49 +124,54 @@ const Coupons = ({ id }) => {
                     </div>
 
                     <div className="flex flex-col justify-center">
-                      <p className="font-bold">{item.couponName}</p>
-                      <p className="text-xs font-light">{item.couponNumber}</p>
-                    </div>
-                  </div>
-                </TableColumnContent>
-                <TableColumnContent>
-                  <div className="flex">
-                    <div
-                      className={`font-bold rounded-full text-sm px-4 py-1 ${percentage(
-                        item.percentage
-                      )}`}
-                    >
-                      <p className=" uppercase">{item.percentage}%</p>
+                      <p className="mr-3 font-bold">
+                        {item?.firstName} {item?.lastName}
+                      </p>
+
+                      <div className="flex items-center">
+                        <p className="text-xs font-light">
+                          @{item?.credential.username}
+                        </p>
+                        <LuDot />
+                        {item?.status == "ONLINE" ? (
+                          <p className=" text-xs font-light text-green-600">
+                            online
+                          </p>
+                        ) : (
+                          <p className=" text-xs font-light text-red-600">
+                            offline
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
                   <div className="flex flex-col">
                     <div className="flex items-center">
-                      <p className="">{convertDate(item.startDate)}</p>
+                      <p className="mr-3 ">{item?.contact}</p>
+                    </div>
+                  </div>
+                </TableColumnContent>
+                <TableColumnContent>
+                  {renderRating(item.averageRating)}
+                </TableColumnContent>
+                <TableColumnContent>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <p className="mr-3 ">{item?.credential.email}</p>
                     </div>
                   </div>
                 </TableColumnContent>
                 <TableColumnContent>
                   <div className="flex flex-col">
                     <div className="flex items-center">
-                      <p className="">{convertDate(item.endDate)}</p>
+                      <p className="mr-3 ">
+                        {item?.address?.street} {item?.address?.houseNumber},{" "}
+                        {item?.address?.city}
+                      </p>
                     </div>
                   </div>
-                </TableColumnContent>
-                <TableColumnContent>
-                  {/* <Link to={`${item.id}`}> */}
-                  <Button
-                    variant="danger"
-                    className="px-2 py-1 text-xs rounded-md"
-                    onClick={async () => {
-                      await setCouponID(item?.id);
-                      handleOpenDeleteCouponModal();
-                    }}
-                  >
-                    Delete Coupon
-                  </Button>
-                  {/* </Link> */}
                 </TableColumnContent>
               </TableRow>
             );
@@ -230,9 +182,9 @@ const Coupons = ({ id }) => {
   );
 };
 
-export default Coupons;
+export default AvailableCouriers;
 
-Coupons.propTypes = {
+AvailableCouriers.propTypes = {
   id: PropTypes.string,
   show: PropTypes.bool,
 };

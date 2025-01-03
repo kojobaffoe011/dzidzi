@@ -180,8 +180,16 @@ const Dashboard = () => {
         <MdOutlineDeliveryDining className={className} size="25px" />
       ),
       text: "Couriers",
-      userType: ["ADMIN"],
+      userType: ["ADMIN", "SERVICE"],
     },
+    // {
+    //   link: "couriers-online",
+    //   icon: (className = "") => (
+    //     <MdOutlineDeliveryDining className={className} size="25px" />
+    //   ),
+    //   text: "Online couriers",
+    //   userType: ["ADMIN", "SERVICE"],
+    // },
     {
       link: "tickets",
       icon: (className = "") => <TiTicket className={className} size="25px" />,
@@ -234,6 +242,8 @@ const Dashboard = () => {
     if (activeUserLoading || isCourierLoading) {
       return <Loader />;
     }
+
+    // if()
     return (
       <div className="p-2">
         <Outlet context={[activeUserLoading, activeUser]} />

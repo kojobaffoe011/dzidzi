@@ -51,6 +51,8 @@ import ViewRestaurantCoupons from "./pages/admin/ViewRestaurantCoupons";
 import Tickets from "./pages/admin/Tickets";
 import UserSupportPage from "./pages/main/userprofile/UserSupportPage";
 import ViewUserTickets from "./pages/main/userprofile/ViewUserTickets";
+import AvailableCouriers from "./pages/admin/AvailableCouriers";
+import CouriersOutlet from "./pages/admin/CouriersOutlet";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -151,7 +153,20 @@ const App = () => {
                   <Route path="services/:id" exact element={<VIewServices />} />
                   <Route path="" exact element={<Home />} />
                   <Route path="users" exact element={<Users />} />
-                  <Route path="couriers" exact element={<Couriers />} />
+
+                  <Route path="couriers" exact element={<CouriersOutlet />}>
+                    <Route path="" exact element={<Couriers />} />
+                    <Route
+                      path="online"
+                      exact
+                      element={<AvailableCouriers />}
+                    />
+                  </Route>
+                  <Route
+                    path="couriers-online"
+                    exact
+                    element={<AvailableCouriers />}
+                  />
                   <Route path="services" exact element={<Services />} />
                   <Route path="coupons" exact element={<Coupons />} />
                   <Route path="menus" exact element={<Menus />} />

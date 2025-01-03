@@ -19,7 +19,10 @@ import axios from "axios";
 import Spinner from "../../../components/loaders/Spinner";
 import DzidziLoader from "../../../components/loaders/DzidziLoader";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
-import { axiosInstance, useGetActiveUser, useGetActiveUserDetails } from "../../../components/brokers/apicalls";
+import {
+  useGetActiveUser,
+  useGetActiveUserDetails,
+} from "../../../components/brokers/apicalls";
 import { post } from "../../../utils/transport";
 
 const deliveryOptions = [
@@ -38,6 +41,8 @@ const deliveryOptions = [
 
 const Checkout = () => {
   const [deliveryType, setDeliveryType] = useState("Standard");
+  const [couponNumber, setCouponNumber] = useState(null);
+  const [orderNote, setOrderNote] = useState(null);
   const { auth, setAuth } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -76,8 +81,11 @@ const Checkout = () => {
 
   const navigateTo = (url) => navigate(url);
 
-  const {data: userDetails, isLoading: userDetailsLoading} = useGetActiveUser()
-  const {data, isLoading} = useGetActiveUserDetails(userDetails?.currentUserId)
+  const { data: userDetails, isLoading: userDetailsLoading } =
+    useGetActiveUser();
+  const { data, isLoading } = useGetActiveUserDetails(
+    userDetails?.currentUserId
+  );
 
   const totalOrderSum = auth?.orders?.reduce((total, order) => {
     return (
@@ -105,8 +113,6 @@ const Checkout = () => {
     },
   ];
 
-
-
   const totalPayableAmount = totalBreakdown.reduce((total, item) => {
     return total + item.amount;
   }, 0);
@@ -123,7 +129,7 @@ const Checkout = () => {
         open: false,
         orderDetails: data,
       }));
-      const orderID = data?.id
+      const orderID = data?.id;
 
       await mutateAsync({ orderID });
 
@@ -138,59 +144,60 @@ const Checkout = () => {
   const proceedToPayment = () => {
     let orderItemsPush = [];
     auth?.orders?.forEach((element) => orderItemsPush.push(element.id));
-    try {
-      mutate({
-      orderItems:
-        orderItemsPush,
+    const payload = {
+      orderItems: orderItemsPush,
       useMyAddress: auth?.deliveryAddress ? auth?.useMyAddress : true,
-      address: auth?.deliveryAddress?.street ? auth?.deliveryAddress : {
-        city: data?.address?.city,
-        houseNumber: data?.address?.houseNumber,
-        street: data?.address?.street,
-        zip: data?.address?.zip,
-      },
-      // couponNumber: "DI9D6J8FHG",
-    });
-    return
+      address: auth?.deliveryAddress?.street
+        ? auth?.deliveryAddress
+        : {
+            city: data?.address?.city,
+            houseNumber: data?.address?.houseNumber,
+            street: data?.address?.street,
+            zip: data?.address?.zip,
+          },
+    };
+    try {
+      mutate(
+        couponNumber
+          ? {
+              ...payload,
+              couponNumber: couponNumber,
+              orderNote: orderNote,
+            }
+          : { ...payload, orderNote: orderNote }
+      );
+      return;
     } catch (error) {
-
-      showErrorToast(error.message)
+      showErrorToast(error.message);
     }
-    
   };
 
-
-
-
-  const {mutateAsync, isPending: paymentIntentPending} = useMutation({
-    mutationKey: ['createPaymentIntent'],
-    mutationFn:   async (paymentData) => {
-      const response = await axios.post('checkout', paymentData);
+  const { mutateAsync, isPending: paymentIntentPending } = useMutation({
+    mutationKey: ["createPaymentIntent"],
+    mutationFn: async (paymentData) => {
+      const response = await axios.post("checkout", paymentData);
       return response.data;
     },
     onSuccess: (paymentResponse) => {
-        // Handle success, navigate to success page
-        console.log('Payment Intent Created:', paymentResponse);
-      },
+      // Handle success, navigate to success page
+      console.log("Payment Intent Created:", paymentResponse);
+    },
     onError: (error) => {
-      if(error.message == 'Request failed with status code 403'){
-        navigateTo('/details/user-profile/orders')
+      if (error.message == "Request failed with status code 403") {
+        navigateTo("/details/user-profile/orders");
       }
-        console.error('Error proceeding with payment:', error);
-      },
+      console.error("Error proceeding with payment:", error);
+    },
+  });
 
-  })
-
-
-  if(userDetailsLoading || isLoading){
-    return <DzidziLoader/>
+  if (userDetailsLoading || isLoading) {
+    return <DzidziLoader />;
   }
 
-  if(userDetails?.currentUserRole != 'USER'){
+  if (userDetails?.currentUserRole != "USER") {
     //navigate to unauthorized route
-    return <div>Unauthorized</div>
+    return <div>Unauthorized</div>;
   }
-
 
   if (!auth?.orders || auth?.orders?.length < 1) {
     return (
@@ -226,14 +233,15 @@ const Checkout = () => {
         userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="600px"
-        address = {data?.address}
+        address={data?.address}
       />
       <PromoCode
         isOpen={promoCodeOpen}
-        handleCancel={handleClosePromoCodeModal}
+        handlecancel={handleClosePromoCodeModal}
         userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="350px"
+        setcouponnumber={setCouponNumber}
       />
       <AddNote
         isOpen={addNoteOpen}
@@ -241,6 +249,7 @@ const Checkout = () => {
         userRole={"RESTAURANT_ADMIN"}
         order={selectedOrder}
         width="350px"
+        setordernote={setOrderNote}
       />
       <div className="grid grid-cols-3 mt-16 gap-16">
         <div className="col-span-2 flex flex-col">
@@ -255,15 +264,13 @@ const Checkout = () => {
             <div className="flex gap-4 items-center">
               <LuBaggageClaim className="text-gray-600" size="20px" />
               {auth?.deliveryAddress?.street ? (
-
-                
                 <div className="flex flex-col">
                   <p className="text-md font-normal">
                     {`${auth?.deliveryAddress?.street},
                     ${auth?.deliveryAddress?.houseNumber}`}
                   </p>
                   <p className="text-sm font-normal text-gray-600">
-                    {`${auth?.deliveryAddress?.zip || ''} 
+                    {`${auth?.deliveryAddress?.zip || ""} 
                     ${auth?.deliveryAddress?.city}`}
                   </p>
                 </div>
@@ -458,9 +465,7 @@ const Checkout = () => {
             </div>
             <div
               className="flex gap-4 w-full justify-between cursor-pointer "
-              onClick={() => 
-                handleOpenPromoCodeModal()
-              }
+              onClick={() => handleOpenPromoCodeModal()}
             >
               <MdOutlineDiscount className="text-gray-600" size="20px" />
               <div className="flex justify-between items-center flex-grow">
