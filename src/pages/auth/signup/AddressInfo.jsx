@@ -8,7 +8,7 @@ import Button from "../../../components/reusableComponents/Button";
 import { useLocation } from "react-router";
 
 const AddressInfo = () => {
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
 
   const signupInfo = localStorage.getItem("signup");
   const basicDetails = JSON.parse(signupInfo);
@@ -17,16 +17,23 @@ const AddressInfo = () => {
 
   const queryParams = new URLSearchParams(search);
   const verifyParam = queryParams.get("verificationcode"); // Get the value of "verificationcode"
+  const user_type = queryParams.get("type"); // Get the value of "verificationcode"
   const verificationCode = verifyParam ? verifyParam.replace(/ /g, "+") : "";
 
-  const navigateLink = () => {
-    let link = "/auth/register/login-info";
-    if (pathname.includes("restaurant")) {
-      link = `/auth/register/restaurant/login-info?verificationcode=${verificationCode}`;
-    } else if (pathname.includes("courier")) {
-      link = `/auth/register/courier/login-info?verificationcode=${verificationCode}`;
-    } else link = "/auth/register/login-info";
+  const navigateLink = (type) => {
+    // let link = "/auth/register/login-info";
+    // if (pathname.includes("restaurant")) {
+    //   link = `/auth/register/restaurant/login-info?verificationcode=${verificationCode}`;
+    // } else if (pathname.includes("courier")) {
+    //   link = `/auth/register/courier/login-info?verificationcode=${verificationCode}`;
+    // } else link = "/auth/register/login-info";
 
+    let link = "/auth/register/login-info";
+    if (type == "regular") {
+      link = `/auth/register/login-info?type=${type}`;
+    } else {
+      link = `/auth/register/login-info?verificationcode=${verificationCode}&type=${type}`;
+    }
     return link;
   };
 
@@ -57,7 +64,7 @@ const AddressInfo = () => {
         addressCompleted: true,
       })
     );
-    navigateTo(navigateLink());
+    navigateTo(navigateLink(user_type));
   };
 
   if (!basicDetails || !basicDetails?.basicCompleted) {

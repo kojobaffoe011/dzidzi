@@ -1224,6 +1224,8 @@ export const useRestaurantCompleteAccount = () => {
       address,
     } = data;
 
+    console.log(data);
+
     // Create a FormData object
     const formData = new FormData();
     formData.append("name", name);
@@ -1248,7 +1250,7 @@ export const useRestaurantCompleteAccount = () => {
 };
 
 //restaurant complete courier
-export const useCourierCompleteAccount = () => {
+export const useCourierCompleteAccount = (user_type) => {
   const mutationFn = (data) => {
     const {
       verificationcode,
@@ -1264,7 +1266,7 @@ export const useCourierCompleteAccount = () => {
     const formData = new FormData();
     formData.append("lastName", lastName);
     formData.append("contact", contact);
-    formData.append("contact1", contact);
+    // formData.append("contact1", contact);
     formData.append("firstName", firstName);
     formData.append("newPassword", password);
     formData.append("repeatPass", password);
@@ -1272,12 +1274,19 @@ export const useCourierCompleteAccount = () => {
     formData.append("address", address);
 
     // Send the FormData as the request body
-    return axiosInstance.put(
-      `${NO_AUTH_URL}/courier/complete-account?verificationCode=${encodeURIComponent(
-        verificationcode
-      )}`,
-      formData
-    );
+    return user_type == "courier"
+      ? axiosInstance.put(
+          `${NO_AUTH_URL}/${user_type}/complete-account?verificationCode=${encodeURIComponent(
+            verificationcode
+          )}`,
+          formData
+        )
+      : axiosInstance.post(
+          `${NO_AUTH_URL}/${user_type}/complete-account?verificationCode=${encodeURIComponent(
+            verificationcode
+          )}`,
+          formData
+        );
   };
 
   return { mutationFn };

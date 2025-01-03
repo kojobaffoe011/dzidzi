@@ -9,10 +9,11 @@ import { useLocation } from "react-router";
 
 const BasicDetails = () => {
   const { navigateTo } = useNavigateTo();
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
 
   const queryParams = new URLSearchParams(search);
   const verifyParam = queryParams.get("verificationcode"); // Get the value of "verificationcode"
+  const user_type = queryParams.get("type"); // Get the value of "verificationcode"
   const verificationCode = verifyParam ? verifyParam.replace(/ /g, "+") : "";
 
   const userSchema = yup.object().shape({
@@ -30,17 +31,23 @@ const BasicDetails = () => {
 
   const { register, handleSubmit } = useForm({
     resolver: yupResolver(
-      pathname.includes("restaurant") ? restaurantSchema : userSchema
+      user_type == "restaurant" ? restaurantSchema : userSchema
     ),
   });
 
-  const navigateLink = () => {
+  const navigateLink = (type) => {
     let link = "/auth/register/address";
-    if (pathname.includes("restaurant")) {
-      link = `/auth/register/restaurant/address?verificationcode=${verificationCode}`;
-    } else if (pathname.includes("courier")) {
-      link = `/auth/register/courier/address?verificationcode=${verificationCode}`;
-    } else link = "/auth/register/address";
+    if (type == "regular") {
+      link = `/auth/register/address?type=${type}`;
+    } else {
+      link = `/auth/register/address?verificationcode=${verificationCode}&type=${type}`;
+    }
+
+    // if (pathname.includes("restaurant")) {
+    //   link = `/auth/register/restaurant/address?verificationcode=${verificationCode}`;
+    // } else if (pathname.includes("courier")) {
+    //   link = `/auth/register/courier/address?verificationcode=${verificationCode}`;
+    // } else link = "/auth/register/address";
 
     return link;
   };
@@ -50,7 +57,7 @@ const BasicDetails = () => {
       "signup",
       JSON.stringify({ basicCompleted: true, ...data })
     );
-    navigateTo(navigateLink());
+    navigateTo(navigateLink(user_type));
   };
 
   return (
@@ -65,7 +72,7 @@ const BasicDetails = () => {
         </p>
 
         <form action="" className="flex flex-col w-full gap-6">
-          {pathname.includes("restaurant") ? (
+          {user_type == "restaurant" ? (
             <div className={`flex flex-col gap-1 ${resp}`}>
               <CustomInput
                 register={register}
@@ -112,7 +119,7 @@ const BasicDetails = () => {
             />
           </div>
 
-          {pathname.includes("restaurant") && (
+          {user_type == "restaurant" && (
             <div className={`flex flex-col gap-1 ${resp}`}>
               <CustomInput
                 register={register}

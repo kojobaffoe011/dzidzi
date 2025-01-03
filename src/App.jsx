@@ -42,7 +42,6 @@ import Profile from "./pages/main/userprofile/profile";
 import General from "./pages/main/userprofile/General";
 import MyOrders from "./pages/main/userprofile/MyOrders";
 import Support from "./pages/main/userprofile/Support";
-import { ModalProvider } from "./context/modalProvider";
 import ViewRestaurantMenus from "./pages/admin/ViewRestaurantMenus";
 import RestaurantBranches from "./pages/admin/RestaurantBranches";
 import ViewRestaurantBranches from "./pages/admin/ViewRestaurantBranches";
@@ -52,8 +51,6 @@ import ViewRestaurantCoupons from "./pages/admin/ViewRestaurantCoupons";
 import Tickets from "./pages/admin/Tickets";
 import UserSupportPage from "./pages/main/userprofile/UserSupportPage";
 import ViewUserTickets from "./pages/main/userprofile/ViewUserTickets";
-import RestaurantOutlet from "./pages/auth/restaurant-signup/RestaurantOutlet";
-import CourierOutlet from "./pages/auth/courier-signup copy/CourierOutlet";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -86,21 +83,6 @@ const App = () => {
                 <Route path="verify" element={<Verify />} />
 
                 {/* <Route path="newpassword/:phone" element={<NewPassword />} /> */}
-              </Route>
-
-              <Route
-                path="auth/register/restaurant"
-                element={<RestaurantOutlet />}
-              >
-                <Route path="" element={<BasicDetails />} />
-                <Route path="address" element={<AddressInfo />} />
-                <Route path="login-info" element={<LoginDetails />} />
-              </Route>
-
-              <Route path="auth/register/courier" element={<CourierOutlet />}>
-                <Route path="" element={<BasicDetails />} />
-                <Route path="address" element={<AddressInfo />} />
-                <Route path="login-info" element={<LoginDetails />} />
               </Route>
 
               <Route

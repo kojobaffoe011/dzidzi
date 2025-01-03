@@ -6,9 +6,8 @@ import { FiUser } from "react-icons/fi";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLogInOutline } from "react-icons/io5";
 import rider from "../../assets/images/motorbike.png";
-import PropTypes from "prop-types";
 
-const LoginOutlet = ({ altsteps, active, altactive }) => {
+const LoginOutlet = () => {
   const { pathname } = useLocation();
 
   const steps = [
@@ -37,9 +36,6 @@ const LoginOutlet = ({ altsteps, active, altactive }) => {
       icon: (className) => <IoLogInOutline className={className} />,
     },
   ];
-
-  const tabs = altsteps || steps;
-
   return (
     <div className="w-screen h-screen flex flex-col ">
       <div className="grid grid-cols-4">
@@ -61,15 +57,11 @@ const LoginOutlet = ({ altsteps, active, altactive }) => {
 
             {pathname.includes("register") && (
               <div className="flex flex-col w-full h-full p-2">
-                {tabs.map((item, idx) => {
+                {steps.map((item, idx) => {
                   const isActive =
                     (item.name == "Basic Info" &&
-                      (active
-                        ? pathname == `/auth/register${active}`
-                        : pathname == `/auth/register`)) ||
-                    (altactive
-                      ? pathname == `/auth/register/${altactive}/${item.link}`
-                      : pathname == `/auth/register/${item.link}`);
+                      pathname == `/auth/register`) ||
+                    pathname == `/auth/register/${item.link}`;
 
                   return (
                     <div key={idx} className="flex gap-2">
@@ -83,7 +75,7 @@ const LoginOutlet = ({ altsteps, active, altactive }) => {
                         >
                           {item.icon("text-2xl")}
                         </div>
-                        {idx < tabs.length - 1 && (
+                        {idx < steps.length - 1 && (
                           <div className="h-12 border-l-2 border-gray-300 my-1" />
                         )}
                       </div>
@@ -141,7 +133,11 @@ const LoginOutlet = ({ altsteps, active, altactive }) => {
                   : " No account yet?"}
               </p>
               <Link
-                to={pathname.includes("register") ? "/auth" : "/auth/register"}
+                to={
+                  pathname.includes("register")
+                    ? "/auth"
+                    : "/auth/register?type=regular"
+                }
               >
                 <p className="text-blue-500 underline lg:text-base md:text-base xs:text-xs sm:text-xs ss:text-xs xss:text-xs">
                   {pathname.includes("register")
@@ -161,9 +157,3 @@ const LoginOutlet = ({ altsteps, active, altactive }) => {
 };
 
 export default LoginOutlet;
-
-LoginOutlet.propTypes = {
-  altsteps: PropTypes.array,
-  active: PropTypes.string,
-  altactive: PropTypes.string,
-};

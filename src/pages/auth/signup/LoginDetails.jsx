@@ -19,10 +19,9 @@ import Button from "../../../components/reusableComponents/Button";
 import { useLocation } from "react-router";
 
 const LoginDetails = () => {
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
   const { navigateTo } = useNavigateTo();
-  const { mutationFn } = useRestaurantCompleteAccount();
-  const { mutationFn: courierMutFn } = useCourierCompleteAccount();
+
   const [isFocused, setIsFocused] = useState(false);
   const [userData, setUserData] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
@@ -31,7 +30,11 @@ const LoginDetails = () => {
 
   const queryParams = new URLSearchParams(search);
   const verifyParam = queryParams.get("verificationcode"); // Get the value of "verificationcode"
-  const verificationcode = verifyParam ? verifyParam.replace(/ /g, "+") : "";
+  const verificationcode = verifyParam?.replace(/ /g, "+"); // verifyParam ?  : "";
+  const user_type = queryParams.get("type"); // Get the value of "verificationcode"
+
+  const { mutationFn } = useRestaurantCompleteAccount();
+  const { mutationFn: courierMutFn } = useCourierCompleteAccount(user_type);
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -83,11 +86,7 @@ const LoginDetails = () => {
     watch,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(
-      pathname.includes("restaurant") || pathname.includes("courier")
-        ? otherSchema
-        : userSchema
-    ),
+    resolver: yupResolver(user_type != "regular" ? otherSchema : userSchema),
   });
 
   const password = watch("password");
@@ -154,7 +153,7 @@ const LoginDetails = () => {
 
   const { mutate: userRoleMutate, isPending: isUserRolePending } = useMutation({
     mutationKey: ["complete-restaurant"],
-    mutationFn: pathname.includes("restaurant") ? mutationFn : courierMutFn,
+    mutationFn: user_type == "restaurant" ? mutationFn : courierMutFn,
     onSuccess: async () => {
       showErrorToast("Registration successfully completed");
       navigateTo("/auth/register/success");
@@ -194,9 +193,9 @@ const LoginDetails = () => {
   console.log(errors);
 
   const formSubmitHandler = async (data) => {
-    if (pathname.includes("restaurant") && Object.keys(errors).length === 0) {
+    if (user_type == "restaurant" && Object.keys(errors).length === 0) {
       return userRoleMutate({
-        verificationcode: verificationcode,
+        verificationcode,
         name: parsedUserDetails.name,
         bio: parsedUserDetails.bio,
         password: data.password,
@@ -212,13 +211,13 @@ const LoginDetails = () => {
         },
       });
     } else if (
-      pathname.includes("courier") &&
+      (user_type == "courier" || user_type == "service") &&
       Object.keys(errors).length === 0
     ) {
       return userRoleMutate({
-        verificationcode: verificationcode,
-        firstName: parsedUserDetails.name,
-        lastName: parsedUserDetails.lastName,
+        verificationcode,
+        firstName: parsedUserDetails.firstname,
+        lastName: parsedUserDetails.lastname,
         password: data.password,
         contact: parsedUserDetails.contact,
         username: data.username,
@@ -261,7 +260,7 @@ const LoginDetails = () => {
         >
           <div className="flex flex-col gap-6 col-span-2 mt-4">
             <div className="grid grid-cols-3 gap-1">
-              {pathname == "/auth/register/login-info" && (
+              {user_type == "regular" && (
                 <div className="w-full col-span-2 ">
                   <CustomInput
                     register={register}
@@ -273,11 +272,7 @@ const LoginDetails = () => {
                   />
                 </div>
               )}
-              <div
-                className={
-                  pathname !== "/auth/register/login-info" && "col-span-3"
-                }
-              >
+              <div className={user_type !== "regular" && "col-span-3"}>
                 <CustomInput
                   register={register}
                   name={"username"}

@@ -71,7 +71,7 @@ const Header = () => {
           )}
           {!loggedIn && (
             <div className="flex gap-2">
-              <Link to="/auth/register">
+              <Link to="/auth/register?type=regular">
                 <button className="rounded-full bg-white px-6 py-2 border border-gray-900">
                   <div className="flex items-center justify-center">
                     <p className="font-bold font-gray-500 text-xs ">Register</p>

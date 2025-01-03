@@ -18,6 +18,7 @@ import FilterType from "../../components/reusableComponents/FilterType";
 import FilterComponent from "../../components/reusableComponents/FilterComponent";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import AddUserRoleModal from "../../components/modal/restaurant/AddUserRoleModal";
+import { LuDot } from "react-icons/lu";
 
 const Couriers = () => {
   const [open, setOpen] = useState(false);
@@ -173,9 +174,22 @@ const Couriers = () => {
                         <p className="mr-3 font-bold">
                           {item?.firstName} {item?.lastName}
                         </p>
-                        <p className="mr-3 text-xs font-light">
-                          @{item?.credential.username}
-                        </p>
+
+                        <div className="flex items-center">
+                          <p className="text-xs font-light">
+                            @{item?.credential.username}
+                          </p>
+                          <LuDot />
+                          {item?.status == "ONLINE" ? (
+                            <p className=" text-xs font-light text-green-600">
+                              online
+                            </p>
+                          ) : (
+                            <p className=" text-xs font-light text-red-600">
+                              offline
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </TableColumnContent>
