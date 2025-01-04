@@ -2262,3 +2262,26 @@ export const useUpdateCourierAvailability = () => {
 
   return { mutationFn };
 };
+
+//update address
+export const useUpdateAddress = () => {
+  const mutationFn = (data) => {
+    return put(`/address`, data);
+  };
+
+  return { mutationFn };
+};
+
+//update password
+export const useUpdatePassword = () => {
+  const mutationFn = (data) => {
+    const { username, password } = data;
+
+    return post(
+      `/forgotten-password?username=${username}&password=${password}&repeatedPassword=${password}`,
+      data
+    );
+  };
+
+  return { mutationFn };
+};

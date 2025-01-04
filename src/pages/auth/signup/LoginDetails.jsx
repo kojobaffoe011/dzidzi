@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import * as yup from "yup";
-import { showErrorToast } from "../../../toast/Toast";
+import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import Spinner from "../../../components/loaders/Spinner";
 import { useNavigateTo } from "../../../hooks/useNavigateTo";
 import Unauthorized from "../../../components/reusableComponents/Unauthorized";
@@ -155,7 +155,7 @@ const LoginDetails = () => {
     mutationKey: ["complete-restaurant"],
     mutationFn: user_type == "restaurant" ? mutationFn : courierMutFn,
     onSuccess: async () => {
-      showErrorToast("Registration successfully completed");
+      showSuccessToast("Registration successfully completed");
       navigateTo("/auth/register/success");
     },
     onError: (error) => {
