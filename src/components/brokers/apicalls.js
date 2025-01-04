@@ -2191,11 +2191,42 @@ export const useVerifyUser = (id) => {
   });
 };
 
+//update 2fa
+export const useChange2FAStaus = () => {
+  const mutationFn = (data) => {
+    const { status, username } = data;
+
+    let url = "";
+    if (status) {
+      url = `/2fa/disable?username=${username}`;
+    } else url = `/2fa/enable?username=${username}`;
+    return post(url, data);
+  };
+
+  return { mutationFn };
+};
+
+export const useVerify2FACode = () => {
+  const mutationFn = (data) => {
+    const { code, username } = data;
+    return axiosInstance.post(
+      `${NO_AUTH_URL}/2fa/verification?username=${username}&code=${code}`,
+      data,
+      {
+        headers: {
+          Authorization: null,
+        },
+      }
+    );
+  };
+
+  return { mutationFn };
+};
+
 //update menu visibility
 export const useUpdateMenuVisibility = (id) => {
   const mutationFn = (data) => {
     const { visible } = data;
-    console.log(visible);
 
     let url = "";
     if (visible) {

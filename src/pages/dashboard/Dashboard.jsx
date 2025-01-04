@@ -7,7 +7,7 @@ import {
   IoRestaurantOutline,
 } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { RiCoupon2Line } from "react-icons/ri";
+import { RiCoupon2Line, RiSettings5Line } from "react-icons/ri";
 import { ImSwitch } from "react-icons/im";
 import { TbUsersGroup } from "react-icons/tb";
 import CheckOnlineStatus from "../../components/CheckOnlineStatus";
@@ -204,14 +204,14 @@ const Dashboard = () => {
       ],
     },
 
-    // {
-    //   link: "profile-details",
-    //   icon: (className = "") => (
-    //     <FaUserGraduate className={className} size="25px" />
-    //   ),
-    //   text: "Profile",
-    //   userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
-    // },
+    {
+      link: "profile-details",
+      icon: (className = "") => (
+        <RiSettings5Line className={className} size="25px" />
+      ),
+      text: "Profile",
+      userType: ["ADMIN", "RESTAURANT_ADMIN", "COURIER", "SERVICE"],
+    },
   ];
 
   const { mutate: updateCourierStatus, isPending: statusPending } = useMutation(

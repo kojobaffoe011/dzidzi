@@ -53,6 +53,7 @@ import UserSupportPage from "./pages/main/userprofile/UserSupportPage";
 import ViewUserTickets from "./pages/main/userprofile/ViewUserTickets";
 import AvailableCouriers from "./pages/admin/AvailableCouriers";
 import CouriersOutlet from "./pages/admin/CouriersOutlet";
+import TwoFA from "./pages/auth/TwoFA";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,7 @@ const App = () => {
                 </Route>
 
                 <Route path="verify" element={<Verify />} />
+                <Route path="2fa" element={<TwoFA />} />
 
                 {/* <Route path="newpassword/:phone" element={<NewPassword />} /> */}
               </Route>

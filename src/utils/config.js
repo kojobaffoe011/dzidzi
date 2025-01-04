@@ -240,3 +240,8 @@ export const position = {
   top: "top-[-465px]",
   right: "right-[-380px]",
 };
+
+export const setLoginTimestamp = () => {
+  const loginTime = new Date().getTime(); // Current timestamp in milliseconds
+  localStorage.setItem("loginTime", loginTime.toString());
+};

@@ -1,5 +1,6 @@
 import { useOutletContext } from "react-router";
 import UserProfileDetails from "../../../components/reusableComponents/UserProfileDetails";
+import TwoFALogic from "../../../components/reusableComponents/TwoFALogic";
 
 const EditPassword = () => {
   return (
@@ -158,6 +159,7 @@ const General = () => {
       <div className="grid grid-cols-4 mt-4 gap-4">
         <EditPassword />
         <EditAddress />
+        <TwoFALogic username={data?.credential?.username} />
       </div>
     </div>
   );
