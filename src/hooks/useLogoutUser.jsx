@@ -6,35 +6,29 @@ import useAuth from "./useAuth";
 import { useNavigate } from "react-router";
 import { timeOutError } from "../utils/config";
 
-export function useLogoutUser (){
-      const {mutationFn} = useLogout()
-      const {setAuth} = useAuth()
-        const navigate = useNavigate();
-        const navigateTo = (url) => {
+export function useLogoutUser() {
+  const { mutationFn } = useLogout();
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+  const navigateTo = (url) => {
     navigate(url);
   };
 
-  const {mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["logout"],
     mutationFn: mutationFn,
-    onSuccess: ()=>{
+    onSuccess: () => {
       setAuth({});
-    localStorage.removeItem("dzidzi");
-    localStorage.removeItem("loginTime");
-    cookie.clearCipher();
-    navigateTo("/")
+      localStorage.removeItem("dzidzi");
+      localStorage.removeItem("loginTime");
+      cookie.clearCipher();
+      navigateTo("/");
     },
-    onError: (error)=>{
-     timeOutError(error)
-     showErrorToast(error.message)
+    onError: (error) => {
+      timeOutError(error);
+      showErrorToast(error.message);
     },
-    
+  });
 
-
-
-})
-
-return {mutate, isPending}
-
+  return { mutate, isPending };
 }
-

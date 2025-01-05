@@ -54,6 +54,9 @@ import ViewUserTickets from "./pages/main/userprofile/ViewUserTickets";
 import AvailableCouriers from "./pages/admin/AvailableCouriers";
 import CouriersOutlet from "./pages/admin/CouriersOutlet";
 import TwoFA from "./pages/auth/TwoFA";
+import CheckoutForm from "./pages/main/payment/CheckOutForm";
+import CompletePage from "./pages/main/payment/CompletePage";
+import PaymentPage from "./pages/main/payment/PaymentPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -104,6 +107,10 @@ const App = () => {
                   element={<ReviewOrder />}
                 ></Route>
                 <Route path="checkout/:id" exact element={<Checkout />}></Route>
+                <Route path="payment" exact element={<PaymentPage />}>
+                  <Route path="checkout" element={<CheckoutForm />} />
+                  <Route path="complete" element={<CompletePage />} />
+                </Route>
                 <Route path="user-profile" exact element={<Profile />}>
                   <Route path="" exact element={<General />} />
                   <Route path="orders" exact element={<MyOrders />} />

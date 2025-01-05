@@ -28,6 +28,7 @@ const Form = () => {
     // isError: isActiveUserError,
     // error: activeUserError,
   } = useGetActiveUser();
+  console.log(activeUser);
 
   const {
     refetch: refetchDetails,
@@ -86,7 +87,9 @@ const Form = () => {
           showSuccessToast("Logged in Succesfully");
 
           if (user?.currentUserRole == "USER") {
-            const { data: userDetails } = await refetchDetails();
+            const { data: userDetails } = await refetchDetails(
+              user?.currentUserId
+            );
             setAuth({
               ...auth,
               userCredentials: userDetails,
@@ -100,7 +103,7 @@ const Form = () => {
             if (auth?.orders && auth?.restaurant) {
               navigateTo(`/details/checkout/${auth?.restaurant.id}`);
             } else {
-              navigateTo("/details");
+              // navigateTo("/details");
             }
           } else {
             navigateTo("/dashboard");

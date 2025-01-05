@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
-import { useGetSingleCourier } from "../../components/brokers/apicalls";
+import {
+  useGetSingleAdmin,
+  useGetSingleCourier,
+  useGetSingleRestaurant,
+  useGetSingleService,
+} from "../../components/brokers/apicalls";
 import { useOutletContext } from "react-router";
 import Breadcrumbs from "../../components/reusableComponents/Breadcrumbs";
 import { RiContactsBookFill } from "react-icons/ri";
@@ -11,19 +16,22 @@ import Loader from "../../components/loaders/Loader";
 import ErrorOccured from "../../components/notices/ErrorOccured";
 import TwoFALogic from "../../components/reusableComponents/TwoFALogic";
 
-const UserBasicDetails = ({ data }) => {
+const UserBasicDetails = ({ data, user_type }) => {
   const basicDetails = [
     {
       text: `${data?.address?.street} ${data?.address?.houseNumber}, ${data?.address?.city}`,
       icon: <IoLocationSharp />,
+      admin: user_type == "ADMIN" ? false : true,
     },
     {
       text: `${data?.contact}`,
       icon: <RiContactsBookFill />,
+      admin: user_type == "ADMIN" ? false : true,
     },
     {
       text: `${data?.credential?.email}`,
       icon: <MdEmail />,
+      admin: true,
     },
   ];
 
@@ -37,7 +45,7 @@ const UserBasicDetails = ({ data }) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-8">
               <p className="text-4xl font-extrabold">
-                {data?.firstName} {data?.lastName}
+                {data?.firstName || data?.name} {data?.lastName || ""}
               </p>
               <span className="text-sm text-gray-400">
                 ({data?.credential?.username})
@@ -45,17 +53,19 @@ const UserBasicDetails = ({ data }) => {
             </div>
 
             <div className="flex flex-col">
-              {basicDetails.map((item, idx) => {
-                return (
-                  <div
-                    className="flex items-center gap-4 mt-1 text-gray-400"
-                    key={idx}
-                  >
-                    <div>{item.icon}</div>
-                    <p className="text-xs">{item.text}</p>
-                  </div>
-                );
-              })}
+              {basicDetails
+                .filter((item) => item.admin)
+                .map((item, idx) => {
+                  return (
+                    <div
+                      className="flex items-center gap-4 mt-1 text-gray-400"
+                      key={idx}
+                    >
+                      <div>{item.icon}</div>
+                      <p className="text-xs">{item.text}</p>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
@@ -69,10 +79,30 @@ const MyProfileDetails = () => {
   const { data, isLoading, isError } = useGetSingleCourier(
     activeUser?.currentUserRole == "COURIER" && activeUser?.currentUserId
   );
-  // const USER_ROLES_AND_FETCHES = {
-  //   user: "COURIER",
-  //   endpoint:
-  // };
+  const {
+    data: serviceData,
+    isLoading: isServiceLoading,
+    isError: isServiceError,
+  } = useGetSingleService(
+    activeUser?.currentUserRole == "SERVICE" && activeUser?.currentUserId
+  );
+
+  const {
+    data: restaurantData,
+    isLoading: isRestaurantLoading,
+    isError: isRestaurantError,
+  } = useGetSingleRestaurant(
+    activeUser?.currentUserRole.includes("RESTAURANT") &&
+      activeUser?.currentUserId
+  );
+
+  const {
+    data: adminData,
+    isLoading: isAdminLoading,
+    isError: isAdminError,
+  } = useGetSingleAdmin(
+    activeUser?.currentUserRole == "ADMIN" && activeUser?.currentUserId
+  );
 
   const breadcrumbs = [
     {
@@ -97,10 +127,10 @@ const MyProfileDetails = () => {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading || isServiceLoading || isRestaurantLoading || isAdminLoading) {
     return <Loader />;
   }
-  if (isError) {
+  if (isError || isServiceError || isRestaurantError || isAdminError) {
     return <ErrorOccured />;
   }
   return (
@@ -108,9 +138,19 @@ const MyProfileDetails = () => {
       <Breadcrumbs breadcrumbs={breadcrumbs} />
       <div className="px-4 pb-4 grid grid-cols-4">
         <div className="col-span-2 grid grid-cols-2 gap-2">
-          <UserBasicDetails data={data} />
+          <UserBasicDetails
+            data={data || serviceData || restaurantData || adminData}
+            user_type={activeUser?.currentUserRole}
+          />
           {/* <div className="flex flex-col gap-2"> */}
-          <TwoFALogic username={data?.credential.username} />
+          <TwoFALogic
+            username={
+              data?.credential.username ||
+              serviceData?.credential.username ||
+              restaurantData?.credential.username ||
+              adminData?.credential.username
+            }
+          />
           {/* </div> */}
         </div>
       </div>
@@ -123,4 +163,5 @@ export default MyProfileDetails;
 UserBasicDetails.propTypes = {
   isLoading: PropTypes.bool,
   data: PropTypes.object,
+  user_type: PropTypes.string,
 };

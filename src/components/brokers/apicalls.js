@@ -555,6 +555,34 @@ export const useGetSingleCourier = (id) => {
   });
 };
 
+export const useGetSingleAdmin = (id) => {
+  const queryKey = ["admin", id];
+
+  const url = `/administration/${id}`;
+
+  const queryFn = () => {
+    return get(url);
+  };
+
+  const select = (response) => {
+    return response?.data;
+  };
+
+  const enabled = Boolean(id);
+
+  return useQuery({
+    queryKey,
+    queryFn,
+    select,
+    enabled,
+    refetch0nWindowFocus: false,
+    refetchOnmount: false,
+    refetch0nReconnect: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
 const fetchMenus = async ({ queryKey, pageParam = {} }) => {
   const [_key, restaurantID, category, rating, minPrice, maxPrice, name] =
     queryKey;
@@ -2281,6 +2309,29 @@ export const useUpdatePassword = () => {
       `/forgotten-password?username=${username}&password=${password}&repeatedPassword=${password}`,
       data
     );
+  };
+
+  return { mutationFn };
+};
+
+//create payment intent
+export const useCreatePaymentIntent = () => {
+  const mutationFn = (data) => {
+    const { orderId } = data;
+
+    return post(`/checkout?orderId=${orderId}`, data);
+  };
+
+  return { mutationFn };
+};
+
+//use makeorder
+
+export const useMakeOrder = () => {
+  const mutationFn = (data) => {
+    const response = post(`/order/make-order`, data);
+    console.log(response);
+    return response;
   };
 
   return { mutationFn };

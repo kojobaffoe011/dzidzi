@@ -44,7 +44,7 @@ const errorhandler = (error) => {
 
     return;
   }
-  if (error.message.includes('timeout')) {
+  if (error.message.includes("timeout")) {
     notifyError("Connection timed out");
 
     return;
@@ -84,45 +84,62 @@ axiosInstance.interceptors.response.use(
 // Add Axios request interceptor to set the token
 axiosInstance.interceptors.request.use(
   (config) => setToken(config),
+  // (response) => successHandler(response),
   (error) => Promise.reject(error)
 );
 
-// Function to make a POST request
 export const post = async (route, payload) => {
-  await new Promise((resolve, reject) => {
-    axiosInstance
-      .post(route, payload)
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
-  });
+  try {
+    const response = await axiosInstance.post(route, payload);
+    return response; // Return response for success
+  } catch (error) {
+    // Optional: log or handle specific errors here
+    console.error("Post Request Error:", error);
+    throw error; // Re-throw the error for the caller to handle
+  }
 };
 
-// Function to make a PUT request
-export const put = async (route, payload) =>
-  await new Promise((resolve, reject) => {
-    axiosInstance
-      .put(route, payload)
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
-  });
+export const put = async (route, payload) => {
+  try {
+    const response = await axiosInstance.put(route, payload);
+    return response; // Return response for success
+  } catch (error) {
+    // Optional: log or handle specific errors here
+    console.error("Post Request Error:", error);
+    throw error; // Re-throw the error for the caller to handle
+  }
+};
 
 // Function to make a GET request
 export const get = async (route) =>
   await new Promise((resolve, reject) => {
     axiosInstance
-      .get(route, config)
+      .get(route)
       .then((res) => resolve(res))
       .catch((err) => reject(err));
   });
+//    {
+//   try {
+//     const response = await axiosInstance.get(route);
+//     return response; // Return response for success
+//   } catch (error) {
+//     // Optional: log or handle specific errors here
+//     console.error("Post Request Error:", error);
+//     throw error; // Re-throw the error for the caller to handle
+//   }
+// };
 
 // Function to make a DELETE request
-export const delete_request = async (route) =>
-  await new Promise((resolve, reject) => {
-    axiosInstance
-      .delete(route)
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
-  });
+export const delete_request = async (route) => {
+  try {
+    const response = await axiosInstance.delete(route);
+    return response; // Return response for success
+  } catch (error) {
+    // Optional: log or handle specific errors here
+    console.error("Post Request Error:", error);
+    throw error; // Re-throw the error for the caller to handle
+  }
+};
 
 // Function to make multiple Axios requests simultaneously
 export const all = async (routes) =>

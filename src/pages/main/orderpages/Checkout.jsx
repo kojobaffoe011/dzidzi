@@ -20,8 +20,10 @@ import Spinner from "../../../components/loaders/Spinner";
 import DzidziLoader from "../../../components/loaders/DzidziLoader";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import {
+  useCreatePaymentIntent,
   useGetActiveUser,
   useGetActiveUserDetails,
+  useMakeOrder,
 } from "../../../components/brokers/apicalls";
 import { post } from "../../../utils/transport";
 
@@ -45,6 +47,8 @@ const Checkout = () => {
   const [orderNote, setOrderNote] = useState(null);
   const { auth, setAuth } = useAuth();
   const { id } = useParams();
+  const { mutationFn } = useCreatePaymentIntent();
+  const { mutationFn: makeOrderMut } = useMakeOrder();
   const navigate = useNavigate();
 
   const [showCartItems, setShowCartItems] = useState(false);
@@ -119,19 +123,18 @@ const Checkout = () => {
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["checkOutOrderItem"],
-    mutationFn: async (data) => {
-      const response = await post(`order/make-order`, data);
-      return response?.data;
-    },
-    onSuccess: async (data) => {
+    mutationFn: makeOrderMut,
+    onSuccess: async (response) => {
+      const { data } = response;
+
       setAuth((prevAuth) => ({
         ...prevAuth,
         open: false,
         orderDetails: data,
       }));
-      const orderID = data?.id;
+      const orderId = data?.id;
 
-      await mutateAsync({ orderID });
+      await mutateAsync({ orderId });
 
       showSuccessToast("Order Successfully Created");
     },
@@ -174,10 +177,7 @@ const Checkout = () => {
 
   const { mutateAsync, isPending: paymentIntentPending } = useMutation({
     mutationKey: ["createPaymentIntent"],
-    mutationFn: async (paymentData) => {
-      const response = await axios.post("checkout", paymentData);
-      return response.data;
-    },
+    mutationFn,
     onSuccess: (paymentResponse) => {
       // Handle success, navigate to success page
       console.log("Payment Intent Created:", paymentResponse);
