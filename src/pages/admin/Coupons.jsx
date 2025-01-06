@@ -115,14 +115,17 @@ const Coupons = ({ id }) => {
       <div className="flex flex-col mt-4">
         {pathname == "/dashboard/coupons" && (
           <div className="justify-end flex">
-            <Button
-              variant="primary"
-              rounded
-              className=" text-xs px-4 py-2"
-              onClick={() => handleOpenAddCouponModal()}
-            >
-              Add Coupon
-            </Button>
+            {(activeUser?.currentUserRole.includes("RESTAURANT") ||
+              activeUser?.currentUserRole == "ADMIN") && (
+              <Button
+                variant="primary"
+                rounded
+                className=" text-xs px-4 py-2"
+                onClick={() => handleOpenAddCouponModal()}
+              >
+                Add Coupon
+              </Button>
+            )}
           </div>
         )}
 

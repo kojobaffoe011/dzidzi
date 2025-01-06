@@ -10,8 +10,11 @@ import { useAddRestaurantBranch } from "../../brokers/apicalls";
 import { showErrorToast, showSuccessToast } from "../../../toast/Toast";
 import { timeOutError } from "../../../utils/config";
 import Spinner from "../../loaders/Spinner";
+import { useState } from "react";
+import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 
 const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
+  const [isFocused, setIsFocused] = useState(false);
   const userSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     email: yup
@@ -27,7 +30,7 @@ const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
     password: yup
       .string()
       .required("Password is required")
-      .min(8, "Password must be at least 8 characters long")
+      .min(12, "Password must be at least 12 characters long")
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%.%^()_#+=*?&-])[A-Za-z\d@$!%.%^()_#+=*?&-]+$/,
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol"
@@ -39,14 +42,43 @@ const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
     // agreeBox: yup.boolean().oneOf([true], "Please tick checkbox"),
   });
 
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
   const {
     register,
     handleSubmit,
-    // watch,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(userSchema),
   });
+
+  const password = watch("password");
+
+  const passReq = [
+    {
+      text: "Must be at least 12 characters long",
+      isSatisfied: password?.length >= 12,
+    },
+    {
+      text: "Must contain a lowercase character",
+      isSatisfied: /[a-z]/.test(password),
+    },
+    {
+      text: "Must contain an uppercase character",
+      isSatisfied: /[A-Z]/.test(password),
+    },
+    {
+      text: "Must contain a symbol - @$!%.%^()_#+=*?&-",
+      isSatisfied: /[@$!%.%^()_#+=*?&-]/.test(password),
+    },
+  ];
 
   const { mutationFn } = useAddRestaurantBranch();
 
@@ -107,7 +139,11 @@ const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
           <p className="text-xs">We need a sec to load your order details</p>
         </div>
       ) : ( */}
-      <form action="" onSubmit={handleSubmit(handleAddBranch)}>
+      <form
+        action=""
+        onSubmit={handleSubmit(handleAddBranch)}
+        className="overflow-scroll"
+      >
         <div className="flex flex-col mt-2 relative h-full">
           <div className="flex-col flex border-b mt-3">
             <p className="text-sm text-gray-600 font-bold">Basic Details</p>
@@ -197,14 +233,42 @@ const AddBranchModal = ({ top, right, open, setOpen, refetch }) => {
                 placeholder={"Enter username here"}
               />
               <div className="grid grid-cols-2 gap-2">
-                <CustomInput
-                  register={register}
-                  name={"password"}
-                  label={"PASSWORD"}
-                  type={"password"}
-                  required={true}
-                  placeholder={"Enter password"}
-                />
+                <div className="flex flex-col gap-1 relative">
+                  <CustomInput
+                    register={register}
+                    name={"password"}
+                    label={"PASSWORD"}
+                    type={"password"}
+                    required={true}
+                    placeholder={"Enter password"}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                  />
+                  {isFocused && (
+                    <div className="flex flex-col mt-1">
+                      {passReq.map((item, idx) => {
+                        return (
+                          <div className="flex" key={idx}>
+                            {item?.isSatisfied ? (
+                              <IoCheckmarkCircle className="text-green-600" />
+                            ) : (
+                              <IoCloseCircle className="text-red-600" />
+                            )}
+                            <p
+                              className={`text-xs ${
+                                item?.isSatisfied
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {item.text}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
                 <CustomInput
                   register={register}
                   name={"repeatpassword"}

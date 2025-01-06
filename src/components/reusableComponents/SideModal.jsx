@@ -40,11 +40,8 @@ const SideModal = ({
     <>
       {open && (
         <div
-          className={`p-4 flex flex-col h-[1015px] shadow-md absolute ${
-            right ? right : "right-4"
-          } ${top ? top : "top-[-0px]"} ${bottom ? bottom : " bottom-5"} ${
-            left ? left : " "
-          } w-[450px] ${zindex || "z-[10]"} bg-white shadow-lg  rounded-lg`}
+          className={`p-4 flex flex-col h-[1015px] shadow-md fixed right-[15px] top-[15px] bottom-5
+           w-[450px] z-[10] bg-white shadow-lg  rounded-lg`}
         >
           <div className="mt-4 flex justify-between items-center border-b">
             <div className="flex flex-col">

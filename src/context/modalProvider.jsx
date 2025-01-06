@@ -34,7 +34,7 @@ export const ModalProvider = ({ children }) => {
       <div className="relative">
         {open && (
           <div
-            className="bg-black opacity-[0.5] absolute right-0 h-screen w-full z-[10]"
+            className="bg-black opacity-[0.5] fixed right-0 h-full w-full z-[10]"
             // onClick={() => closeModal()}
           />
         )}

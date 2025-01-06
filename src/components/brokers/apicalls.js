@@ -1274,8 +1274,6 @@ export const useRestaurantCompleteAccount = () => {
       address,
     } = data;
 
-    console.log(data);
-
     // Create a FormData object
     const formData = new FormData();
     formData.append("name", name);
@@ -1578,7 +1576,7 @@ export const useSignup = () => {
 export const useAddOrderItem = () => {
   const mutationFn = (data) => {
     const response = post(`/item`, data);
-    return response?.data;
+    return response;
   };
 
   return { mutationFn };
@@ -1588,7 +1586,7 @@ export const useAddOrderItem = () => {
 export const useAddRestaurantBranch = () => {
   const mutationFn = (data) => {
     const response = post(`/restaurant/add-branch`, data);
-    return response?.data;
+    return response;
   };
 
   return { mutationFn };
@@ -2294,7 +2292,7 @@ export const useUpdateCourierAvailability = () => {
 //update address
 export const useUpdateAddress = () => {
   const mutationFn = (data) => {
-    return put(`/address`, data);
+    return put(`/user`, data);
   };
 
   return { mutationFn };
@@ -2330,7 +2328,6 @@ export const useCreatePaymentIntent = () => {
 export const useMakeOrder = () => {
   const mutationFn = (data) => {
     const response = post(`/order/make-order`, data);
-    console.log(response);
     return response;
   };
 

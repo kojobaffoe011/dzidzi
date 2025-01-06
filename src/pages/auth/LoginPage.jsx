@@ -28,7 +28,6 @@ const Form = () => {
     // isError: isActiveUserError,
     // error: activeUserError,
   } = useGetActiveUser();
-  console.log(activeUser);
 
   const {
     refetch: refetchDetails,
@@ -103,7 +102,7 @@ const Form = () => {
             if (auth?.orders && auth?.restaurant) {
               navigateTo(`/details/checkout/${auth?.restaurant.id}`);
             } else {
-              // navigateTo("/details");
+              navigateTo("/details");
             }
           } else {
             navigateTo("/dashboard");

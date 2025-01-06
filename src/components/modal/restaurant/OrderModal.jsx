@@ -209,7 +209,7 @@ const OrderModal = ({ orderID, top, right, open, setOpen, refetch }) => {
                     <div key={idx} className="grid-cols-3 grid mb-2">
                       <div className="flex flex-col ">
                         <p className="font-bold text-sm">
-                          {item.extra ? item.extra.name : item.menu.name}
+                          {item.extra ? item.extra.name : item.menu?.name}
                         </p>
                         <p className="font-light text-xs">
                           {item.extra ? "extra" : "menu"}
@@ -224,7 +224,7 @@ const OrderModal = ({ orderID, top, right, open, setOpen, refetch }) => {
                         <p className="font-normal text-sm">
                           {(item.extra
                             ? item.extra.price * item.quantity
-                            : item.menu.price * item.quantity
+                            : item.menu?.price * item.quantity
                           ).toFixed(2)}
                         </p>
                       </div>

@@ -70,7 +70,7 @@ const Orders = () => {
 
   const tablehead = [
     { title: "ORDER DETAILS", sortable: true, sortKey: "ORDER_NUMBER" },
-    { title: "Price", sortable: true, sortKey: "PRICE" },
+    { title: "Price", sortable: false, sortKey: "PRICE" },
     { title: "STATUS", sortable: true, sortKey: "OSTATUS" },
     { title: "USER", sortable: false },
     { title: "COURIER", sortable: false },

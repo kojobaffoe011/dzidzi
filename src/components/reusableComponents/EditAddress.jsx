@@ -21,6 +21,7 @@ const EditAddress = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(addressSchema),
@@ -30,6 +31,7 @@ const EditAddress = () => {
     mutationKey: ["update-address"],
     mutationFn,
     onSuccess: () => {
+      reset();
       showSuccessToast("Address updated successfully");
     },
     onError: (error) => {

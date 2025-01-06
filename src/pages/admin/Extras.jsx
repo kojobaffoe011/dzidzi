@@ -157,16 +157,18 @@ const Extras = ({ id, top }) => {
         <div className="mt-2 flex flex-col gap-2">
           <p className="font-bold text-2xl">Extras</p>
           <div className="flex justify-end">
-            <Button
-              variant="primary"
-              className="px-2 py-2 text-sm"
-              rounded
-              onClick={() => {
-                handleOpenModal();
-              }}
-            >
-              Add Extras
-            </Button>
+            {activeUser?.currentUserRole.includes("RESTAURANT") && (
+              <Button
+                variant="primary"
+                className="px-2 py-2 text-sm"
+                rounded
+                onClick={() => {
+                  handleOpenModal();
+                }}
+              >
+                Add Extras
+              </Button>
+            )}
           </div>
         </div>
       )}

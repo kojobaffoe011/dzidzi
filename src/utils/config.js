@@ -237,8 +237,8 @@ export const activeFilters = (filters, type) => {
 };
 
 export const position = {
-  top: "top-[-465px]",
-  right: "right-[-380px]",
+  top: "top-[15px]",
+  right: "right-[15px]",
 };
 
 export const setLoginTimestamp = () => {

@@ -20,7 +20,7 @@ const OTPField = () => {
   const { mutationFn } = useVerify2FACode();
   const { navigateTo } = useNavigateTo();
   const { auth, setAuth } = useAuth();
-  const [otp, setOtp] = useState(new Array(4).fill(""));
+  const [otp, setOtp] = useState(new Array(6).fill(""));
   const [activeUser, setActiveUser] = useState(null);
   const [activeOTP, setActiveOTP] = useState(0);
   const inputRef = useRef(null);

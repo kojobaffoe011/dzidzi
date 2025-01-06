@@ -188,7 +188,6 @@ import OrderModal from "../../../components/modal/restaurant/OrderModal";
 const MyOrders = ({ userID, position }) => {
   const [orderID, setOrderID] = useState(null);
   const [open, setOpen] = useState(null);
-  const { auth, setAuth } = useAuth();
   const [, data] = useOutletContext();
 
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,7 +1,10 @@
 import { useCallback, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
-import { useCourierListPaged } from "../../components/brokers/apicalls";
+import {
+  useCourierListPaged,
+  useGetActiveUser,
+} from "../../components/brokers/apicalls";
 import Button from "../../components/reusableComponents/Button";
 import {
   activeFilters,
@@ -70,6 +73,13 @@ const Couriers = () => {
     currentPage
   );
 
+  const {
+    data: activeUser,
+    isLoading: activeUserLoading,
+    // isError: isActiveUserError,
+    // error: activeUserError,
+  } = useGetActiveUser();
+
   let courierData = courierList?.pages?.flatMap((page) => page?.data);
   const numberOfPages = courierData?.[0].totalPages;
 
@@ -95,16 +105,18 @@ const Couriers = () => {
         <p className="font-bold text-2xl">Couriers</p>
         {pathname == "/dashboard/couriers" && (
           <div className="flex justify-end">
-            <Button
-              variant="primary"
-              className="px-2 py-2 text-sm"
-              rounded
-              onClick={() => {
-                handleOpenModal();
-              }}
-            >
-              Add Courier
-            </Button>
+            {activeUser?.currentUserRole.includes("RESTAURANT") && (
+              <Button
+                variant="primary"
+                className="px-2 py-2 text-sm"
+                rounded
+                onClick={() => {
+                  handleOpenModal();
+                }}
+              >
+                Add Courier
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -146,7 +158,7 @@ const Couriers = () => {
           totalCount={6}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          isLoading={courierLoading}
+          isLoading={courierLoading || activeUserLoading}
           numberOfPages={numberOfPages}
           isFetchingNextPage={courierFetchingNextPage}
           dataHasNextPage={courierHasNextPage}
